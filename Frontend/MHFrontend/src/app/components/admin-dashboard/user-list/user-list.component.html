@@ -1,0 +1,144 @@
+<div class="bg-white rounded-lg p-4 md:p-6 shadow-md">
+    <!-- Header  -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <div class="w-full sm:max-w-[350px]">
+        <div class="flex w-full">
+          <input 
+            type="text" 
+            placeholder="Search users..." 
+            [(ngModel)]="searchTerm" 
+            (input)="filterUsers()"
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:border-[#E69B6B] focus:ring-2 focus:ring-[rgba(230,155,107,0.2)]">
+          <button class="bg-[#E69B6B] text-white border-0 rounded-r-md px-3 py-2 cursor-pointer">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Items per page  -->
+      <div class="flex items-center">
+        <select 
+          [(ngModel)]="itemsPerPage" 
+          (change)="updatePagination()"
+          class="p-2 border border-gray-300 rounded-md outline-none text-sm">
+          <option [value]="10">10 per page</option>
+          <option [value]="20">20 per page</option>
+          <option [value]="50">50 per page</option>
+          <option [value]="100">100 per page</option>
+        </select>
+      </div>
+    </div>
+  
+    <!-- Desktop Table View (hidden on small screens) -->
+    <div class="hidden sm:block overflow-x-auto">
+      <table class="w-full border-collapse text-sm">
+        <thead>
+          <tr>
+            <th class="p-3 text-left border-b-2 border-gray-200 text-gray-600 font-semibold cursor-pointer hover:text-[#E69B6B]" 
+                (click)="sortBy('name')">
+              Username <i class="fas fa-sort"></i>
+            </th>
+            <th class="p-3 text-left border-b-2 border-gray-200 text-gray-600 font-semibold cursor-pointer hover:text-[#E69B6B]" 
+                (click)="sortBy('phone')">
+              Phone Number <i class="fas fa-sort"></i>
+            </th>
+            <th class="p-3 text-left border-b-2 border-gray-200 text-gray-600 font-semibold cursor-pointer hover:text-[#E69B6B]" 
+                (click)="sortBy('email')">
+              Email <i class="fas fa-sort"></i>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of paginatedUsers">
+            <td class="p-3 border-b border-gray-200">{{ user.name }}</td>
+            <td class="p-3 border-b border-gray-200">{{ user.phone }}</td>
+            <td class="p-3 border-b border-gray-200">{{ user.email }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Mobile Card View (shown only on small screens) -->
+    <div class="sm:hidden space-y-4">
+      <div 
+        *ngFor="let user of paginatedUsers" 
+        class="border border-gray-200 rounded-lg p-4 shadow-sm">
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-medium text-[#E69B6B]">{{ user.name }}</span>
+        </div>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-start">
+            <span class="w-24 text-gray-500">Phone:</span>
+            <span>{{ user.phone }}</span>
+          </div>
+          <div class="flex items-start">
+            <span class="w-24 text-gray-500">Email:</span>
+            <span class="break-all">{{ user.email }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Empty State -->
+    <div class="py-12 px-4 text-center text-gray-600" *ngIf="paginatedUsers.length === 0">
+      <div class="text-5xl text-gray-300 mb-4">
+        <i class="fas fa-users-slash"></i>
+      </div>
+      <h3 class="mb-2 text-gray-800 text-xl">No Users Found</h3>
+      <p class="max-w-[300px] mx-auto">Try adjusting your search or filter to find what you're looking for.</p>
+    </div>
+  
+    <!-- Pagination -->
+<div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 text-sm">
+    <div class="text-gray-600 text-center sm:text-left order-2 sm:order-1 text-xs sm:text-sm">
+      Showing {{ startIndex + 1 }} to {{ endIndex }} of {{ filteredUsers.length }} users
+    </div>
+    
+    <div class="flex gap-1 order-1 sm:order-2">
+      <!-- First page button  -->
+      <button 
+        [disabled]="currentPage === 1" 
+        (click)="goToPage(1)"
+        class="hidden xs:flex w-8 h-8 rounded-md border border-gray-300 bg-white text-gray-800 items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
+        <i class="fas fa-angle-double-left"></i>
+      </button>
+      
+      <!-- Previous page button -->
+      <button 
+        [disabled]="currentPage === 1" 
+        (click)="goToPage(currentPage - 1)"
+        class="w-8 h-8 rounded-md border border-gray-300 bg-white text-gray-800 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
+        <i class="fas fa-angle-left"></i>
+      </button>
+      
+      <!-- Page numbers -->
+      <ng-container *ngFor="let page of getVisiblePageNumbers()">
+        <button 
+          [ngClass]="{
+            'bg-[#E69B6B] text-white border-[#E69B6B]': currentPage === page, 
+            'bg-white text-gray-800 border-gray-300': currentPage !== page
+          }"
+          (click)="goToPage(page)"
+          class="w-8 h-8 rounded-md border flex items-center justify-center">
+          {{ page }}
+        </button>
+      </ng-container>
+      
+      <!-- Next page button -->
+      <button 
+        [disabled]="currentPage === totalPages" 
+        (click)="goToPage(currentPage + 1)"
+        class="w-8 h-8 rounded-md border border-gray-300 bg-white text-gray-800 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
+        <i class="fas fa-angle-right"></i>
+      </button>
+      
+      <!-- Last page button  -->
+      <button 
+        [disabled]="currentPage === totalPages" 
+        (click)="goToPage(totalPages)"
+        class="hidden xs:flex w-8 h-8 rounded-md border border-gray-300 bg-white text-gray-800 items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
+        <i class="fas fa-angle-double-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
