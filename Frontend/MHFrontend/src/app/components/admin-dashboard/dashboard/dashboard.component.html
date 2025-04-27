@@ -1,0 +1,75 @@
+<div class="flex flex-col md:flex-row h-screen bg-[#f5f7fa] font-['Segoe_UI',Tahoma,Geneva,Verdana,sans-serif]">
+    <!-- Mobile Menu Button -->
+    <button 
+      (click)="toggleSidebar()"
+      class="md:hidden absolute top-4 left-4 z-20 p-2 bg-white rounded-md ">
+      <i class="fas" [ngClass]="sidebarOpen ? 'fa-times' : 'fa-bars'"></i>
+    </button>
+
+    <!-- Sidebar Navigation -->
+    <aside 
+      [ngClass]="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}"
+      class="fixed md:static md:translate-x-0 top-0 left-0 h-full w-[250px] bg-white text-[#333] flex flex-col shadow-md z-10 transition-transform duration-300">
+      <div class="p-6 text-xl font-bold text-[#E69B6B] text-center border-b border-[#eee]">
+        Madinah Hub
+      </div>
+      
+      <nav class="flex-1 p-6">
+        <ul class="space-y-2">
+          <li>
+            <a [class.bg-[#E69B6B]]="activeComponent === 'dashboard-home'" 
+               [class.text-white]="activeComponent === 'dashboard-home'"
+               [class.font-medium]="activeComponent === 'dashboard-home'"
+               class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-white transition-all duration-300 block"
+               (click)="setActiveComponent('dashboard-home'); closeSidebarOnMobile()">
+              <i class="fas fa-home mr-2.5 w-5 text-center"></i> Dashboard
+            </a>
+          </li>
+          <li>
+            <a [class.bg-[#E69B6B]]="activeComponent === 'user-list'" 
+               [class.text-white]="activeComponent === 'user-list'"
+               [class.font-medium]="activeComponent === 'user-list'"
+               class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-white transition-all duration-300 block"
+               (click)="setActiveComponent('user-list'); closeSidebarOnMobile()">
+              <i class="fas fa-users mr-2.5 w-5 text-center"></i> Users
+            </a>
+          </li>
+        </ul>
+      </nav>
+  
+      <div class="p-4 text-center text-sm text-[#888] border-t border-[#eee]">
+        &copy; 2025 Madinah Hub
+      </div>
+    </aside>
+  
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col overflow-hidden">
+      <!-- Top Header -->
+      <header class="bg-white py-4 md:px-8 pl-16 md:pl-8 pr-4 flex justify-between items-center border-b border-[#eee] h-[60px]">
+        <div>
+          <h1 class="text-xl font-medium text-[#333] m-0">{{ getPageTitle() }}</h1>
+        </div>
+        
+        <div class="flex items-center">
+          <div class="flex items-center">
+            <button class="py-1.5 px-3 bg-[#E69B6B] text-white border-0 rounded cursor-pointer text-sm">
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Dashboard Content -->
+      <div class="flex-1 p-4 md:p-6 bg-[#f5f7fa] overflow-auto">
+        <!-- Component Views -->
+        <app-user-list *ngIf="activeComponent === 'user-list'"></app-user-list>
+      </div>
+    </main>
+
+    <!-- Overlay for mobile -->
+    <div 
+      *ngIf="sidebarOpen" 
+      (click)="closeSidebarOnMobile()"
+      class="md:hidden fixed inset-0 bg-black bg-opacity-50 z-0">
+    </div>
+</div>
