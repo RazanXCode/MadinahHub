@@ -1,16 +1,42 @@
-<nav class="justify-between h-8">
-    <div class="p-2">
-        <img src="../../../assets/logo.png" alt="Medinah Hub" class="w-56">
-    </div>       
-</nav>
-<div class="justify-around flex p-16 ">
-    <div class="w-3/4 flex flex-col justify-center  ">
-        <h1 class="text-3xl font-bold">Connect, Explore, and Belong — All in One Hub</h1>
-        <p>Welcome to Medina Hub System — the ultimate digital space for visitors to discover local communities, 
-            book events, and engage with others in real time. Whether you're here for a short stay or an extended visit, Medina Hub helps you feel right at home by making every experience more meaningful and connected.</p>
-        <button>Get Started</button>
+<!-- Navbar with logo -->
+<nav class="flex items-center px-6 py-4">
+    <div>
+      <img src="../../../assets/logo.png" alt="Madinah Hub" class="w-48">
     </div>
-    <div class="w-1/3 -space-x-36">
-            <img src="../../../assets/landing1.png" alt="">
+  </nav>
+  
+  <!-- Main content section with text and image side by side -->
+  <div class="container mx-auto flex flex-wrap items-center px-6 py-12">
+    <!-- Text content - taking exactly 1/2 of the width -->
+    <div class="w-1/2 pr-8 ">
+      <h1 class="text-4xl font-bold mb-6">Connect, Explore, and Belong — All in One Hub</h1>
+      
+      <p class="text-lg mb-8">
+        Welcome to Medina Hub System — the ultimate digital space
+        for visitors to discover local communities, book events, and
+        engage with others in real time. Whether you're here for a
+        short stay or an extended visit, Medina Hub helps you feel right
+        at home by making every experience more meaningful and
+        connected.
+      </p>
+      
+      <div class="space-y-4">
+        <!-- Get Started button with styling -->
+        <button class="bg-blue-400 hover:bg-blue-500 text-white font-medium py-3 px-8 rounded-md transition duration-300">
+          Get Started
+        </button>
+        
+        <!-- Explore Communities button with outline styling -->
+        <div class="mt-4">
+          <button class="border border-gray-400 hover:border-gray-600 text-gray-700 font-medium py-3 px-8 rounded-md transition duration-300">
+            Explore Communities
+          </button>
+        </div>
+      </div>
     </div>
-</div>
+    
+    <!-- Image section - taking exactly 1/2 of the width -->
+    <div class="w-1/2">
+      <img src="../../../assets/landing1.png" alt="People connecting" class="w-full">
+    </div>
+  </div>
