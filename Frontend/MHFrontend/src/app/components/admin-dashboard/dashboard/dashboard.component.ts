@@ -1,13 +1,17 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserListComponent } from '../user-list/user-list.component';
+import { ManageCommunitiesComponent } from '../manage-communities/manage-communities.component';
+import { CommunityFormComponent } from '../community-form/community-form.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
     CommonModule,
-    UserListComponent
+    UserListComponent,
+    ManageCommunitiesComponent,
+    CommunityFormComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
@@ -26,6 +30,10 @@ export class DashboardComponent {
         return 'Dashboard Overview';
       case 'user-list':
         return 'User Management';
+      case 'manage-communities':
+        return 'Communities';
+      case 'community-form':
+        return 'Create/Edit Community';
       default:
         return 'Dashboard';
     }
