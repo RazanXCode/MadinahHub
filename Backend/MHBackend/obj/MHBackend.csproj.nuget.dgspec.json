@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\razan\\OneDrive\\Desktop\\MadinahHub\\Backend\\MHBackend\\MHBackend.csproj": {}
+    "C:\\Users\\a7mad\\Desktop\\vsFolder\\TaibahValley\\FinalProject\\MadinahHub\\Backend\\MHBackend\\MHBackend.csproj": {}
   },
   "projects": {
-    "C:\\Users\\razan\\OneDrive\\Desktop\\MadinahHub\\Backend\\MHBackend\\MHBackend.csproj": {
+    "C:\\Users\\a7mad\\Desktop\\vsFolder\\TaibahValley\\FinalProject\\MadinahHub\\Backend\\MHBackend\\MHBackend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\razan\\OneDrive\\Desktop\\MadinahHub\\Backend\\MHBackend\\MHBackend.csproj",
+        "projectUniqueName": "C:\\Users\\a7mad\\Desktop\\vsFolder\\TaibahValley\\FinalProject\\MadinahHub\\Backend\\MHBackend\\MHBackend.csproj",
         "projectName": "MHBackend",
-        "projectPath": "C:\\Users\\razan\\OneDrive\\Desktop\\MadinahHub\\Backend\\MHBackend\\MHBackend.csproj",
-        "packagesPath": "C:\\Users\\razan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\razan\\OneDrive\\Desktop\\MadinahHub\\Backend\\MHBackend\\obj\\",
+        "projectPath": "C:\\Users\\a7mad\\Desktop\\vsFolder\\TaibahValley\\FinalProject\\MadinahHub\\Backend\\MHBackend\\MHBackend.csproj",
+        "packagesPath": "C:\\Users\\a7mad\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\a7mad\\Desktop\\vsFolder\\TaibahValley\\FinalProject\\MadinahHub\\Backend\\MHBackend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\razan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\a7mad\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
