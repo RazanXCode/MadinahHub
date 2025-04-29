@@ -27,7 +27,7 @@ namespace MHBackend.Controllers
 
             return events.Select(e => new EventReadDto
             {
-                EventId = e.EventId,
+
                 PublicEventId = e.PublicEventId,
                 Title = e.Title,
                 Description = e.Description,
@@ -54,7 +54,7 @@ namespace MHBackend.Controllers
 
             return new EventReadDto
             {
-                EventId = e.EventId,
+
                 PublicEventId = e.PublicEventId,
                 Title = e.Title,
                 Description = e.Description,

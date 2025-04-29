@@ -4,7 +4,7 @@ namespace MHBackend.DTOs
 {
     public class EventReadDto
     {
-        public int EventId { get; set; }
+      
         public string PublicEventId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
