@@ -31,7 +31,7 @@
         <select 
           [(ngModel)]="filterType" 
           (change)="filterEvents()"
-          class="py-1.5 px-3 border border-gray-300 rounded-md outline-none bg-white">
+          class=" text-xs py-1.5 px-3 border border-gray-300 rounded-md outline-none bg-white">
           <option value="">All Types</option>
           <option value="public">Public</option>
           <option value="private">Private</option>
@@ -43,7 +43,7 @@
         <select 
           [(ngModel)]="filterLocation" 
           (change)="filterEvents()"
-          class="py-1.5 px-3 border border-gray-300 rounded-md outline-none bg-white">
+          class="text-xs py-1.5 px-3 border border-gray-300 rounded-md outline-none bg-white">
           <option value="">All Locations</option>
           <option value="online">Online</option>
           <option value="in-person">In-Person</option>
@@ -54,7 +54,7 @@
         <select 
           [(ngModel)]="sortBy" 
           (change)="filterEvents()"
-          class="py-1.5 px-3 border border-gray-300 rounded-md outline-none bg-white">
+          class="text-xs py-1.5 px-3 border border-gray-300 rounded-md outline-none bg-white">
           <option value="date">Date (Upcoming First)</option>
           <option value="title">Event Name</option>
           <option value="created">Recently Created</option>
@@ -75,8 +75,8 @@
             class="absolute top-2.5 right-2.5 py-1 px-2 rounded-full text-xs font-semibold capitalize"
             [ngClass]="{
               'bg-green-100 text-green-800': getEventStatus(event) === 'upcoming',
-              'bg-amber-100 text-amber-800': getEventStatus(event) === 'ongoing',
-              'bg-gray-200 text-gray-700': getEventStatus(event) === 'completed'
+              'bg-amber-100 text-amber-800': getEventStatus(event) === 'active',
+              'bg-gray-200 text-gray-700': getEventStatus(event) === 'finished',
             }">
             {{ getEventStatus(event) }}
           </div>

@@ -147,11 +147,11 @@ export class ManageEventsComponent implements OnInit {
   getEventStatus(event: Event): string {
     const now = new Date();
     if (event.startDate > now) {
-      return 'upcoming';
+      return 'Upcoming';
     } else if (event.endDate < now) {
-      return 'completed';
+      return 'Active';
     } else {
-      return 'ongoing';
+      return 'Finished';
     }
   }
 

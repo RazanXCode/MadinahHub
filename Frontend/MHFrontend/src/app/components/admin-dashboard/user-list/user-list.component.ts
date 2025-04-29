@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 interface User {
   id: number;
   name: string;
-  email: string;
+  createdAt: Date;
   phone: string;  
 }
 
@@ -53,10 +53,16 @@ export class UserListComponent implements OnInit {
       const lineNumber = Math.floor(1000 + Math.random() * 9000);
       const phone = `(${areaCode}) ${prefix}-${lineNumber}`;
       
+      // Generate a random date 
+      const today = new Date();
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(today.getFullYear() - 1);
+      const createdAt = new Date(oneYearAgo.getTime() + Math.random() * (today.getTime() - oneYearAgo.getTime()));
+
       this.users.push({
         id: i,
         name: `User ${i}`,
-        email: `user${i}@example.com`,
+        createdAt: createdAt,
         phone: phone  
       });
     }
@@ -70,7 +76,7 @@ export class UserListComponent implements OnInit {
       const term = this.searchTerm.toLowerCase();
       filtered = filtered.filter(user => 
         user.name.toLowerCase().includes(term) || 
-        user.email.toLowerCase().includes(term)
+        this.formatDate(user.createdAt).includes(term)
       );
     }
 
@@ -90,6 +96,14 @@ export class UserListComponent implements OnInit {
 
     this.filteredUsers = filtered;
     this.updatePagination();
+  }
+  formatDate(date: Date): string {
+    // DD/MM/YYYY format
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    
+    return `${day}/${month}/${year}`;
   }
 
   updatePagination() {

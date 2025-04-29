@@ -27,6 +27,13 @@ export class EventFormComponent implements OnInit, OnChanges {
     { value: 'private', label: 'Private' }
   ];
   
+  communities: any[] = [
+    { id: 1, name: 'Health & Wellness' },
+    { id: 2, name: 'Medical Professionals' },
+    { id: 3, name: 'Patient Support' },
+    { id: 4, name: 'Fitness Group' }
+  ];
+  
   constructor(private fb: FormBuilder) {}
   
   ngOnInit(): void {
@@ -38,30 +45,32 @@ export class EventFormComponent implements OnInit, OnChanges {
       this.initForm();
     }
     
-    if (this.eventData && this.editMode) {
-      this.populateForm();
+    // Check if visibility or edit mode changed
+    if (changes['isVisible'] && changes['isVisible'].currentValue === true) {
+      if (this.editMode && this.eventData) {
+        // In edit mode, populate form with event data
+        this.populateForm();
+      } else {
+        // In create mode, reset the form
+        this.resetForm();
+      }
     }
   }
   
   initForm(): void {
     this.eventForm = this.fb.group({
       title: ['', [Validators.required]],
-      type: ['public', [Validators.required]], // Default to public
+      community: ['', [Validators.required]], 
+      type: ['public', [Validators.required]],
       capacity: [50, [Validators.required, Validators.min(1), Validators.max(1000)]],
+      imageUrl: [''], 
+      location: ['', [Validators.required]],
       description: ['', [Validators.required]],
-      isOnline: [false],
-      location: [''],
-      meetingUrl: [''],
       startDate: ['', [Validators.required]],
-      startTime: ['', [Validators.required]],
       endDate: ['', [Validators.required]],
-      endTime: ['', [Validators.required]]
     });
     
-    this.eventForm.get('isOnline')?.valueChanges.subscribe(isOnline => {
-      this.updateValidators();
-    });
-    
+    // Monitor type changes for capacity validation
     this.eventForm.get('type')?.valueChanges.subscribe(type => {
       const capacityControl = this.eventForm.get('capacity');
       if (type === 'private') {
@@ -81,6 +90,21 @@ export class EventFormComponent implements OnInit, OnChanges {
     });
   }
   
+  resetForm(): void {
+    this.eventForm.reset({
+      title: '',
+      community: '',
+      type: 'public',
+      capacity: 50,
+      imageUrl: '',
+      location: '',
+      description: '',
+      startDate: '',
+      endDate: '',
+    });
+    this.imagePreview = null;
+  }
+  
   populateForm(): void {
     if (!this.eventData) return;
     
@@ -89,52 +113,44 @@ export class EventFormComponent implements OnInit, OnChanges {
     
     this.eventForm.patchValue({
       title: this.eventData.title,
+      community: this.eventData.community || '',
       type: this.eventData.type || 'public',
       capacity: this.eventData.capacity || 50,
       description: this.eventData.description,
-      isOnline: this.eventData.isOnline,
-      location: this.eventData.location,
-      meetingUrl: this.eventData.meetingUrl,
+      location: this.eventData.location || '',
       startDate: this.formatDate(startDate),
-      startTime: this.formatTime(startDate),
       endDate: this.formatDate(endDate),
-      endTime: this.formatTime(endDate)
     });
     
-    if (this.eventData.image) {
-      this.imagePreview = this.eventData.image;
+    if (this.eventData.coverImage) {
+      this.imagePreview = this.eventData.coverImage;
     }
-    
-    this.updateValidators();
   }
   
-  setOnlineMode(isOnline: boolean): void {
-    this.eventForm.patchValue({ isOnline });
-    this.updateValidators();
-  }
-  
-  updateValidators(): void {
-    const isOnline = this.eventForm.get('isOnline')?.value;
+  setEventType(type: 'public' | 'private'): void {
+    this.eventForm.patchValue({ type });
     
-    if (isOnline) {
-      this.eventForm.get('location')?.clearValidators();
-      this.eventForm.get('meetingUrl')?.setValidators([
+    // capacity validation based on type
+    const capacityControl = this.eventForm.get('capacity');
+    if (type === 'private') {
+      capacityControl?.setValidators([
         Validators.required, 
-        Validators.pattern('https?://.+')
+        Validators.min(1), 
+        Validators.max(100)
       ]);
     } else {
-      this.eventForm.get('meetingUrl')?.clearValidators();
-      this.eventForm.get('location')?.setValidators([Validators.required]);
+      capacityControl?.setValidators([
+        Validators.required, 
+        Validators.min(1), 
+        Validators.max(1000)
+      ]);
     }
-    
-    this.eventForm.get('location')?.updateValueAndValidity();
-    this.eventForm.get('meetingUrl')?.updateValueAndValidity();
+    capacityControl?.updateValueAndValidity();
   }
   
   onImageSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-
       const reader = new FileReader();
       reader.onload = (e) => {
         this.imagePreview = e.target?.result as string;
@@ -151,11 +167,8 @@ export class EventFormComponent implements OnInit, OnChanges {
     return date.toISOString().split('T')[0];
   }
   
-  formatTime(date: Date): string {
-    return date.toTimeString().substring(0, 5);
-  }
-  
   closeForm(): void {
+    this.resetForm();  // Reset form when closing
     this.formClose.emit();
   }
   
@@ -172,23 +185,18 @@ export class EventFormComponent implements OnInit, OnChanges {
     // Prepare form data
     const formData = this.eventForm.value;
     
-    // Combine date and time into Date objects
-    const startDateTime = this.combineDateTime(formData.startDate, formData.startTime);
-    const endDateTime = this.combineDateTime(formData.endDate, formData.endTime);
-    
     // Create the event object to submit
     const eventData = {
-      id: this.eventData?.id,
+      id: this.editMode ? this.eventData?.id : null, // Only include ID when editing
       title: formData.title,
+      community: formData.community,
       type: formData.type,
       capacity: formData.capacity,
       description: formData.description,
-      isOnline: formData.isOnline,
-      location: formData.isOnline ? null : formData.location,
-      meetingUrl: formData.isOnline ? formData.meetingUrl : null,
-      startDate: startDateTime,
-      endDate: endDateTime,
-      coverImage: this.imagePreview
+      location: formData.location,
+      startDate: new Date(formData.startDate),
+      endDate: new Date(formData.endDate),
+      coverImage: this.imagePreview || formData.imageUrl || null
     };
     
     // Submit event data 
@@ -196,10 +204,4 @@ export class EventFormComponent implements OnInit, OnChanges {
     this.isSubmitting = false;
   }
   
-  // combine date and time strings into a Date object
-  combineDateTime(dateStr: string, timeStr: string): Date {
-    const [year, month, day] = dateStr.split('-').map(Number);
-    const [hours, minutes] = timeStr.split(':').map(Number);
-    return new Date(year, month - 1, day, hours, minutes);
-  }
 }
