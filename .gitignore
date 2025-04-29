@@ -1,0 +1,5 @@
+# Ignore build results
+bin/
+obj/
+out/
+Migrations/
