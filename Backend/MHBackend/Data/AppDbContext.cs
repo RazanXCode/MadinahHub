@@ -22,7 +22,7 @@ namespace MHBackend.Data
                 
             // Make UserIdPublic unique as well
             modelBuilder.Entity<User>()
-                .HasIndex(u => u.UserIdPublic)
+                .HasIndex(u => u.PublicUserId)
                 .IsUnique();
                 
             // Configure the enum to be stored as a string

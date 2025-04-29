@@ -15,19 +15,19 @@ namespace MHBackend.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FirebaseUid = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserIdPublic = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PublicUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.UserId);
                 });
 
             migrationBuilder.CreateIndex(
@@ -37,9 +37,9 @@ namespace MHBackend.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_UserIdPublic",
+                name: "IX_Users_PublicUserId",
                 table: "Users",
-                column: "UserIdPublic",
+                column: "PublicUserId",
                 unique: true);
         }
 

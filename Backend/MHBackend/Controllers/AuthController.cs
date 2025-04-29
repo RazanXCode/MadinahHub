@@ -39,11 +39,11 @@ namespace MHBackend.Controllers
             var user = new User
             {
                 FirebaseUid = firebaseUid,
-                Username = request.Username,
+                UserName = request.Username,
                 Address = request.Address,
                 PhoneNumber = request.PhoneNumber,
-                Role = UserRole.Visitor,  // Default role using enum
-                UserIdPublic = userIdPublic,
+                Role = Role.User,  // Default role using enum
+                PublicUserId = userIdPublic,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -52,16 +52,16 @@ namespace MHBackend.Controllers
             // Map to response DTO
             var response = new UserResponse
             {
-                Id = user.Id,
-                Username = user.Username,
+                UserId = user.UserId,
+                UserName = user.UserName,
                 Address = user.Address,
                 Role = user.Role,
                 PhoneNumber = user.PhoneNumber,
-                UserIdPublic = user.UserIdPublic,
+                PublicUserId = user.PublicUserId,
                 CreatedAt = user.CreatedAt
             };
 
-            return CreatedAtAction(nameof(Login), new { id = user.Id }, response);
+            return CreatedAtAction(nameof(Login), new { id = user.UserId }, response);
         }
 
         [HttpPost("login")]
@@ -80,12 +80,12 @@ namespace MHBackend.Controllers
 
             var response = new UserResponse
             {
-                Id = user.Id,
-                Username = user.Username,
+                UserId = user.UserId,
+                UserName = user.UserName,
                 Address = user.Address,
                 Role = user.Role,
                 PhoneNumber = user.PhoneNumber,
-                UserIdPublic = user.UserIdPublic,
+                PublicUserId = user.PublicUserId,
                 CreatedAt = user.CreatedAt
             };
 
