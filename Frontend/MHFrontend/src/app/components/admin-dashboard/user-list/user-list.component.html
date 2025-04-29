@@ -35,14 +35,14 @@
         <thead>
           <tr class="bg-gray-50">
             <th class="p-4 text-left border-b-2 border-gray-200 text-gray-600 font-semibold cursor-pointer hover:text-[#E69B6B] transition-colors" 
-                (click)="sortBy('name')">
+                (click)="sortBy('userName')">
               <div class="flex items-center">
                 <span>Username</span>
                 <i class="fas fa-sort ml-2 text-gray-400"></i>
               </div>
             </th>
             <th class="p-4 text-left border-b-2 border-gray-200 text-gray-600 font-semibold cursor-pointer hover:text-[#E69B6B] transition-colors" 
-                (click)="sortBy('phone')">
+                (click)="sortBy('phoneNumber')">
               <div class="flex items-center">
                 <span>Phone Number</span>
                 <i class="fas fa-sort ml-2 text-gray-400"></i>
@@ -61,8 +61,8 @@
           <tr *ngFor="let user of paginatedUsers; let i = index" 
               [ngClass]="{'bg-gray-50': i % 2 === 1}"
               class="hover:bg-[#fff8f3] transition-colors">
-            <td class="p-4 border-t border-gray-200 text-[#E69B6B] font-medium">{{ user.name }}</td>
-            <td class="p-4 border-t border-gray-200">{{ user.phone }}</td>
+            <td class="p-4 border-t border-gray-200 text-[#E69B6B] font-medium">{{ user.userName }}</td>
+            <td class="p-4 border-t border-gray-200">{{ user.phoneNumber }}</td>
             <td class="p-4 border-t border-gray-200">{{ formatDate(user.createdAt) }}</td>
           </tr>
         </tbody>
@@ -75,29 +75,53 @@
         *ngFor="let user of paginatedUsers" 
         class="border border-gray-200 rounded-lg p-4 shadow-sm">
         <div class="flex justify-between items-center mb-2">
-          <span class="font-medium text-[#E69B6B]">{{ user.name }}</span>
+          <span class="font-medium text-[#E69B6B]">{{ user.userName }}</span>
         </div>
         <div class="space-y-2 text-sm">
           <div class="flex items-start">
             <span class="w-24 text-gray-500">Phone:</span>
-            <span>{{ user.phone }}</span>
+            <span>{{ user.phoneNumber }}</span>
           </div>
           <div class="flex items-start">
-            <span class="w-24 text-gray-500">Email:</span>
+            <span class="w-24 text-gray-500">Created At</span>
             <span class="break-all">{{ formatDate(user.createdAt) }}</span>
           </div>
         </div>
       </div>
     </div>
     
-    <!-- Empty State -->
-    <div class="py-12 px-4 text-center text-gray-600" *ngIf="paginatedUsers.length === 0">
-      <div class="text-5xl text-gray-300 mb-4">
-        <i class="fas fa-users-slash"></i>
-      </div>
-      <h3 class="mb-2 text-gray-800 text-xl">No Users Found</h3>
-      <p class="max-w-[300px] mx-auto">Try adjusting your search or filter to find what you're looking for.</p>
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading" class="py-12 px-4 text-center">
+    <div class="flex justify-center mb-4">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#E69B6B]"></div>
     </div>
+    <p class="text-gray-600">Loading users...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && error" class="py-10 px-4 text-center">
+    <div class="text-5xl text-red-300 mb-4">
+      <i class="fas fa-users-slash"></i>
+    </div>
+    <h3 class="mb-2 text-gray-800 text-xl">Failed to load users</h3>
+    <p class="max-w-[350px] mx-auto mb-4 text-gray-600">{{ error }}</p>
+    <button 
+      (click)="loadUsers()" 
+      class="px-4 py-2 bg-[#E69B6B] text-white rounded-md hover:bg-[#d58a5b] transition-colors">
+      Try Again
+    </button>
+  </div>
+
+  <!-- Empty State - Only show when not loading and there are no users -->
+  <div class="py-12 px-4 text-center text-gray-600" 
+      *ngIf="!isLoading && !error && paginatedUsers.length === 0">
+    <div class="text-5xl text-gray-300 mb-4">
+      <i class="fas fa-users-slash"></i>
+    </div>
+    
+    <h3 class="mb-2 text-gray-800 text-xl">No Users Found</h3>
+    <p class="max-w-[300px] mx-auto">Try adjusting your search or filter to find what you're looking for.</p>
+  </div>
   
     <!-- Pagination -->
 <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 text-sm">
