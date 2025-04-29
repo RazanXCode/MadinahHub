@@ -11,16 +11,9 @@ import { AuthService } from './services/auth.service';
   template: `
     <nav>
       <div>
-        <a href="#">MH Application</a>
-        <div>
+
           <ul>
             <ng-container *ngIf="(authService.currentUser$ | async) === null; else loggedIn">
-              <li>
-                <a routerLink="/login" routerLinkActive="active">Login</a>
-              </li>
-              <li>
-                <a routerLink="/register" routerLinkActive="active">Register</a>
-              </li>
             </ng-container>
             <ng-template #loggedIn>
               <li>
@@ -29,7 +22,7 @@ import { AuthService } from './services/auth.service';
             </ng-template>
           </ul>
         </div>
-      </div>
+
     </nav>
     <div>
       <router-outlet></router-outlet>
