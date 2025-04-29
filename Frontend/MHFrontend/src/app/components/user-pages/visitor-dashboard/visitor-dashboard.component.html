@@ -1,0 +1,102 @@
+<!-- visitor-dashboard.component.html -->
+<div class="p-6">
+    <h1 class="text-2xl font-bold mb-16">Welcome Back, Ahmed!</h1>
+    
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold mb-8">View your communities :</h2>
+    </div>
+    
+    <!-- PrimeNG Carousel with Tailwind classes -->
+    <div class="relative px-8">
+      <p-carousel [value]="communities" [numVisible]="3" [numScroll]="1" 
+        [responsiveOptions]="responsiveOptions" styleClass="communities-carousel"
+        [showNavigators]="true" [showIndicators]="false">
+        
+        <ng-template pTemplate="item" let-community>
+          <div class="mx-2 shadow-md rounded-lg overflow-hidden bg-white border border-gray-200 max-w-[280px]">
+            <!-- Card Header with Chip Icon -->
+            <div class="bg-[#c8c788] h-24 flex items-center justify-center">
+             <img src="../../../../assets/image.png" alt="" class="max-h-fit">
+            </div>
+            
+            <!-- Card Content -->
+            <div class="p-4 text-center mt-4">
+              <h3 class="text-xl font-medium mb-2">{{community.name}}</h3>
+              <p class="text-gray-600 text-sm mb-4">
+                {{community.description}}
+              </p>
+              
+              <!-- Member Count -->
+              <div class="flex justify-center items-center mb-3">
+                <i class="pi pi-users mr-1 text-gray-600"></i>
+                <span class="text-sm text-black font-bold">x{{community.members}}</span>
+              </div>
+              
+              <!-- View Button with inline styling -->
+              <button pButton type="button" label="View" 
+                class="p-button-rounded"
+                [ngStyle]="{
+                  'background-color': '#e9d18c',
+                  'border': 'none',
+                  'color': 'black',
+                  'font-weight': 'normal',
+                  'padding': '0.4rem 1.5rem'
+                }">
+              </button>
+            </div>
+          </div>
+        </ng-template>
+      </p-carousel>
+    </div>
+  </div>
+  
+  <!-- Upcoming events  -->
+
+<div class="p-6">
+    <h2 class="text-2xl font-bold mb-8">Upcoming events :</h2>
+    
+    <!-- PrimeNG Carousel for Events -->
+    <div class="relative px-8 ">
+      <p-carousel [value]="events" [numVisible]="3" [numScroll]="1" 
+        [responsiveOptions]="responsiveOptions" styleClass="events-carousel"
+        [showNavigators]="true" [showIndicators]="false">
+        
+        <ng-template pTemplate="item" let-event>
+          <div class="mx-2 shadow-md rounded-lg overflow-hidden bg-white border border-gray-200 max-w-[320px] min-h-96">
+            <!-- Event Image -->
+            <div class="h-40 overflow-hidden">
+              <img [src]="'../../../../assets/image.png'" alt="Event image" class="w-full h-full object-cover">
+            </div>
+            
+            <!-- Event Content -->
+            <div class="p-4 text-center">
+              <h3 class="text-xl font-bold mb-2">{{event.title}}</h3>
+              
+              <!-- Date and Time -->
+              <div class="flex justify-center items-center mb-2">
+                <span class="text-sm text-gray-600">{{event.date}}, {{event.time}}</span>
+              </div>
+              
+              <!-- Location -->
+              <div class="flex justify-center items-center mb-4">
+                <span class="text-sm text-gray-600">{{event.location}}</span>
+              </div>
+              
+              <!-- See Details Button -->
+              <button pButton type="button" label="See Details" 
+                class="p-button-rounded"
+                [ngStyle]="{
+                  'background-color': '#E69B6B',
+                  'border': 'none',
+                  'color': 'white',
+                  'font-weight': 'normal',
+                  'padding': '0.4rem 1.5rem'
+                }">
+              </button>
+            </div>
+          </div>
+        </ng-template>
+      </p-carousel>
+    </div>
+  </div>
+  
