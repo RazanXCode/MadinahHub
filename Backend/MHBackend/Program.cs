@@ -20,7 +20,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add database context
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContext<MyAppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add repositories

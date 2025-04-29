@@ -12,9 +12,9 @@ public interface IUserRepository
 
 public class UserRepository : IUserRepository
 {
-    private readonly AppDbContext _context;
+    private readonly MyAppDbContext _context;
 
-    public UserRepository(AppDbContext context)
+    public UserRepository(MyAppDbContext context)
     {
         _context = context;
     }
