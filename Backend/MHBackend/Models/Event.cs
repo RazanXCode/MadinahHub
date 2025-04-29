@@ -33,7 +33,7 @@ namespace MHBackend.Models
         [Required]
         public EventType EventType { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
 
         public string? ImageUrl { get; set; }
 

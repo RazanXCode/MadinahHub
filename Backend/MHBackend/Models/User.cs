@@ -25,7 +25,7 @@ namespace MHBackend.Models
         [Required]
         public Role Role { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
 
         // Navigation properties 
         public ICollection<Event> EventsCreated { get; set; } = new List<Event>();

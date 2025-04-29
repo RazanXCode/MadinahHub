@@ -5,7 +5,7 @@ namespace MHBackend.Models
     public class UserCommunity
     {
         [Required]
-        public DateTime JoinDate { get; set; }  = DateTime.UtcNow; 
+        public DateTime JoinDate { get; set; }
 
         // FK
         public int UserId { get; set; }

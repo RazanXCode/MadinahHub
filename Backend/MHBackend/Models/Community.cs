@@ -20,7 +20,7 @@ namespace MHBackend.Models
         public int MemberCount { get; set; }
 
         [Required]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
 
         public string? ImageUrl { get; set; }
 

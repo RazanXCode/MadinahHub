@@ -11,7 +11,7 @@ namespace MHBackend.Models
         public string PublicBookingId { get; set; }
 
         [Required]
-        public DateTime BookingDate { get; set; } = DateTime.UtcNow;
+        public DateTime BookingDate { get; set; }
 
         [Required]
         public BookingStatus Status { get; set; }

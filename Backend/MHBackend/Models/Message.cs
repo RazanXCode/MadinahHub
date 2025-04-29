@@ -15,8 +15,7 @@ namespace MHBackend.Models
         public string Content { get; set; }
 
         [Required]
-        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-
+        public DateTime Timestamp { get; set; }
         [Required]
         public MessageStatus Status { get; set; }
 

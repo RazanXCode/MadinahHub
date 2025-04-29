@@ -46,7 +46,9 @@ namespace MHBackend.Data
                 .Property(m => m.Status)
                 .HasConversion<string>();
 
-
+            // Composite primary key for join table
+            modelBuilder.Entity<UserCommunity>()
+                .HasKey(uc => new { uc.UserId, uc.CommunityId });
 
             // User - UserCommunity (1-to-many) & Community - UserCommunity (1-to-many)
             modelBuilder.Entity<UserCommunity>()
@@ -82,7 +84,7 @@ namespace MHBackend.Data
                 .HasOne(t => t.Event)
                 .WithMany(e => e.Tickets)
                 .HasForeignKey(t => t.EventId)
-               .OnDelete(DeleteBehavior.Cascade);  // on event delete, delete all its Tickets 
+               .OnDelete(DeleteBehavior.Restrict);  // on event delete, delete all its Tickets 
 
 
             // Booking - User (Many-to-1)
@@ -105,7 +107,7 @@ namespace MHBackend.Data
                 .HasOne(n => n.User)
                 .WithMany(u => u.Notifications)
                 .HasForeignKey(n => n.UserId)
-                .OnDelete(DeleteBehavior.Cascade);  // When User is deleted, also delete Notifications
+                .OnDelete(DeleteBehavior.NoAction);
 
             // Message - User & Community (Many-to-1)
             modelBuilder.Entity<Message>()

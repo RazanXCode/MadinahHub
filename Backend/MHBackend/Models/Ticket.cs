@@ -14,7 +14,7 @@ namespace MHBackend.Models
         public string QRCode { get; set; }
 
         [Required]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
 
         [Required]
         public TicketStatus Status { get; set; }
