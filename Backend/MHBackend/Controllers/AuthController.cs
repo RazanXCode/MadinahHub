@@ -18,7 +18,6 @@ namespace MHBackend.Controllers
             _userRepository = userRepository;
         }
 
-
         [HttpPost("register")]
         [Authorize]
         public async Task<IActionResult> Register([FromBody] CreateUserRequest request)
@@ -33,6 +32,9 @@ namespace MHBackend.Controllers
             if (existingUser != null)
                 return Conflict("User already exists");
 
+            // Generate a unique public ID
+            string userIdPublic = GenerateUniquePublicId();
+
             // Build the new user entity
             var user = new User
             {
@@ -40,7 +42,8 @@ namespace MHBackend.Controllers
                 Username = request.Username,
                 Address = request.Address,
                 PhoneNumber = request.PhoneNumber,
-                Role = "visitor",      // default role
+                Role = UserRole.Visitor,  // Default role using enum
+                UserIdPublic = userIdPublic,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -54,12 +57,12 @@ namespace MHBackend.Controllers
                 Address = user.Address,
                 Role = user.Role,
                 PhoneNumber = user.PhoneNumber,
+                UserIdPublic = user.UserIdPublic,
                 CreatedAt = user.CreatedAt
             };
 
             return CreatedAtAction(nameof(Login), new { id = user.Id }, response);
         }
-
 
         [HttpPost("login")]
         [Authorize]
@@ -82,10 +85,18 @@ namespace MHBackend.Controllers
                 Address = user.Address,
                 Role = user.Role,
                 PhoneNumber = user.PhoneNumber,
+                UserIdPublic = user.UserIdPublic,
                 CreatedAt = user.CreatedAt
             };
 
             return Ok(response);
+        }
+
+        // Helper method to generate a unique public ID
+        private string GenerateUniquePublicId()
+        {
+            // Generate a unique ID using a combination of timestamp and random values
+            return $"usr_{DateTime.UtcNow.Ticks}_{Guid.NewGuid().ToString("N").Substring(0, 8)}";
         }
     }
 }

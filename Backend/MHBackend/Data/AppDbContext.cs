@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using MHBackend.Models;
 
-namespace MHBackend.Data{ public class AppDbContext : DbContext
+namespace MHBackend.Data
+{ 
+    public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -17,6 +19,16 @@ namespace MHBackend.Data{ public class AppDbContext : DbContext
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.FirebaseUid)
                 .IsUnique();
+                
+            // Make UserIdPublic unique as well
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.UserIdPublic)
+                .IsUnique();
+                
+            // Configure the enum to be stored as a string
+            modelBuilder.Entity<User>()
+                .Property(u => u.Role)
+                .HasConversion<string>();
         }
     }
 }
