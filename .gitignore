@@ -1,0 +1,6 @@
+# Ignore build artifacts in nested project
+Backend/MHBackend/obj/
+Backend/MHBackend/bin/
+
+# Ignore EF Core migrations folder
+Backend/MHBackend/Migrations/
