@@ -1,12 +1,23 @@
+import PrimeUI from 'tailwindcss-primeui';
+
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   purge: [
     './src/**/*.html',
     './src/**/*.ts',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
+      backgroundColor: {
+        surface: 'var(--p-content-background)',
+      },
       colors: {
+        content: {
+          'hover-background': 'var(--p-content-hover-background)',
+          background: 'var(--p-content-background)',
+        },
         'primary': '#E69B6B',
         'secondary': '#2c3e50',
       },
@@ -18,9 +29,9 @@ module.exports = {
       },
       animation: {
         'slideIn': 'slideIn 0.3s ease-out'
-      } 
+      }
     },
   },
   variants: {},
-  plugins: [],
+  plugins: [PrimeUI],
 }
