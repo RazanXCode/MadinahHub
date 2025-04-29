@@ -34,6 +34,15 @@
               <i class="fas fa-users mr-2.5 w-5 text-center"></i> Users
             </a>
           </li>
+          <li>
+            <a [class.bg-[#E69B6B]]="activeComponent === 'manage-communities'" 
+               [class.text-white]="activeComponent === 'manage-communities'"
+               [class.font-medium]="activeComponent === 'manage-communities'"
+               class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-white transition-all duration-300 block"
+               (click)="setActiveComponent('manage-communities')">
+              <i class="fas fa-building mr-2.5 w-5 text-center"></i> Communities
+            </a>
+          </li>
         </ul>
       </nav>
   
@@ -63,6 +72,8 @@
       <div class="flex-1 p-4 md:p-6 bg-[#f5f7fa] overflow-auto">
         <!-- Component Views -->
         <app-user-list *ngIf="activeComponent === 'user-list'"></app-user-list>
+        <app-manage-communities *ngIf="activeComponent === 'manage-communities'"></app-manage-communities>
+
       </div>
     </main>
 
