@@ -35,8 +35,8 @@ namespace MHBackend.Controllers
                 Capacity = e.Capacity,
                 StartDate = e.StartDate,
                 EndDate = e.EndDate,
-                Status = e.Status,
-                EventType = e.EventType,
+                Status = e.Status.ToString(),
+                EventType = e.EventType.ToString(),
                 ImageUrl = e.ImageUrl,
                 CreatedBy = e.CreatedBy,
                 CommunityId = e.CommunityId
@@ -62,8 +62,8 @@ namespace MHBackend.Controllers
                 Capacity = e.Capacity,
                 StartDate = e.StartDate,
                 EndDate = e.EndDate,
-                Status = e.Status,
-                EventType = e.EventType,
+                Status = e.Status.ToString(),
+                EventType = e.EventType.ToString(),
                 ImageUrl = e.ImageUrl,
                 CreatedBy = e.CreatedBy,
                 CommunityId = e.CommunityId
