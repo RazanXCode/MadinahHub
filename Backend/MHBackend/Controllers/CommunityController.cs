@@ -198,27 +198,6 @@ namespace MHBackend.Controllers
         }
 
 
-        //GET: communities/my-communities
-        [HttpGet("my-communities")]
-        public async Task<IActionResult> GetMyCommunities()
-        {
-            var userId = 1; // replace after adding firebase auth
-            var communities = await _db.UserCommunities
-                .Include(uc => uc.Community)
-                .Where(uc => uc.UserId == userId)
-                .Select(uc => new UserCommunityDto
-                {
-                    Name = uc.Community.Name,
-                    Description = uc.Community.Description,
-                    MemberCount = uc.Community.MemberCount,
-                    ImageUrl = uc.Community.ImageUrl,
-                    JoinDate = uc.JoinDate
-                })
-                .ToListAsync();
-            return Ok(communities);
-        }
-
-
         // GET: communities/GetCommunitiesNames
         [HttpGet("GetCommunitiesNames")]
         public async Task<IActionResult> GetCommunitiesNames()
