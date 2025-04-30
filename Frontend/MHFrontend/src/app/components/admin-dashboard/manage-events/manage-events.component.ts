@@ -2,19 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventFormComponent } from '../event-form/event-form.component'; 
-
-interface Event {
-  id: number;
-  title: string;
-  description: string;
-  type: 'public' | 'private';
-  startDate: Date;
-  endDate: Date;
-  isOnline: boolean;
-  location: string;
-  coverImage: string;
-  createdAt: Date;
-}
+import { EventService, Event, EventCreate, EventUpdate } from '../../../services/event/event.service';
 
 @Component({
   selector: 'app-manage-events',
@@ -43,49 +31,35 @@ export class ManageEventsComponent implements OnInit {
   filteredEvents: Event[] = [];
   displayedEvents: Event[] = [];
 
+  // UI state
+  isLoading = false;
+  error: string | null = null;
+
+  constructor(private eventService: EventService) {}
+
   ngOnInit(): void {
-    this.generateMockEvents();
-    this.filterEvents();
+    this.loadEvents();
   }
-
-  generateMockEvents(): void {
-    const types: ('public' | 'private')[] = ['public', 'private'];
+  loadEvents(): void {
+    this.isLoading = true;
+    this.error = null;
     
-    const eventTitles = [
-      'Healthcare Innovation Summit', 'Medical Ethics Workshop', 
-      'Patient Care Symposium', 'Wellness & Prevention Conference', 
-      'Medical Technology Expo', 'Healthcare Policy Forum',
-      'Mental Health Awareness Workshop', 'Emergency Response Training'
-    ];
-    
-    const now = new Date();
-    
-    for (let i = 0; i < eventTitles.length; i++) {
-      const daysOffset = Math.floor(Math.random() * 60) - 30;
-      const startDate = new Date();
-      startDate.setDate(now.getDate() + daysOffset);
-      startDate.setHours(9, 0, 0, 0);
-      
-      const endDate = new Date(startDate);
-      endDate.setHours(startDate.getHours() + 2); 
-      
-      const isOnline = i % 2 === 0; 
-      
-      this.events.push({
-        id: i + 1,
-        title: eventTitles[i],
-        description: `Event description for ${eventTitles[i]}`,
-        type: types[i % types.length],
-        startDate: startDate,
-        endDate: endDate,
-        isOnline: isOnline,
-        location: isOnline ? 'Online' : 'Medical Center',
-        coverImage: 'https://placehold.co/800x300?text=Event+Image', // placeholder
-        createdAt: new Date(startDate.getTime() - 1000*60*60*24*7) 
-      });
-    }
+    this.eventService.getEvents().subscribe({
+      next: (data) => {
+        this.events = data.map(event => ({
+          ...event,
+          startDate: new Date(event.startDate),
+          endDate: new Date(event.endDate)
+        }));
+        this.isLoading = false;
+        this.filterEvents();
+      },
+      error: (err) => {
+        this.error = 'Failed to load events. Please try again.';
+        this.isLoading = false;
+      }
+    });
   }
-
   filterEvents(): void {
     let filtered = [...this.events];
     
@@ -97,21 +71,18 @@ export class ManageEventsComponent implements OnInit {
         event.description.toLowerCase().includes(term)
       );
     }
-    
     // Apply type filter
     if (this.filterType) {
-      filtered = filtered.filter(event => event.type === this.filterType);
+      filtered = filtered.filter(event => event.eventType.toLowerCase() === this.filterType);
     }
-    
     // Apply location filter
     if (this.filterLocation) {
       if (this.filterLocation === 'online') {
-        filtered = filtered.filter(event => event.isOnline);
+        filtered = filtered.filter(event => event.location.toLowerCase().includes('online'));
       } else if (this.filterLocation === 'in-person') {
-        filtered = filtered.filter(event => !event.isOnline);
+        filtered = filtered.filter(event => !event.location.toLowerCase().includes('online'));
       }
     }
-    
     // Apply sorting
     filtered.sort((a, b) => {
       const now = new Date();
@@ -121,38 +92,25 @@ export class ManageEventsComponent implements OnInit {
           return a.startDate.getTime() - b.startDate.getTime();
         case 'title':
           return a.title.localeCompare(b.title);
-        case 'created':
-          return b.createdAt.getTime() - a.createdAt.getTime();
         default:
           return 0;
       }
     });
-    
     this.filteredEvents = filtered;
     this.updateDisplayedEvents();
   }
-
   updateDisplayedEvents(): void {
     this.displayedEvents = this.filteredEvents.slice(0, this.visibleCount);
   }
-
   loadMore(): void {
     this.visibleCount = Math.min(
       this.visibleCount + this.loadMoreIncrement,
       this.filteredEvents.length
     );
     this.updateDisplayedEvents();
-  }
-
-  getEventStatus(event: Event): string {
-    const now = new Date();
-    if (event.startDate > now) {
-      return 'Upcoming';
-    } else if (event.endDate < now) {
-      return 'Active';
-    } else {
-      return 'Finished';
-    }
+  } 
+  getEventStatus(event: any): string {
+    return (event.status || '').toLowerCase() || 'unknown';
   }
 
   createEvent(): void {
@@ -173,38 +131,59 @@ export class ManageEventsComponent implements OnInit {
 
   handleEventFormSubmit(eventData: any): void {
     if (this.isEditMode && this.selectedEvent) {
-      // Update existing event
-      const index = this.events.findIndex(e => e.id === this.selectedEvent!.id);
-      if (index !== -1) {
-        this.events[index] = {
-          ...this.events[index],
-          title: eventData.title,
-          description: eventData.description,
-          type: eventData.type,
-          startDate: eventData.startDate,
-          endDate: eventData.endDate,
-          isOnline: eventData.isOnline,
-          location: eventData.location,
-        };
-      }
+      const updateData: EventUpdate = {
+        ...eventData
+      };
+
+      this.eventService.updateEvent(this.selectedEvent.publicEventId, updateData).subscribe({
+        next: () => {
+          // Success 
+          this.loadEvents();
+          this.showEventForm = false;
+        },
+        error: (err) => {
+          console.error('Error updating event:', err);
+          // Handle error (consider showing an error message)
+        }
+      });
     } else {
       // Add new event
-      const newEvent = {
-        id: this.events.length + 1,
-        title: eventData.title,
-        description: eventData.description,
-        type: eventData.type,
-        startDate: eventData.startDate,
-        endDate: eventData.endDate,
-        isOnline: eventData.isOnline,
-        location: eventData.location,
-        coverImage: 'https://placehold.co/800x300?text=Event+Image', // placeholder
-        createdAt: new Date()
-      };
-      this.events.push(newEvent as Event);
-    }
     
-    this.filterEvents();
-    this.showEventForm = false;
+    const createData: EventCreate = {
+      ...eventData,
+      eventType: eventData.eventType === 'public' ? 0 : 1,
+      createdBy: 0, // Hardcoded user ID
+      communityId: 1  // Hardcoded community ID
+    };
+      
+      this.eventService.createEvent(createData).subscribe({
+        next: (createdEvent) => {
+          this.loadEvents();
+          this.showEventForm = false;
+        },
+        error: (err) => {
+          console.error('Error creating event:', err);
+        }
+      });
+    }
+  }
+  // Show confirmation before deleting
+  confirmDeleteEvent(event: Event): void {
+    if (confirm(`Delete "${event.title}"?`)) {
+      this.deleteEvent(event);
+    }
+  }
+  // Perform the actual deletion
+  deleteEvent(event: Event): void {
+    this.eventService.deleteEvent(event.publicEventId).subscribe({
+      next: () => {
+        this.events = this.events.filter(e => e.publicEventId !== event.publicEventId);
+        this.filterEvents(); 
+        // Show success message
+      },
+      error: (err) => {
+        console.error('Error deleting event:', err);
+      }
+    });
   }
 }
