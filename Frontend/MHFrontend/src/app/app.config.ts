@@ -7,16 +7,15 @@ import { MyPreset } from '../assets/themes/mytheme';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
-  providers: [
-    providePrimeNG({
-      theme: {
-        preset: MyPreset,
-        options: {
-          prefix: 'p',
-          darkModeSelector: '.dark',
-          cssLayer: {
-            name: 'primeng',
-            order: 'theme, base, primeng',
+  providers: [    providePrimeNG({
+    theme: {
+      preset: MyPreset,
+      options: {
+        prefix: 'p',
+        darkModeSelector: '.dark',
+        cssLayer: {
+          name: 'primeng',
+          order: 'theme, base, primeng',
           },
         },
       },
