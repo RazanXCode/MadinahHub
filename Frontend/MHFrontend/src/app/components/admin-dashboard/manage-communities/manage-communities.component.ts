@@ -8,7 +8,6 @@ interface Community {
   name: string;
   description: string;
   type: 'public' | 'private';  
-  status: 'active' | 'inactive';
   memberCount: number;
   createdAt: Date;
   coverImage: string;
@@ -66,7 +65,6 @@ export class ManageCommunitiesComponent implements OnInit {
         name: communityNames[i],
         description: `Community for ${communityNames[i].toLowerCase()}`,
         type: types[i % 2], 
-        status: i % 5 === 0 ? 'inactive' : 'active',
         memberCount: Math.floor(Math.random() * 100),
         createdAt: new Date(Date.now() - Math.floor(Math.random() * 10000000000)),
         coverImage: 'https://placehold.co/800x200?text=Community+Image'
@@ -169,7 +167,6 @@ export class ManageCommunitiesComponent implements OnInit {
         name: communityData.name,
         description: communityData.description,
         type: 'public', // Default to public
-        status: 'active',
         memberCount: 0,
         createdAt: new Date(),
         coverImage: 'https://placehold.co/800x200?text=Community+Image'

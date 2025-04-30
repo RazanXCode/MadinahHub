@@ -8,11 +8,15 @@
 
     <!-- Sidebar Navigation -->
     <aside 
-      [ngClass]="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}"
-      class="fixed md:static md:translate-x-0 top-0 left-0 h-full w-[250px] bg-white text-[#333] flex flex-col shadow-md z-10 transition-transform duration-300">
-      <div class="p-6 text-xl font-bold text-[#E69B6B] text-center border-b border-[#eee]">
-        Madinah Hub
-      </div>
+    [ngClass]="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}"
+    class="fixed md:static md:translate-x-0 top-0 left-0 h-full w-[320px] bg-white text-[#333] flex flex-col shadow-md z-10 transition-transform duration-300">
+    <div class="p-4 text-center border-b border-[#eee] flex flex-row items-center justify-center">
+      <img src="assets/images/logo.png" alt="Madinah Hub Logo" class="h-[70px] w-auto">
+      <span class="text-lg font-bold">
+        <span class="text-[#343a40]">Madinah </span>
+        <span class="text-[#E69B6B]">Hub</span>
+      </span>
+    </div>
       
       <nav class="flex-1 p-6">
         <ul class="space-y-2">
@@ -20,7 +24,7 @@
             <a [class.bg-[#E69B6B]]="activeComponent === 'dashboard-home'" 
                [class.text-white]="activeComponent === 'dashboard-home'"
                [class.font-medium]="activeComponent === 'dashboard-home'"
-               class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-white transition-all duration-300 block"
+               class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-[#E69B6B] transition-all duration-300 block"
                (click)="setActiveComponent('dashboard-home'); closeSidebarOnMobile()">
               <i class="fas fa-home mr-2.5 w-5 text-center"></i> Dashboard
             </a>
@@ -29,7 +33,7 @@
             <a [class.bg-[#E69B6B]]="activeComponent === 'user-list'" 
                [class.text-white]="activeComponent === 'user-list'"
                [class.font-medium]="activeComponent === 'user-list'"
-               class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-white transition-all duration-300 block"
+               class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-[#E69B6B] transition-all duration-300 block"
                (click)="setActiveComponent('user-list'); closeSidebarOnMobile()">
               <i class="fas fa-users mr-2.5 w-5 text-center"></i> Users
             </a>
@@ -38,9 +42,18 @@
             <a [class.bg-[#E69B6B]]="activeComponent === 'manage-communities'" 
                [class.text-white]="activeComponent === 'manage-communities'"
                [class.font-medium]="activeComponent === 'manage-communities'"
-               class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-white transition-all duration-300 block"
+               class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-[#E69B6B] transition-all duration-300 block"
                (click)="setActiveComponent('manage-communities')">
               <i class="fas fa-building mr-2.5 w-5 text-center"></i> Communities
+            </a>
+          </li>
+          <li>
+            <a [class.bg-[#E69B6B]]="activeComponent === 'manage-events'" 
+               [class.text-white]="activeComponent === 'manage-events'"
+               [class.font-medium]="activeComponent === 'manage-events'"
+               class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-[#E69B6B] transition-all duration-300 block"
+               (click)="setActiveComponent('manage-events')">
+              <i class="fas fa-calendar mr-2.5 w-5 text-center"></i> Events
             </a>
           </li>
         </ul>
@@ -73,7 +86,7 @@
         <!-- Component Views -->
         <app-user-list *ngIf="activeComponent === 'user-list'"></app-user-list>
         <app-manage-communities *ngIf="activeComponent === 'manage-communities'"></app-manage-communities>
-
+        <app-manage-events *ngIf="activeComponent === 'manage-events'"></app-manage-events>  
       </div>
     </main>
 

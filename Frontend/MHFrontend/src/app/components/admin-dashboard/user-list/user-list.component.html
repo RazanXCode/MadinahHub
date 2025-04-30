@@ -30,29 +30,40 @@
     </div>
   
     <!-- Desktop Table View (hidden on small screens) -->
-    <div class="hidden sm:block overflow-x-auto">
+    <div class="hidden sm:block overflow-x-auto rounded-lg border border-gray-200">
       <table class="w-full border-collapse text-sm">
         <thead>
-          <tr>
-            <th class="p-3 text-left border-b-2 border-gray-200 text-gray-600 font-semibold cursor-pointer hover:text-[#E69B6B]" 
+          <tr class="bg-gray-50">
+            <th class="p-4 text-left border-b-2 border-gray-200 text-gray-600 font-semibold cursor-pointer hover:text-[#E69B6B] transition-colors" 
                 (click)="sortBy('name')">
-              Username <i class="fas fa-sort"></i>
+              <div class="flex items-center">
+                <span>Username</span>
+                <i class="fas fa-sort ml-2 text-gray-400"></i>
+              </div>
             </th>
-            <th class="p-3 text-left border-b-2 border-gray-200 text-gray-600 font-semibold cursor-pointer hover:text-[#E69B6B]" 
+            <th class="p-4 text-left border-b-2 border-gray-200 text-gray-600 font-semibold cursor-pointer hover:text-[#E69B6B] transition-colors" 
                 (click)="sortBy('phone')">
-              Phone Number <i class="fas fa-sort"></i>
+              <div class="flex items-center">
+                <span>Phone Number</span>
+                <i class="fas fa-sort ml-2 text-gray-400"></i>
+              </div>
             </th>
-            <th class="p-3 text-left border-b-2 border-gray-200 text-gray-600 font-semibold cursor-pointer hover:text-[#E69B6B]" 
-                (click)="sortBy('email')">
-              Email <i class="fas fa-sort"></i>
+            <th class="p-4 text-left border-b-2 border-gray-200 text-gray-600 font-semibold cursor-pointer hover:text-[#E69B6B] transition-colors" 
+                (click)="sortBy('createdAt')">
+              <div class="flex items-center">
+                <span>Created At</span>
+                <i class="fas fa-sort ml-2 text-gray-400"></i>
+              </div>
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let user of paginatedUsers">
-            <td class="p-3 border-b border-gray-200">{{ user.name }}</td>
-            <td class="p-3 border-b border-gray-200">{{ user.phone }}</td>
-            <td class="p-3 border-b border-gray-200">{{ user.email }}</td>
+          <tr *ngFor="let user of paginatedUsers; let i = index" 
+              [ngClass]="{'bg-gray-50': i % 2 === 1}"
+              class="hover:bg-[#fff8f3] transition-colors">
+            <td class="p-4 border-t border-gray-200 text-[#E69B6B] font-medium">{{ user.name }}</td>
+            <td class="p-4 border-t border-gray-200">{{ user.phone }}</td>
+            <td class="p-4 border-t border-gray-200">{{ formatDate(user.createdAt) }}</td>
           </tr>
         </tbody>
       </table>
@@ -73,7 +84,7 @@
           </div>
           <div class="flex items-start">
             <span class="w-24 text-gray-500">Email:</span>
-            <span class="break-all">{{ user.email }}</span>
+            <span class="break-all">{{ formatDate(user.createdAt) }}</span>
           </div>
         </div>
       </div>
