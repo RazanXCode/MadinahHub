@@ -230,6 +230,34 @@ namespace MHBackend.Controllers
         }
 
 
+        //GET: community/events
+        [HttpGet("events/{publicCommunityId}")]
+        public async Task<IActionResult> GetCommunityEvents(string publicCommunityId)
+        {
+            //Check if community exists
+            var community = await _db.Communities
+                .FirstOrDefaultAsync(c => c.PublicCommunityId == publicCommunityId);
+            if (community == null)
+                return NotFound();
+
+            //Get events for the community
+            var events = await _db.Events
+           .Where(e => e.Community.CommunityId == community.CommunityId)
+           .Where(e => e.StartDate >= DateTime.UtcNow) // to select only future events
+            .Select(e => new CommunityEventDto
+            {
+            PublicEventId = e.PublicEventId,
+            Title = e.Title,
+            Description = e.Description,
+            Location = e.Location,
+            StartDate = e.StartDate,
+            Status = e.Status,
+            ImageUrl = e.ImageUrl
+            }).ToListAsync();
+            return Ok(events);
+        }
+
+
 
 
     }
