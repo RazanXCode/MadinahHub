@@ -4,11 +4,12 @@ import { DashboardComponent } from './components/admin-dashboard/dashboard/dashb
 import { LandingPageComponent } from './components/user-pages/landing-page/landing-page.component';
 import { NavbarComponent } from './components/user-pages/navbar/navbar.component';
 import { VisitorDashboardComponent } from './components/user-pages/visitor-dashboard/visitor-dashboard.component';
+import { AllEventsComponent } from "./components/user-pages/all-events/all-events.component";
 
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, DashboardComponent, LandingPageComponent, NavbarComponent , VisitorDashboardComponent],
+  imports: [RouterOutlet, DashboardComponent, LandingPageComponent, NavbarComponent, VisitorDashboardComponent, AllEventsComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

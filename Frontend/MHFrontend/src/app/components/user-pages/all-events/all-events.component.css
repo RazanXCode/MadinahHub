@@ -1,0 +1,97 @@
+/* Custom styles for all-events component */
+
+/* Button hover effect */
+:host ::ng-deep .p-button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .w-64, .w-48 {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+  }
+  
+  /* Card hover effect */
+  .grid > div {
+    transition: all 0.3s ease;
+  }
+  
+  .grid > div:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Search input styling */
+  :host ::ng-deep .p-inputtext:focus {
+    border-color: #E69B6B;
+    box-shadow: 0 0 0 1px #E69B6B;
+  }
+  
+  /* Dropdown styling */
+  :host ::ng-deep .p-dropdown:focus {
+    box-shadow: 0 0 0 1px #E69B6B;
+  }
+  
+  :host ::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
+    background-color: #E69B6B;
+    color: white;
+  }
+  
+  /* Modal styling */
+  :host ::ng-deep .event-details-modal .p-dialog-header {
+    background-color: #E69B6B;
+    color: white;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+  }
+  
+  :host ::ng-deep .event-details-modal .p-dialog-content {
+    padding: 0;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+  
+  :host ::ng-deep .event-details-modal .p-dialog-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 1rem;
+  }
+  
+  .event-modal-content {
+    padding: 1.5rem;
+  }
+  
+  :host ::ng-deep .p-dialog-mask {
+    backdrop-filter: blur(4px);
+  }
+  
+  /* Animation for modal */
+  :host ::ng-deep .p-dialog {
+    transform: translateY(0);
+    transition: transform 0.2s ease-out;
+  }
+  
+  :host ::ng-deep .p-dialog-enter-from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  
+  :host ::ng-deep .p-dialog-leave-to {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  
+  /* Mobile adjustments for modal */
+  @media (max-width: 640px) {
+    :host ::ng-deep .event-details-modal .p-dialog-content {
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+    
+    .grid-cols-2 {
+      grid-template-columns: 1fr;
+    }
+  }
