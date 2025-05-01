@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { EventFormComponent } from '../event-form/event-form.component'; 
+import { EventFormComponent } from '../event-form/event-form.component';
 import { EventService, Event, EventCreate, EventUpdate } from '../../../services/event/event.service';
 
 @Component({
@@ -36,14 +36,14 @@ export class ManageEventsComponent implements OnInit {
   error: string | null = null;
   successMessage: string | null = null;
 
-  constructor(private eventService: EventService) {}
+  constructor(private eventService: EventService) { }
   ngOnInit(): void {
     this.loadEvents();
   }
   loadEvents(): void {
     this.isLoading = true;
     this.error = null;
-    
+
     this.eventService.getEvents().subscribe({
       next: (data) => {
         this.events = data.map(event => ({
@@ -65,8 +65,8 @@ export class ManageEventsComponent implements OnInit {
     // Apply search filter
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(event => 
-        event.title.toLowerCase().includes(term) || 
+      filtered = filtered.filter(event =>
+        event.title.toLowerCase().includes(term) ||
         event.description.toLowerCase().includes(term)
       );
     }
@@ -85,7 +85,7 @@ export class ManageEventsComponent implements OnInit {
     // Apply sorting
     filtered.sort((a, b) => {
       const now = new Date();
-      
+
       switch (this.sortBy) {
         case 'date':
           return a.startDate.getTime() - b.startDate.getTime();
@@ -107,7 +107,7 @@ export class ManageEventsComponent implements OnInit {
       this.filteredEvents.length
     );
     this.updateDisplayedEvents();
-  } 
+  }
   getEventStatus(event: any): string {
     return (event.status || '').toLowerCase() || 'unknown';
   }
@@ -118,7 +118,7 @@ export class ManageEventsComponent implements OnInit {
   }
   editEvent(event: Event): void {
     this.isEditMode = true;
-    this.selectedEvent = { ...event }; 
+    this.selectedEvent = { ...event };
     this.showEventForm = true;
   }
   handleEventFormClose(): void {
@@ -136,22 +136,22 @@ export class ManageEventsComponent implements OnInit {
           this.loadEvents();
           this.showEventForm = false;
           this.successMessage = 'Event updated successfully!';
-          setTimeout(() => this.successMessage = null, 5000); 
+          setTimeout(() => this.successMessage = null, 5000);
         },
         error: (err) => {
           console.error('Error updating event:', err);
           this.error = 'Failed to update event. Please try again.';
-          setTimeout(() => this.error = null, 5000); 
+          setTimeout(() => this.error = null, 5000);
         }
       });
     } else {
-    // Add new event
-    const createData: EventCreate = {
-      ...eventData,
-      eventType: eventData.eventType === 'public' ? 0 : 1,
-      createdBy: 1, // Hardcoded user ID
-      communityId: 2  // Hardcoded community ID
-    };
+      // Add new event
+      const createData: EventCreate = {
+        ...eventData,
+        eventType: eventData.eventType === 'public' ? 0 : 1,
+        //TODO: createBy should be set to the logged-in user's ID
+        createdBy: 1, // Hardcoded user ID
+      };
       this.eventService.createEvent(createData).subscribe({
         next: (createdEvent) => {
           this.loadEvents();
@@ -174,7 +174,7 @@ export class ManageEventsComponent implements OnInit {
   // Delete event
   deleteEvent(): void {
     if (!this.pendingDeleteEvent) return;
-    
+
     const event = this.pendingDeleteEvent;
     this.eventService.deleteEvent(event.publicEventId).subscribe({
       next: () => {

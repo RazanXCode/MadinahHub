@@ -1,99 +1,299 @@
 <div class="flex flex-col md:flex-row h-screen bg-[#f5f7fa] font-['Segoe_UI',Tahoma,Geneva,Verdana,sans-serif]">
-    <!-- Mobile Menu Button -->
-    <button 
-      (click)="toggleSidebar()"
-      class="md:hidden absolute top-4 left-4 z-20 p-2 bg-white rounded-md ">
-      <i class="fas" [ngClass]="sidebarOpen ? 'fa-times' : 'fa-bars'"></i>
-    </button>
+  <!-- Mobile Menu Button -->
+  <button (click)="toggleSidebar()" class="md:hidden absolute top-4 left-4 z-20 p-2 bg-white rounded-md ">
+    <i class="fas" [ngClass]="sidebarOpen ? 'fa-times' : 'fa-bars'"></i>
+  </button>
 
-    <!-- Sidebar Navigation -->
-    <aside 
-    [ngClass]="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}"
+  <!-- Sidebar Navigation -->
+  <aside [ngClass]="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}"
     class="fixed md:static md:translate-x-0 top-0 left-0 h-full w-[320px] bg-white text-[#333] flex flex-col shadow-md z-10 transition-transform duration-300">
     <div class="p-4 text-center border-b border-[#eee] flex flex-row items-center justify-center">
-      <img src="assets/logo.png" alt="Madinah Hub Logo" class="h-[70px] w-auto">
+      <img src="assets/images/logo.png" alt="Madinah Hub Logo" class="h-[70px] w-auto">
       <span class="text-lg font-bold">
         <span class="text-[#343a40]">Madinah </span>
         <span class="text-[#E69B6B]">Hub</span>
       </span>
     </div>
-      
-      <nav class="flex-1 p-6">
-        <ul class="space-y-2">
-          <li>
-            <a [class.bg-[#E69B6B]]="activeComponent === 'dashboard-home'" 
-               [class.text-white]="activeComponent === 'dashboard-home'"
-               [class.font-medium]="activeComponent === 'dashboard-home'"
-               class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-[#E69B6B] transition-all duration-300 block"
-               (click)="setActiveComponent('dashboard-home'); closeSidebarOnMobile()">
-              <i class="fas fa-home mr-2.5 w-5 text-center"></i> Dashboard
-            </a>
-          </li>
-          <li>
-            <a [class.bg-[#E69B6B]]="activeComponent === 'user-list'" 
-               [class.text-white]="activeComponent === 'user-list'"
-               [class.font-medium]="activeComponent === 'user-list'"
-               class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-[#E69B6B] transition-all duration-300 block"
-               (click)="setActiveComponent('user-list'); closeSidebarOnMobile()">
-              <i class="fas fa-users mr-2.5 w-5 text-center"></i> Users
-            </a>
-          </li>
-          <li>
-            <a [class.bg-[#E69B6B]]="activeComponent === 'manage-communities'" 
-               [class.text-white]="activeComponent === 'manage-communities'"
-               [class.font-medium]="activeComponent === 'manage-communities'"
-               class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-[#E69B6B] transition-all duration-300 block"
-               (click)="setActiveComponent('manage-communities')">
-              <i class="fas fa-building mr-2.5 w-5 text-center"></i> Communities
-            </a>
-          </li>
-          <li>
-            <a [class.bg-[#E69B6B]]="activeComponent === 'manage-events'" 
-               [class.text-white]="activeComponent === 'manage-events'"
-               [class.font-medium]="activeComponent === 'manage-events'"
-               class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-[#E69B6B] transition-all duration-300 block"
-               (click)="setActiveComponent('manage-events')">
-              <i class="fas fa-calendar mr-2.5 w-5 text-center"></i> Events
-            </a>
-          </li>
-        </ul>
-      </nav>
-  
-      <div class="p-4 text-center text-sm text-[#888] border-t border-[#eee]">
-        &copy; 2025 Madinah Hub
+
+    <nav class="flex-1 p-6">
+      <ul class="space-y-2">
+        <li>
+          <a [class.bg-[#E69B6B]]="activeComponent === 'dashboard-home'"
+            [class.text-white]="activeComponent === 'dashboard-home'"
+            [class.font-medium]="activeComponent === 'dashboard-home'"
+            class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-[#E69B6B] transition-all duration-300 block"
+            (click)="setActiveComponent('dashboard-home'); closeSidebarOnMobile()">
+            <i class="fas fa-home mr-2.5 w-5 text-center"></i> Dashboard
+          </a>
+        </li>
+        <li>
+          <a [class.bg-[#E69B6B]]="activeComponent === 'user-list'" [class.text-white]="activeComponent === 'user-list'"
+            [class.font-medium]="activeComponent === 'user-list'"
+            class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-[#E69B6B] transition-all duration-300 block"
+            (click)="setActiveComponent('user-list'); closeSidebarOnMobile()">
+            <i class="fas fa-users mr-2.5 w-5 text-center"></i> Users
+          </a>
+        </li>
+        <li>
+          <a [class.bg-[#E69B6B]]="activeComponent === 'manage-communities'"
+            [class.text-white]="activeComponent === 'manage-communities'"
+            [class.font-medium]="activeComponent === 'manage-communities'"
+            class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-[#E69B6B] transition-all duration-300 block"
+            (click)="setActiveComponent('manage-communities')">
+            <i class="fas fa-building mr-2.5 w-5 text-center"></i> Communities
+          </a>
+        </li>
+        <li>
+          <a [class.bg-[#E69B6B]]="activeComponent === 'manage-events'"
+            [class.text-white]="activeComponent === 'manage-events'"
+            [class.font-medium]="activeComponent === 'manage-events'"
+            class="flex items-center px-5 py-3 text-[#555] rounded-md hover:bg-[rgba(230,155,107,0.2)] hover:text-[#E69B6B] transition-all duration-300 block"
+            (click)="setActiveComponent('manage-events')">
+            <i class="fas fa-calendar mr-2.5 w-5 text-center"></i> Events
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="p-4 text-center text-sm text-[#888] border-t border-[#eee]">
+      &copy; 2025 Madinah Hub
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <!-- Top Header -->
+    <header
+      class="bg-white py-4 md:px-8 pl-16 md:pl-8 pr-4 flex justify-between items-center border-b border-[#eee] h-[60px]">
+      <div>
+        <h1 class="text-xl font-medium text-[#333] m-0">{{ getPageTitle() }}</h1>
       </div>
-    </aside>
-  
-    <!-- Main Content Area -->
-    <main class="flex-1 flex flex-col overflow-hidden">
-      <!-- Top Header -->
-      <header class="bg-white py-4 md:px-8 pl-16 md:pl-8 pr-4 flex justify-between items-center border-b border-[#eee] h-[60px]">
-        <div>
-          <h1 class="text-xl font-medium text-[#333] m-0">{{ getPageTitle() }}</h1>
-        </div>
-        
+
+      <div class="flex items-center">
         <div class="flex items-center">
-          <div class="flex items-center">
-            <button class="py-1.5 px-3 bg-[#E69B6B] text-white border-0 rounded cursor-pointer text-sm">
-              Logout
-            </button>
+          <button class="py-1.5 px-3 bg-[#E69B6B] text-white border-0 rounded cursor-pointer text-sm">
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+    <!-- Dashboard Content -->
+    <div class="flex-1 p-4 md:p-6 bg-[#f5f7fa] overflow-auto">
+      <!-- Dashboard Home Content -->
+      <div *ngIf="activeComponent === 'dashboard-home'" class="grid grid-cols-1 gap-6">
+        <!-- Loading State -->
+        <div *ngIf="isLoadingDashboard" class="flex justify-center items-center h-64">
+          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#E69B6B]"></div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div *ngIf="!isLoadingDashboard">
+          <!-- Welcome Banner -->
+          <div class="bg-gradient-to-r from-[#E69B6B] to-[#e6835b] rounded-lg p-6 text-white shadow-md">
+            <h2 class="text-2xl font-bold mb-2">Welcome to Madinah Hub Admin</h2>
+            <p class="opacity-90">Manage your communities, events, and users.</p>
+          </div>
+
+          <!-- Summary Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+             <!-- Users Card -->
+            <div class="bg-white rounded-lg p-5 shadow-md border-l-4 border-blue-500">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-gray-600 text-sm mb-1">Total Users</p>
+                  <h3 class="text-2xl font-bold text-gray-800">{{ totalUsers }}</h3>
+                  <p class="text-sm text-green-600 mt-2">
+                    <i class="fas fa-arrow-up mr-1"></i> {{ newUsersThisMonth }} new this month
+                  </p>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-full text-blue-500">
+                  <i class="fas fa-users text-xl"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Communities Card -->
+            <div class="bg-white rounded-lg p-5 shadow-md border-l-4 border-purple-500">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-gray-600 text-sm mb-1">Communities</p>
+                  <h3 class="text-2xl font-bold text-gray-800">{{ totalCommunities }}</h3>
+                  <p class="text-sm text-gray-500 mt-2">
+                    Active communities
+                  </p>
+                </div>
+                <div class="bg-purple-100 p-3 rounded-full text-purple-500">
+                  <i class="fas fa-building text-xl"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Events Card -->
+            <div class="bg-white rounded-lg p-5 shadow-md border-l-4 border-amber-500">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-gray-600 text-sm mb-1">Events</p>
+                  <h3 class="text-2xl font-bold text-gray-800">{{ totalEvents }}</h3>
+                  <p class="text-sm text-gray-500 mt-2">
+                    In all communities
+                  </p>
+                </div>
+                <div class="bg-amber-100 p-3 rounded-full text-amber-500">
+                  <i class="fas fa-calendar-alt text-xl"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity Section -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            <!-- Recent Communities -->
+            <div class="bg-white rounded-lg shadow-md p-5">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Recent Communities</h3>
+                <button (click)="navigateToManageCommunities()" class="text-sm text-[#E69B6B] hover:underline">View
+                  All</button>
+              </div>
+
+              <div class="space-y-4">
+                <div *ngFor="let community of recentCommunities"
+                  class="flex items-center p-3 hover:bg-gray-50 rounded-md transition-colors">
+                  <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden mr-3">
+                    <img *ngIf="community.imageUrl" [src]="community.imageUrl" alt="Community"
+                      class="w-full h-full object-cover">
+                    <div *ngIf="!community.imageUrl"
+                      class="w-full h-full flex items-center justify-center bg-[#E69B6B] text-white">
+                      <i class="fas fa-building"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 class="font-medium text-gray-800">{{ community.name }}</h4>
+                    <p class="text-sm text-gray-500">{{ community.memberCount }} members</p>
+                  </div>
+                </div>
+
+                <div *ngIf="recentCommunities.length === 0" class="text-center py-4 text-gray-500">
+                  No communities found
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Events -->
+            <div class="bg-white rounded-lg shadow-md p-5">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Upcoming Events</h3>
+                <button (click)="navigateToManageEvents()" class="text-sm text-[#E69B6B] hover:underline">View
+                  All</button>
+              </div>
+
+              <div class="space-y-4">
+                <div *ngFor="let event of recentEvents"
+                  class="flex items-center p-3 hover:bg-gray-50 rounded-md transition-colors">
+                  <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden mr-3">
+                    <img *ngIf="event.imageUrl" [src]="event.imageUrl" alt="Event" class="w-full h-full object-cover">
+                    <div *ngIf="!event.imageUrl"
+                      class="w-full h-full flex items-center justify-center bg-[#E69B6B] text-white">
+                      <i class="fas fa-calendar"></i>
+                    </div>
+                  </div>
+                  <div class="flex-1">
+                    <h4 class="font-medium text-gray-800">{{ event.title }}</h4>
+                    <p class="text-sm text-gray-500">{{ event.startDate | date: 'MMM d, y' }}</p>
+                  </div>
+                  <div class="bg-gray-100 rounded-full px-3 py-1 text-xs">
+                    {{ event.location }}
+                  </div>
+                </div>
+
+                <div *ngIf="recentEvents.length === 0" class="text-center py-4 text-gray-500">
+                  No upcoming events
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Quick Actions -->
+          <div class="bg-white rounded-lg shadow-md p-5 mt-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
+
+            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              <button (click)="navigateToUsers()"
+                class="flex flex-col items-center justify-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                <i class="fas fa-users text-blue-500 text-xl mb-2"></i>
+                <span class="text-sm text-gray-700">Manage Users</span>
+              </button>
+
+              <button (click)="navigateToManageCommunities()"
+                class="flex flex-col items-center justify-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
+                <i class="fas fa-building text-purple-500 text-xl mb-2"></i>
+                <span class="text-sm text-gray-700">Communities</span>
+              </button>
+
+              <button (click)="navigateToManageEvents()"
+                class="flex flex-col items-center justify-center p-4 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors">
+                <i class="fas fa-calendar-alt text-amber-500 text-xl mb-2"></i>
+                <span class="text-sm text-gray-700">Events</span>
+              </button>
+
+              <button (click)="openExportModal()"
+                class="flex flex-col items-center justify-center p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
+                <i class="fas fa-file-pdf text-green-500 text-xl mb-2"></i>
+                <span class="text-sm text-gray-700">Export PDF</span>
+              </button>
+            </div>
           </div>
         </div>
-      </header>
-      
-      <!-- Dashboard Content -->
-      <div class="flex-1 p-4 md:p-6 bg-[#f5f7fa] overflow-auto">
-        <!-- Component Views -->
-        <app-user-list *ngIf="activeComponent === 'user-list'"></app-user-list>
-        <app-manage-communities *ngIf="activeComponent === 'manage-communities'"></app-manage-communities>
-        <app-manage-events *ngIf="activeComponent === 'manage-events'"></app-manage-events>  
       </div>
-    </main>
 
-    <!-- Overlay for mobile -->
-    <div 
-      *ngIf="sidebarOpen" 
-      (click)="closeSidebarOnMobile()"
-      class="md:hidden fixed inset-0 bg-black bg-opacity-50 z-0">
+      <!-- Other Components -->
+      <app-user-list *ngIf="activeComponent === 'user-list'"></app-user-list>
+      <app-manage-communities *ngIf="activeComponent === 'manage-communities'"></app-manage-communities>
+      <app-manage-events *ngIf="activeComponent === 'manage-events'"></app-manage-events>
     </div>
+  </main>
+  <!-- Export Data Modal -->
+  <div *ngIf="showExportModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+      <div class="border-b p-4 flex justify-between items-center">
+        <h3 class="text-lg font-medium text-gray-800">Export Data</h3>
+        <button (click)="showExportModal = false" class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="p-5">
+        <p class="text-gray-600 mb-4">Select what data you want to export as PDF:</p>
+        <div class="space-y-3">
+          <div class="flex items-center">
+            <input type="checkbox" id="exportUsers" [(ngModel)]="exportOptions.users"
+              class="rounded text-[#E69B6B] focus:ring-[#E69B6B]">
+            <label for="exportUsers" class="ml-2 text-gray-700">Users ({{totalUsers}} records)</label>
+          </div>
+          <div class="flex items-center">
+            <input type="checkbox" id="exportCommunities" [(ngModel)]="exportOptions.communities"
+              class="rounded text-[#E69B6B] focus:ring-[#E69B6B]">
+            <label for="exportCommunities" class="ml-2 text-gray-700">Communities ({{totalCommunities}} records)</label>
+          </div>
+          <div class="flex items-center">
+            <input type="checkbox" id="exportEvents" [(ngModel)]="exportOptions.events"
+              class="rounded text-[#E69B6B] focus:ring-[#E69B6B]">
+            <label for="exportEvents" class="ml-2 text-gray-700">Events ({{totalEvents}} records)</label>
+          </div>
+        </div>
+
+        <div class="mt-6 flex justify-between">
+          <button (click)="showExportModal = false"
+            class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
+            Cancel
+          </button>
+          <button [disabled]="!isExportSelectionValid()" [class.opacity-50]="!isExportSelectionValid()"
+            [class.cursor-not-allowed]="!isExportSelectionValid()" (click)="exportData()"
+            class="px-4 py-2 bg-[#E69B6B] text-white rounded-md hover:bg-[#d88a5a] flex items-center">
+            <i class="fas fa-file-pdf mr-2"></i> Export PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Overlay for mobile -->
+  <div *ngIf="sidebarOpen" (click)="closeSidebarOnMobile()" class="md:hidden fixed inset-0 bg-black bg-opacity-50 z-0">
+  </div>
 </div>
