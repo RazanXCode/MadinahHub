@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown';
 import { DialogModule } from 'primeng/dialog';
+import { NavbarComponent } from '../navbar/navbar.component';
 
 @Component({
   selector: 'app-all-events',
@@ -17,7 +18,8 @@ import { DialogModule } from 'primeng/dialog';
     ButtonModule, 
     InputTextModule,
     DropdownModule,
-    DialogModule
+    DialogModule,
+    NavbarComponent
   ],
   templateUrl: './all-events.component.html',
   styleUrl: './all-events.component.css'

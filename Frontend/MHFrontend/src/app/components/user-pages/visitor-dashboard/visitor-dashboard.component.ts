@@ -3,17 +3,18 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CarouselModule } from 'primeng/carousel';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog'; // Added DialogModule
+import { DialogModule } from 'primeng/dialog';
+import { NavbarComponent } from "../navbar/navbar.component";
 
 @Component({
   selector: 'app-visitor-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, CarouselModule, ButtonModule, DialogModule], // Added DialogModule
+  imports: [CommonModule, RouterModule, CarouselModule, ButtonModule, DialogModule, NavbarComponent, NavbarComponent], 
   templateUrl: './visitor-dashboard.component.html',
   styleUrl: './visitor-dashboard.component.css'
 })
 export class VisitorDashboardComponent {
-  // Modal properties (added from all-events)
+  // Modal properties
   displayEventModal: boolean = false;
   selectedEvent: any = null;
   
@@ -43,7 +44,7 @@ export class VisitorDashboardComponent {
       members: 123
     }
   ];
-   // Updated events data with additional properties from all-events component
+   // Updated events data with additional properties
   events = [
     {
       id: 1,
@@ -107,26 +108,35 @@ export class VisitorDashboardComponent {
     }
   ];
   
-  // Responsive options for both carousels
+  // Enhanced responsive options for better mobile experience
   responsiveOptions = [
     {
-      breakpoint: '1199px',
+      breakpoint: '1400px',
       numVisible: 3,
       numScroll: 1
     },
     {
-      breakpoint: '991px',
+      breakpoint: '1200px',
+      numVisible: 3,
+      numScroll: 1
+    },
+    {
+      breakpoint: '992px',
       numVisible: 2,
       numScroll: 1
     },
     {
-      breakpoint: '767px',
+      breakpoint: '768px',
+      numVisible: 1,
+      numScroll: 1
+    },
+    {
+      breakpoint: '576px',
       numVisible: 1,
       numScroll: 1
     }
   ];
   
-  // Added methods from all-events component
   showEventDetails(event: any) {
     this.selectedEvent = event;
     this.displayEventModal = true;
