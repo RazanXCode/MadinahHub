@@ -1,13 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;  
-}
+import { UserService, User } from '../../../services/users/users.service';
 
 @Component({
   selector: 'app-user-list',
@@ -29,7 +23,7 @@ export class UserListComponent implements OnInit {
 
   // Filter properties
   searchTerm = '';
-  sortColumn = 'name';
+  sortColumn = 'userName';
   sortDirection = 'asc';
 
   // User data
@@ -37,29 +31,35 @@ export class UserListComponent implements OnInit {
   filteredUsers: User[] = [];
   paginatedUsers: User[] = [];
 
-  constructor() { }
+  // UI state
+  isLoading = false;
+  error: string | null = null;
+
+  constructor(private userService: UserService) { }
 
   ngOnInit() {
-    // Generate mock data
-    this.generateMockUsers();
-    this.filterUsers();
+    this.loadUsers();
   }
-
-  generateMockUsers() {
-    for (let i = 1; i <= 20; i++) {
-      // Generate random phone numbers
-      const areaCode = 966;
-      const prefix = Math.floor(100 + Math.random() * 900);
-      const lineNumber = Math.floor(1000 + Math.random() * 9000);
-      const phone = `(${areaCode}) ${prefix}-${lineNumber}`;
-      
-      this.users.push({
-        id: i,
-        name: `User ${i}`,
-        email: `user${i}@example.com`,
-        phone: phone  
-      });
-    }
+  loadUsers() {
+    this.isLoading = true;
+    this.error = null;
+    
+    this.userService.getUsers().subscribe({
+      next: (data) => {
+        // Convert string dates to Date objects
+        this.users = data.map(user => ({
+          ...user,
+          createdAt: new Date(user.createdAt)
+        }));
+        this.isLoading = false;
+        this.filterUsers();
+      },
+      error: (err) => {
+        console.error('Error fetching users:', err);
+        this.error = 'Failed to load users. Please try again.';
+        this.isLoading = false;
+      }
+    });
   }
 
   filterUsers() {
@@ -69,13 +69,18 @@ export class UserListComponent implements OnInit {
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
       filtered = filtered.filter(user => 
-        user.name.toLowerCase().includes(term) || 
-        user.email.toLowerCase().includes(term)
+        user.userName.toLowerCase().includes(term) || 
+        this.formatDate(user.createdAt).includes(term)
       );
     }
-
+    
     // Apply sorting
     filtered.sort((a, b) => {
+    if (this.sortColumn === 'createdAt') {
+      return this.sortDirection === 'asc' 
+        ? a.createdAt.getTime() - b.createdAt.getTime()
+        : b.createdAt.getTime() - a.createdAt.getTime();
+    }
       const aValue = a[this.sortColumn as keyof User];
       const bValue = b[this.sortColumn as keyof User];
 
@@ -90,6 +95,14 @@ export class UserListComponent implements OnInit {
 
     this.filteredUsers = filtered;
     this.updatePagination();
+  }
+  formatDate(date: Date): string {
+    // DD/MM/YYYY format
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    
+    return `${day}/${month}/${year}`;
   }
 
   updatePagination() {
