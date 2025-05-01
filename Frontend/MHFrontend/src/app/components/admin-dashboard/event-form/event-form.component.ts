@@ -19,9 +19,8 @@ export class EventFormComponent implements OnInit, OnChanges {
   
   eventForm!: FormGroup;
   isSubmitting = false;
-  imagePreview: string | null = null;
   
-  
+  //TODO: Replace with actual community data from the backend
   communities: any[] = [
     { id: 1, name: 'Health & Wellness' },
     { id: 2, name: 'Medical Professionals' },
@@ -76,7 +75,6 @@ export class EventFormComponent implements OnInit, OnChanges {
       startDate: '',
       endDate: '',
     });
-    this.imagePreview = null;
   }
   
   populateForm(): void {
@@ -105,9 +103,7 @@ export class EventFormComponent implements OnInit, OnChanges {
     } else {
       capacityControl?.enable();
       capacityControl?.setValue(this.eventData.capacity ?? 50);
-    }
-    
-    this.imagePreview = imageUrl || null;
+    } 
   }
   
   setEventType(type: 'public' | 'private'): void {
@@ -121,7 +117,7 @@ export class EventFormComponent implements OnInit, OnChanges {
       capacityControl?.setValidators([
         Validators.required, 
         Validators.min(1), 
-        Validators.max(100)
+        Validators.max(1000)
       ]);
     } else {
       // For public events: Disable capacity and set to null
@@ -131,20 +127,7 @@ export class EventFormComponent implements OnInit, OnChanges {
     }
     capacityControl?.updateValueAndValidity();
   }
-  
-  onImageSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.imagePreview = e.target?.result as string;
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-  removeImage(): void {
-    this.imagePreview = null;
-  }
+
   formatDate(date: Date): string {
     return date.toISOString().split('T')[0];
   }
@@ -163,7 +146,7 @@ export class EventFormComponent implements OnInit, OnChanges {
     this.isSubmitting = true;
     const formData = this.eventForm.getRawValue();
     
-    const finalImageUrl = this.imagePreview || (formData.imageUrl?.trim() || null);
+    const finalImageUrl =  formData.imageUrl?.trim() || null;
     // Convert string values to numeric enum values for API
     const eventData = {
       publicEventId: this.editMode ? this.eventData?.publicEventId : null,      

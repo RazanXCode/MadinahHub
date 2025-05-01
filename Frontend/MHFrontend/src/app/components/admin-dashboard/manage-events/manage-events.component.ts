@@ -19,7 +19,7 @@ export class ManageEventsComponent implements OnInit {
 
   visibleCount = 6;
   loadMoreIncrement = 6;
-
+  pendingDeleteEvent: Event | null = null;
   // Filter properties
   searchTerm = '';
   filterType = '';
@@ -34,9 +34,9 @@ export class ManageEventsComponent implements OnInit {
   // UI state
   isLoading = false;
   error: string | null = null;
+  successMessage: string | null = null;
 
   constructor(private eventService: EventService) {}
-
   ngOnInit(): void {
     this.loadEvents();
   }
@@ -62,7 +62,6 @@ export class ManageEventsComponent implements OnInit {
   }
   filterEvents(): void {
     let filtered = [...this.events];
-    
     // Apply search filter
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
@@ -112,19 +111,16 @@ export class ManageEventsComponent implements OnInit {
   getEventStatus(event: any): string {
     return (event.status || '').toLowerCase() || 'unknown';
   }
-
   createEvent(): void {
     this.isEditMode = false;
     this.selectedEvent = null;
     this.showEventForm = true;
   }
-
   editEvent(event: Event): void {
     this.isEditMode = true;
     this.selectedEvent = { ...event }; 
     this.showEventForm = true;
   }
-
   handleEventFormClose(): void {
     this.showEventForm = false;
   }
@@ -134,56 +130,69 @@ export class ManageEventsComponent implements OnInit {
       const updateData: EventUpdate = {
         ...eventData
       };
-
       this.eventService.updateEvent(this.selectedEvent.publicEventId, updateData).subscribe({
         next: () => {
           // Success 
           this.loadEvents();
           this.showEventForm = false;
+          this.successMessage = 'Event updated successfully!';
+          setTimeout(() => this.successMessage = null, 5000); 
         },
         error: (err) => {
           console.error('Error updating event:', err);
-          // Handle error (consider showing an error message)
+          this.error = 'Failed to update event. Please try again.';
+          setTimeout(() => this.error = null, 5000); 
         }
       });
     } else {
-      // Add new event
-    
+    // Add new event
     const createData: EventCreate = {
       ...eventData,
       eventType: eventData.eventType === 'public' ? 0 : 1,
-      createdBy: 0, // Hardcoded user ID
-      communityId: 1  // Hardcoded community ID
+      createdBy: 1, // Hardcoded user ID
+      communityId: 2  // Hardcoded community ID
     };
-      
       this.eventService.createEvent(createData).subscribe({
         next: (createdEvent) => {
           this.loadEvents();
           this.showEventForm = false;
+          this.successMessage = 'New event created successfully!';
+          setTimeout(() => this.successMessage = null, 5000);
         },
         error: (err) => {
           console.error('Error creating event:', err);
+          this.error = 'Failed to create event. Please try again.';
+          setTimeout(() => this.error = null, 5000);
         }
       });
     }
   }
   // Show confirmation before deleting
   confirmDeleteEvent(event: Event): void {
-    if (confirm(`Delete "${event.title}"?`)) {
-      this.deleteEvent(event);
-    }
+    this.pendingDeleteEvent = event;
   }
-  // Perform the actual deletion
-  deleteEvent(event: Event): void {
+  // Delete event
+  deleteEvent(): void {
+    if (!this.pendingDeleteEvent) return;
+    
+    const event = this.pendingDeleteEvent;
     this.eventService.deleteEvent(event.publicEventId).subscribe({
       next: () => {
         this.events = this.events.filter(e => e.publicEventId !== event.publicEventId);
-        this.filterEvents(); 
-        // Show success message
+        this.filterEvents();
+        this.successMessage = `"${event.title}" has been deleted successfully.`;
+        setTimeout(() => this.successMessage = null, 5000);
+        this.pendingDeleteEvent = null;
       },
       error: (err) => {
         console.error('Error deleting event:', err);
+        this.error = 'Failed to delete event. Please try again.';
+        setTimeout(() => this.error = null, 5000);
+        this.pendingDeleteEvent = null;
       }
     });
+  }
+  cancelDelete(): void {
+    this.pendingDeleteEvent = null;
   }
 }

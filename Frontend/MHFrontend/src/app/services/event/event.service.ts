@@ -96,22 +96,4 @@ export class EventService {
     return date.toISOString();
   }
   
-  /**
-   * Helper method to transform form data to API model
-   */
-  prepareEventData(formData: any): EventCreate {
-    return {
-      title: formData.title,
-      description: formData.description,
-      location: formData.location,
-      capacity: formData.capacity,
-      startDate: new Date(formData.startDate),
-      endDate: new Date(formData.endDate),
-      status: formData.status || 'Active',
-      eventType: formData.eventType || 'Public',
-      imageUrl: formData.imageUrl,
-      createdBy: formData.createdBy || 1,
-      communityId: formData.communityId
-    };
-  }
 }
