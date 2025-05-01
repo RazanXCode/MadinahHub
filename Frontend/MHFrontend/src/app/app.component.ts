@@ -1,13 +1,50 @@
+// src/app/app.component.ts
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+
 import { DashboardComponent } from './components/admin-dashboard/dashboard/dashboard.component';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, DashboardComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  standalone: true,
+  // Bring in both routing & dashboard + common directives
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    CommonModule,
+    DashboardComponent
+  ],
+  template: `
+    <nav>
+      <div>
+        <ul>
+          <!-- If not logged in, show nothing (or maybe a login link) -->
+          <ng-container *ngIf="(authService.currentUser$ | async) === null; else loggedIn">
+            <!-- e.g. <li><a routerLink="/login">Login</a></li> -->
+          </ng-container>
+
+          <!-- Once logged in, show logout -->
+          <ng-template #loggedIn>
+            <li>
+              <a href="#" (click)="logout($event)">Logout</a>
+            </li>
+          </ng-template>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- This is where your routed views (including DashboardComponent) appear -->
+    <router-outlet></router-outlet>
+  `,
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'MHFrontend';
+  constructor(public authService: AuthService) {}
+
+  logout(event: Event): void {
+    event.preventDefault();
+    this.authService.logout().subscribe();
+  }
 }
