@@ -5,6 +5,7 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using MHBackend.Repositories;
 using Microsoft.AspNetCore.Authentication;
+using MHBackend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<MyAppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")) // Note: Add your own Connection string in appsettings.json
 );
+
+// Add Services
+builder.Services.AddSingleton<IQRCodeService, QRCodeService>();
 
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();

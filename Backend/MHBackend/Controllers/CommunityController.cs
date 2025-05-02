@@ -1,10 +1,12 @@
 ﻿using MHBackend.Data;
 using MHBackend.DTOs;
 using MHBackend.Models;
+using MHBackend.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
 
 namespace MHBackend.Controllers
 {
@@ -13,10 +15,14 @@ namespace MHBackend.Controllers
     public class CommunityController : ControllerBase
     {
         private readonly MyAppDbContext _db;
+        private readonly IUserRepository _userRepository;
 
-        public CommunityController(MyAppDbContext db)
+
+        public CommunityController(MyAppDbContext db,   IUserRepository userRepository)
+
         {
             _db = db;
+            _userRepository = userRepository;
 
         }
 
@@ -139,7 +145,13 @@ namespace MHBackend.Controllers
         public async Task<IActionResult> JoinCommunity(string publicCommunityId)
         {
 
-            var userId = 1; // replace after adding firebase auth
+            // Grt current user from token
+            var firebaseUid = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(firebaseUid))
+                return Unauthorized("User not authenticated");
+
+            var user = await _userRepository.GetByFirebaseUidAsync(firebaseUid);
+
 
             var community = await _db.Communities
                 .FirstOrDefaultAsync(c => c.PublicCommunityId == publicCommunityId);
@@ -150,13 +162,13 @@ namespace MHBackend.Controllers
 
             // Check if user already joined
             var existingJoin = await _db.UserCommunities
-                .AnyAsync(uc => uc.UserId == userId && uc.CommunityId == community.CommunityId);
+                .AnyAsync(uc => uc.UserId == user.UserId && uc.CommunityId == community.CommunityId);
             if (existingJoin)
                 return BadRequest("User already in community");
 
             var userJoin = new UserCommunity
             {
-                UserId = userId,
+                UserId = user.UserId,
                 CommunityId = community.CommunityId,
                 JoinDate = DateTime.UtcNow
             };
@@ -176,7 +188,13 @@ namespace MHBackend.Controllers
         [HttpPost("leaveCommunity/{publicCommunityId}")]
         public async Task<IActionResult> LeaveCommunity(string publicCommunityId)
         {
-            var userId = 1; // replace after adding firebase auth
+            // Grt current user from token
+            var firebaseUid = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(firebaseUid))
+                return Unauthorized("User not authenticated");
+
+            var user = await _userRepository.GetByFirebaseUidAsync(firebaseUid);
+
             var community = await _db.Communities
                 .FirstOrDefaultAsync(c => c.PublicCommunityId == publicCommunityId);
             if (community == null)
@@ -186,7 +204,7 @@ namespace MHBackend.Controllers
 
             // Check if user is a member
             var existingJoin = await _db.UserCommunities
-                .FirstOrDefaultAsync(uc => uc.UserId == userId && uc.CommunityId == community.CommunityId);
+                .FirstOrDefaultAsync(uc => uc.UserId == user.UserId && uc.CommunityId == community.CommunityId);
             if (existingJoin == null)
                 return BadRequest("User not in community");
 
