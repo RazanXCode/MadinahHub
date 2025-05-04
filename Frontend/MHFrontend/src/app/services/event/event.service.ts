@@ -50,7 +50,7 @@ export interface EventUpdate {
   providedIn: 'root'
 })
 export class EventService {
-  private apiUrl = 'http://localhost:5021/api/Event';
+  private apiUrl = 'http://localhost:5063/api/Event';
 
   constructor(private http: HttpClient) { }
 

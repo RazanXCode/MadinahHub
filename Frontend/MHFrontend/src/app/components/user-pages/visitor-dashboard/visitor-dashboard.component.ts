@@ -9,7 +9,7 @@ import { CommunityService, CommunityDto } from '../../../services/community/comm
 import { EventService, Event as AppEvent } from '../../../services/event/event.service';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
-
+import { AuthService } from '../../../services/auth.service';
 // Interface for displaying events in the UI
 interface EventDisplay {
   id: string;
@@ -60,6 +60,9 @@ export class VisitorDashboardComponent implements OnInit {
   communityError: string | null = null;
   eventError: string | null = null;
   
+  // User properties
+  userName: string = '';
+
   // Enhanced responsive options for better mobile experience
   responsiveOptions = [
     {
@@ -91,12 +94,19 @@ export class VisitorDashboardComponent implements OnInit {
   
   constructor(
     private communityService: CommunityService,
-    private eventService: EventService
+    private eventService: EventService,
+    private authService: AuthService
   ) {}
   
   ngOnInit(): void {
     this.loadCommunities();
     this.loadEvents();
+
+    this.authService.userProfile$.subscribe(profile => {
+      if (profile) {
+        this.userName = profile.username || (profile as any).userName || 'User';
+      }
+    });
   }
   
   loadCommunities(): void {

@@ -21,7 +21,6 @@ export class EventFormComponent implements OnInit, OnChanges {
   eventForm!: FormGroup;
   isSubmitting = false;
 
-  //TODO: Replace with actual community data from the backend
   communities: CommunityNameDto[] = [];
   isLoadingCommunities = false;
   communityError = '';

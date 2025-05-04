@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service'; 
+
 @Component({
   selector: 'app-landing-page',
   imports: [CommonModule, RouterModule],
@@ -10,13 +12,25 @@ import { Router } from '@angular/router';
 
 })
 export class LandingPageComponent {
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService ) {}
 
   onGetStarted(): void {
-    this.router.navigate(['/login']); 
+    if (this.authService.currentUserValue) {
+      // If the user is logged in, navigate to the dashboard
+      this.router.navigate(['/dashboard']);
+    } else {
+      // If the user is not logged in, navigate to the login page
+      this.router.navigate(['/login']);
+    }
   }
   onExploreCommunities(): void {
-    this.router.navigate(['/dashboard']); 
+    if (this.authService.currentUserValue) {
+      // If the user is logged in, navigate to the dashboard
+      this.router.navigate(['/dashboard']);
+    } else {
+      // If the user is not logged in, navigate to the login page
+      this.router.navigate(['/login']);
+    }
   }
 
 }

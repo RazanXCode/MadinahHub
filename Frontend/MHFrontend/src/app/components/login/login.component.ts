@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
-
+import { UserService } from '../../services/users/users.service';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -19,7 +19,8 @@ export class LoginComponent {
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private userService: UserService 
   ) {
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
@@ -37,9 +38,33 @@ export class LoginComponent {
     this.authService.login(email, password).subscribe({
       next: () => {
         this.authService.loginToBackend().subscribe({
-          next: () => {
+          next: (userProfile) => {
             this.loading = false;
-            this.router.navigate(['/']);
+
+          const publicUserId = userProfile.userIdPublic || (userProfile as any).publicUserId;
+  
+          if (!publicUserId) {
+            this.error = 'User ID not found in profile.';
+            console.error('User ID is missing in userProfile:', userProfile);
+            return;
+          }
+            // Fetch user details using UserService
+            this.userService.getUser(publicUserId).subscribe({
+              next: (user) => {
+                console.log('Fetched User:', user);
+
+                // Role-based redirection
+                if (user.role === 'Admin') {
+                  this.router.navigate(['/admin']);
+                } else {
+                  this.router.navigate(['/dashboard']);
+                }
+              },
+              error: (err) => {
+                console.error('Error fetching user details:', err);
+                this.error = 'Failed to fetch user details. Please try again.';
+              }
+            });
           },
           error: (err) => {
             this.loading = false;

@@ -48,7 +48,7 @@ export class RegisterComponent {
             .subscribe({
               next: (userProfile) => {
                 this.loading = false;
-                this.router.navigate(['/']);
+                this.router.navigate(['/dashboard']);
               },
               error: (err) => {
                 this.loading = false;

@@ -22,34 +22,9 @@ import { AllEventsComponent } from './components/user-pages/all-events/all-event
     VisitorDashboardComponent,
     AllEventsComponent
   ],
-  template: `
-    <nav>
-      <div>
-        <ul>
-          <!-- If not logged in, show nothing -->
-          <ng-container *ngIf="(authService.currentUser$ | async) === null; else loggedIn">
-            <!-- e.g. <li><a routerLink="/login">Login</a></li> -->
-          </ng-container>
-
-          <!-- Once logged in, show logout -->
-          <ng-template #loggedIn>
-            <li>
-              <a href="#" (click)="logout($event)">Logout</a>
-            </li>
-          </ng-template>
-        </ul>
-      </div>
-    </nav>
-
-    <router-outlet></router-outlet>
-  `,
+  templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  constructor(public authService: AuthService) {}
 
-  logout(event: Event): void {
-    event.preventDefault();
-    this.authService.logout().subscribe();
-  }
 }

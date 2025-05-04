@@ -12,6 +12,8 @@ import { forkJoin } from 'rxjs';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -47,6 +49,9 @@ export class DashboardComponent {
   isLoadingDashboard = true;
   dashboardError: string | null = null;
 
+  // User data
+  adminName: string = '';
+
   // Export options
   showExportModal = false;
   exportOptions = {
@@ -57,10 +62,18 @@ export class DashboardComponent {
   constructor(
     private communityService: CommunityService,
     private eventService: EventService,
-    private userService: UserService
+    private userService: UserService,
+    private authService: AuthService,
+    private router: Router
   ) { }
   ngOnInit() {
     this.loadDashboardData();
+
+    this.authService.userProfile$.subscribe(profile => {
+      if (profile) {
+        this.adminName = profile.username || (profile as any).userName || 'Admin';
+      }
+    });
   }
 
   loadDashboardData() {
@@ -282,5 +295,13 @@ export class DashboardComponent {
 
     // Save PDF
     doc.save('madinah-hub-export.pdf');
+  }
+  logout(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        // Successfully logged out
+        this.router.navigate(['/landing']);
+      }
+    });
   }
 }
