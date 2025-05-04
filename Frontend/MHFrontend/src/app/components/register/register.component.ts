@@ -43,15 +43,16 @@ export class RegisterComponent {
     this.authService.register(email, password)
       .subscribe({
         next: (userCredential) => {
+          // After Firebase registration, create user in backend directly without trying to login
           this.authService.createUserInBackend({ username, address, phoneNumber })
             .subscribe({
-              next: () => {
+              next: (userProfile) => {
                 this.loading = false;
                 this.router.navigate(['/']);
               },
               error: (err) => {
                 this.loading = false;
-                this.error = err.error || 'Failed to create user in database';
+                this.error = err.error?.message || 'Failed to create user in database';
                 console.error('Backend error:', err);
               }
             });
