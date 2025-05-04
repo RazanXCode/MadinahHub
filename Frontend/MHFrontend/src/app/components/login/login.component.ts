@@ -39,7 +39,7 @@ export class LoginComponent {
         this.authService.loginToBackend().subscribe({
           next: () => {
             this.loading = false;
-            this.router.navigate(['/']);
+            this.router.navigate(['/dashboard']);
           },
           error: (err) => {
             this.loading = false;

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -12,9 +13,9 @@ import { RouterModule } from '@angular/router';
         <div class="flex justify-between h-16">
           <!-- Brand -->
           <div class="flex items-center">
-            <img src="../../../../assets/navbarlogo.png" alt="Medinah Hub" class="h-20">
-
-            
+            <a routerLink="/landing">
+              <img src="../../../../assets/navbarlogo.png" alt="Medinah Hub" class="h-20">
+            </a>
           </div>
 
           <!-- Desktop Links -->
@@ -28,6 +29,16 @@ import { RouterModule } from '@angular/router';
             <a routerLink="/Events" class="px-3 py-2 rounded-lg text-xl text-secondary hover:bg-primary hover:text-white hover:opacity-80 transition">
               Events
             </a>
+            <!-- Logout Button -->
+            <ng-container *ngIf="(authService.currentUser$ | async) !== null">
+              <a 
+                href="#" 
+                (click)="logout($event)" 
+                class="px-3 py-2 rounded-lg text-xl text-white transition"
+                style="background-color: #E69B6B; hover: background-color:rgb(233, 195, 174);"              >
+                Logout
+              </a>
+            </ng-container>            
           </div>
 
           <!-- Mobile Menu Button -->
@@ -72,14 +83,35 @@ import { RouterModule } from '@angular/router';
         >
           Events
         </a>
+        <ng-container *ngIf="(authService.currentUser$ | async) !== null">
+          <a
+            href="#"
+            (click)="logout($event)"
+            class="block px-4 py-2 text-secondary hover:bg-primary hover:text-white hover:opacity-80 transition"
+            >
+            Logout
+          </a>
+        </ng-container>
       </div>
     </nav>
   `
 })
 export class NavbarComponent {
   menuOpen = false;
+  constructor(public authService: AuthService) {}
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
+  }
+  logout(event: Event): void {
+    event.preventDefault();
+    this.authService.logout().subscribe({
+      next: () => {
+        window.location.href = '/landing'; 
+      },
+      error: (err) => {
+        console.error('Logout failed:', err);
+      }
+    });
   }
 }

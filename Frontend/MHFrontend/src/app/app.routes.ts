@@ -7,7 +7,7 @@ import { LandingPageComponent } from './components/user-pages/landing-page/landi
 import { DashboardComponent } from './components/admin-dashboard/dashboard/dashboard.component';
 
 export const routes: Routes = [
-  // { path: '', redirectTo: 'login', pathMatch: 'full' },
+   { path: '', redirectTo: 'landing', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   // { path: '**', redirectTo: 'login' },
