@@ -20,6 +20,9 @@ module.exports = {
         },
         'primary': '#E69B6B',
         'secondary': '#2c3e50',
+        'accent': '#8EA7C1', //Light Blue
+        'neutral': '#F1D288', //Yellow
+        'foreground': '#00100B', //Text
       },
       keyframes: {
         slideIn: {

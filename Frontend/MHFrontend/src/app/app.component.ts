@@ -5,6 +5,10 @@ import { CommonModule } from '@angular/common';
 
 import { DashboardComponent } from './components/admin-dashboard/dashboard/dashboard.component';
 import { AuthService } from './services/auth.service';
+import { LandingPageComponent } from './components/user-pages/landing-page/landing-page.component';
+import { NavbarComponent } from './components/user-pages/navbar/navbar.component';
+import { VisitorDashboardComponent } from './components/user-pages/visitor-dashboard/visitor-dashboard.component';
+import { AllEventsComponent } from './components/user-pages/all-events/all-events.component';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +18,11 @@ import { AuthService } from './services/auth.service';
     RouterOutlet,
     RouterLink,
     CommonModule,
-    DashboardComponent
+    DashboardComponent,
+    LandingPageComponent,
+    NavbarComponent,
+    VisitorDashboardComponent,
+    AllEventsComponent
   ],
   template: `
     <nav>
