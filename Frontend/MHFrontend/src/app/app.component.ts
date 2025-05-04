@@ -1,4 +1,3 @@
-// src/app/app.component.ts
 import { Component } from '@angular/core';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -9,7 +8,6 @@ import { AuthService } from './services/auth.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  // Bring in both routing & dashboard + common directives
   imports: [
     RouterOutlet,
     RouterLink,
@@ -20,7 +18,7 @@ import { AuthService } from './services/auth.service';
     <nav>
       <div>
         <ul>
-          <!-- If not logged in, show nothing (or maybe a login link) -->
+          <!-- If not logged in, show nothing -->
           <ng-container *ngIf="(authService.currentUser$ | async) === null; else loggedIn">
             <!-- e.g. <li><a routerLink="/login">Login</a></li> -->
           </ng-container>
@@ -35,7 +33,6 @@ import { AuthService } from './services/auth.service';
       </div>
     </nav>
 
-    <!-- This is where your routed views (including DashboardComponent) appear -->
     <router-outlet></router-outlet>
   `,
   styleUrls: ['./app.component.css']

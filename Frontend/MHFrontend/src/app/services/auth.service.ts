@@ -1,4 +1,3 @@
-// src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { 
   getAuth, 
@@ -40,18 +39,27 @@ export interface UserProfile {
 export class AuthService {
   private auth = getAuth(initializeApp(firebaseConfig));
   private currentUserSubject = new BehaviorSubject<User | null>(null);
-  private apiUrl = 'http://localhost:5063/api'; // Updated API URL
+  private apiUrl = 'http://localhost:5063/api';
   private userProfileSubject = new BehaviorSubject<UserProfile | null>(null);
+  private isNewlyRegistered = false;
 
   constructor(private http: HttpClient) {
     onAuthStateChanged(this.auth, (user) => {
       this.currentUserSubject.next(user);
       if (user) {
-        // When user is authenticated, fetch their profile
-        this.getCurrentUser().subscribe({
-          next: (profile) => this.userProfileSubject.next(profile),
-          error: () => this.userProfileSubject.next(null)
-        });
+        // When user is authenticated and it's not a new registration,
+        // fetch their profile
+        if (!this.isNewlyRegistered) {
+          this.getCurrentUser().subscribe({
+            next: (profile) => this.userProfileSubject.next(profile),
+            error: (err) => {
+              console.error('Failed to get user profile:', err);
+              this.userProfileSubject.next(null);
+            }
+          });
+        }
+        // Reset the flag
+        this.isNewlyRegistered = false;
       } else {
         this.userProfileSubject.next(null);
       }
@@ -83,6 +91,8 @@ export class AuthService {
   }
 
   register(email: string, password: string): Observable<UserCredential> {
+    // Set the flag to indicate a new registration
+    this.isNewlyRegistered = true;
     return from(createUserWithEmailAndPassword(this.auth, email, password));
   }
 
@@ -95,15 +105,15 @@ export class AuthService {
   }
 
   // Create user in backend after Firebase authentication
-  createUserInBackend(userData: any): Observable<any> {
+  createUserInBackend(userData: any): Observable<UserProfile> {
     return from(this.getIdToken()).pipe(
       switchMap(token => {
         const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-        return this.http.post(`${this.apiUrl}/Auth/register`, {
+        return this.http.post<UserProfile>(`${this.apiUrl}/Auth/register`, {
           firebaseUid: this.auth.currentUser?.uid,
           ...userData
         }, { headers }).pipe(
-          tap(userProfile => this.userProfileSubject.next(userProfile as UserProfile))
+          tap(userProfile => this.userProfileSubject.next(userProfile))
         );
       })
     );
@@ -129,6 +139,10 @@ export class AuthService {
         return this.http.post<UserProfile>(`${this.apiUrl}/Auth/login`, {}, { headers }).pipe(
           tap(userProfile => this.userProfileSubject.next(userProfile))
         );
+      }),
+      catchError(error => {
+        console.error('Error getting current user:', error);
+        return of(null as unknown as UserProfile);
       })
     );
   }
