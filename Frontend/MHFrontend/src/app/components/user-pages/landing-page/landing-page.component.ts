@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-landing-page',
   imports: [CommonModule, RouterModule],
@@ -10,5 +10,13 @@ import { RouterModule } from '@angular/router';
 
 })
 export class LandingPageComponent {
+  constructor(private router: Router) {}
+
+  onGetStarted(): void {
+    this.router.navigate(['/login']); 
+  }
+  onExploreCommunities(): void {
+    this.router.navigate(['/dashboard']); 
+  }
 
 }
