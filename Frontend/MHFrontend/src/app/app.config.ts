@@ -7,6 +7,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { ReactiveFormsModule } from '@angular/forms';
 import { providePrimeNG } from 'primeng/config';
 import { MyPreset } from '../assets/themes/mytheme';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 export const appConfig: ApplicationConfig = {
   providers: [    providePrimeNG({
@@ -24,6 +25,7 @@ export const appConfig: ApplicationConfig = {
   }),
   provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), provideClientHydration(withEventReplay()),
   provideRouter(routes),
+  provideAnimationsAsync(),
   provideHttpClient(withInterceptorsFromDi()),
-  importProvidersFrom(ReactiveFormsModule)]
+  importProvidersFrom(ReactiveFormsModule)],
 };
