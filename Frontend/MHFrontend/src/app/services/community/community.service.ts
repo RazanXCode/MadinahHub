@@ -37,7 +37,7 @@ export interface CommunityNameDto {
   providedIn: 'root'
 })
 export class CommunityService {
-  private apiUrl = `http://localhost:5021/communities`;
+  private apiUrl = `http://localhost:5063/communities`;
 
   constructor(private http: HttpClient) { }
 
