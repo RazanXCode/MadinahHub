@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CommunityFormComponent } from '../community-form/community-form.component'; 
+import { CommunityFormComponent } from '../community-form/community-form.component';
+import { CommunityService, CommunityDto, CreateCommunityDto } from '../../../services/community/community.service';
 
 interface Community {
-  id: number;
+  publicCommunityId: string;
   name: string;
   description: string;
-  type: 'public' | 'private';  
   memberCount: number;
   createdAt: Date;
-  coverImage: string;
+  imageUrl?: string;
 }
 
 @Component({
@@ -25,10 +25,13 @@ export class ManageCommunitiesComponent implements OnInit {
   showCommunityForm = false;
   selectedCommunity: Community | null = null;
   isEditMode = false;
-  
-  visibleCount = 8; 
+  isLoading = false;
+  error: string | null = null;
+  pendingDeleteCommunity: Community | null = null;
+
+  visibleCount = 8;
   loadMoreIncrement = 8;
-  
+
   startIndex = 0;
   endIndex = 0;
 
@@ -36,60 +39,49 @@ export class ManageCommunitiesComponent implements OnInit {
   searchTerm = '';
   filterType = '';
   sortBy = 'name';
-  
+
   // Data
   communities: Community[] = [];
   filteredCommunities: Community[] = [];
   paginatedCommunities: Community[] = [];
-  
+
+  constructor(private communityService: CommunityService) { }
+
   ngOnInit(): void {
-    this.generateMockCommunities();
-    this.filterCommunities();
+    this.loadCommunities();
   }
 
-  generateMockCommunities(): void {
-    const types: ('public' | 'private')[] = ['public', 'private'];
-    
-    const communityNames = [
-      'Health & Wellness', 'Medical Professionals', 
-      'Patient Support', 'Fitness Group', 
-      'Nutrition Experts', 'Mental Health Awareness',
-      'Cardiology Network', 'Pediatric Care', 
-      'Women\'s Health', 'Senior Living', 
-      'Diabetes Management', 'Cancer Support'
-    ];
-    
-    for (let i = 0; i < communityNames.length; i++) {
-      this.communities.push({
-        id: i + 1,
-        name: communityNames[i],
-        description: `Community for ${communityNames[i].toLowerCase()}`,
-        type: types[i % 2], 
-        memberCount: Math.floor(Math.random() * 100),
-        createdAt: new Date(Date.now() - Math.floor(Math.random() * 10000000000)),
-        coverImage: 'https://placehold.co/800x200?text=Community+Image'
-      });
-    }
+  loadCommunities(): void {
+    this.isLoading = true;
+    this.error = null;
+
+    this.communityService.getAllCommunities().subscribe({
+      next: (communities) => {
+        this.communities = communities;
+        this.isLoading = false;
+        this.filterCommunities();
+      },
+      error: (err) => {
+        console.error('Error loading communities:', err);
+        this.error = 'Failed to load communities. Please try again.';
+        this.isLoading = false;
+      }
+    });
   }
 
   // filtering
   filterCommunities(): void {
     let filtered = [...this.communities];
-    
+
     // Search filter
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(c => 
-        c.name.toLowerCase().includes(term) || 
+      filtered = filtered.filter(c =>
+        c.name.toLowerCase().includes(term) ||
         c.description.toLowerCase().includes(term)
       );
     }
-    
-    // Type filter
-    if (this.filterType) {
-      filtered = filtered.filter(c => c.type === this.filterType);
-    }
-    
+
     // Apply sorting
     filtered.sort((a, b) => {
       switch (this.sortBy) {
@@ -98,19 +90,17 @@ export class ManageCommunitiesComponent implements OnInit {
         case 'members':
           return b.memberCount - a.memberCount;
         case 'created':
-          return b.createdAt.getTime() - a.createdAt.getTime();
-        case 'activity':
-          return b.createdAt.getTime() - a.createdAt.getTime(); 
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         default:
           return 0;
       }
     });
-    
+
     this.filteredCommunities = filtered;
-    
+
     // Reset visible count on filter change
     this.visibleCount = Math.min(8, this.filteredCommunities.length);
-    
+
     this.updatePagination();
   }
 
@@ -128,7 +118,7 @@ export class ManageCommunitiesComponent implements OnInit {
       this.visibleCount + this.loadMoreIncrement,
       this.filteredCommunities.length
     );
-    
+
     // Update the visible count and refresh the displayed items
     this.visibleCount = newVisibleCount;
     this.updatePagination();
@@ -146,34 +136,70 @@ export class ManageCommunitiesComponent implements OnInit {
     this.selectedCommunity = { ...community };
     this.showCommunityForm = true;
   }
+  confirmDeleteCommunity(community: Community): void {
+    this.pendingDeleteCommunity = community;
+  }
+
+  deleteCommunity(): void {
+    if (!this.pendingDeleteCommunity) return;
+
+    const communityId = this.pendingDeleteCommunity.publicCommunityId;
+
+    this.communityService.deleteCommunity(communityId).subscribe({
+      next: () => {
+        // Remove from local arrays
+        this.communities = this.communities.filter(c => c.publicCommunityId !== communityId);
+        this.filterCommunities();
+        this.pendingDeleteCommunity = null;
+      },
+      error: (err) => {
+        console.error('Error deleting community:', err);
+        this.error = 'Failed to delete community. Please try again.';
+        this.pendingDeleteCommunity = null;
+      }
+    });
+  }
+  cancelDelete(): void {
+    this.pendingDeleteCommunity = null;
+  }
 
   handleCommunityFormClose(): void {
     this.showCommunityForm = false;
   }
 
-  // Simplified submission handler
+  // submission handler
   handleCommunityFormSubmit(communityData: any): void {
+    const createData: CreateCommunityDto = {
+      name: communityData.name,
+      description: communityData.description,
+      imageUrl: communityData.imageUrl || null
+    };
+
     if (this.isEditMode && this.selectedCommunity) {
-      // Update existing
-      const index = this.communities.findIndex(c => c.id === this.selectedCommunity!.id);
-      if (index !== -1) {
-        this.communities[index].name = communityData.name;
-        this.communities[index].description = communityData.description;
-      }
+      // Update existing community
+      this.communityService.updateCommunity(this.selectedCommunity.publicCommunityId, createData).subscribe({
+        next: () => {
+          this.loadCommunities(); // Reload all communities
+          this.showCommunityForm = false;
+        },
+        error: (err) => {
+          console.error('Error updating community:', err);
+          this.error = 'Failed to update community. Please try again.';
+        }
+      });
     } else {
-      // Create new
-      this.communities.push({
-        id: this.communities.length + 1,
-        name: communityData.name,
-        description: communityData.description,
-        type: 'public', // Default to public
-        memberCount: 0,
-        createdAt: new Date(),
-        coverImage: 'https://placehold.co/800x200?text=Community+Image'
+      // Create new community
+      this.communityService.createCommunity(createData).subscribe({
+        next: (newCommunity) => {
+          this.communities.push(newCommunity);
+          this.filterCommunities();
+          this.showCommunityForm = false;
+        },
+        error: (err) => {
+          console.error('Error creating community:', err);
+          this.error = 'Failed to create community. Please try again.';
+        }
       });
     }
-    
-    this.filterCommunities();
-    this.showCommunityForm = false;
   }
 }

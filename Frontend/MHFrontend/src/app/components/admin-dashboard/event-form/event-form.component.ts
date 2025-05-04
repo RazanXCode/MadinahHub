@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CommunityService, CommunityNameDto } from '../../../services/community/community.service';
 
 @Component({
   selector: 'app-event-form',
@@ -13,32 +14,31 @@ export class EventFormComponent implements OnInit, OnChanges {
   @Input() isVisible = false;
   @Input() editMode = false;
   @Input() eventData: any = null;
-  
+
   @Output() formClose = new EventEmitter<void>();
   @Output() formSubmit = new EventEmitter<any>();
-  
+
   eventForm!: FormGroup;
   isSubmitting = false;
-  
+
   //TODO: Replace with actual community data from the backend
-  communities: any[] = [
-    { id: 1, name: 'Health & Wellness' },
-    { id: 2, name: 'Medical Professionals' },
-    { id: 3, name: 'Patient Support' },
-    { id: 4, name: 'Fitness Group' }
-  ];
-  constructor(private fb: FormBuilder) {}
-  
+  communities: CommunityNameDto[] = [];
+  isLoadingCommunities = false;
+  communityError = '';
+
+  constructor(private fb: FormBuilder, private communityService: CommunityService) { }
+
   ngOnInit(): void {
     this.initForm();
+    this.loadCommunities();
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (!this.eventForm) {
       this.initForm();
     }
-    
-    if ((changes['eventData']?.currentValue || 
-        (changes['isVisible'] && changes['isVisible'].currentValue === true))) {
+
+    if ((changes['eventData']?.currentValue ||
+      (changes['isVisible'] && changes['isVisible'].currentValue === true))) {
       if (this.editMode && this.eventData) {
         this.populateForm();
       } else if (changes['isVisible']?.currentValue === true) {
@@ -49,20 +49,36 @@ export class EventFormComponent implements OnInit, OnChanges {
   initForm(): void {
     this.eventForm = this.fb.group({
       title: ['', [Validators.required]],
-      community: ['', [Validators.required]], 
+      community: ['', [Validators.required]],
       type: ['public', [Validators.required]],
-      capacity: [{value: null, disabled: true}],
-      imageUrl: [''], 
+      capacity: [{ value: null, disabled: true }],
+      imageUrl: [''],
       location: ['', [Validators.required]],
       description: ['', [Validators.required]],
       startDate: ['', [Validators.required]],
       endDate: ['', [Validators.required]],
     });
-    
-  // Monitor type changes
-  this.eventForm.get('type')?.valueChanges.subscribe(type => {
-    this.setEventType(type);
-  });
+
+    // Monitor type changes
+    this.eventForm.get('type')?.valueChanges.subscribe(type => {
+      this.setEventType(type);
+    });
+  }
+  loadCommunities(): void {
+    this.isLoadingCommunities = true;
+    this.communityError = '';
+
+    this.communityService.getCommunityNames().subscribe({
+      next: (communities) => {
+        this.communities = communities;
+        this.isLoadingCommunities = false;
+      },
+      error: (err) => {
+        console.error('Error loading communities:', err);
+        this.communityError = 'Unable to load communities. Please try again.';
+        this.isLoadingCommunities = false;
+      }
+    });
   }
   resetForm(): void {
     this.eventForm.reset({
@@ -76,12 +92,12 @@ export class EventFormComponent implements OnInit, OnChanges {
       endDate: '',
     });
   }
-  
+
   populateForm(): void {
     if (!this.eventData) return;
-    
-    const isPublic = Number(this.eventData.eventType) === 0 || 
-    String(this.eventData.eventType).toLowerCase() === 'public';
+
+    const isPublic = Number(this.eventData.eventType) === 0 ||
+      String(this.eventData.eventType).toLowerCase() === 'public';
 
     const startDate = new Date(this.eventData.startDate);
     const endDate = new Date(this.eventData.endDate);
@@ -89,13 +105,13 @@ export class EventFormComponent implements OnInit, OnChanges {
 
     this.eventForm.patchValue({
       title: this.eventData.title,
-      type: isPublic ? 'public' : 'private', 
+      type: isPublic ? 'public' : 'private',
       community: this.eventData.communityId || '',
       description: this.eventData.description,
       location: this.eventData.location || '',
       startDate: this.formatDate(startDate),
       endDate: this.formatDate(endDate),
-      imageUrl: imageUrl || '' 
+      imageUrl: imageUrl || ''
     });
     const capacityControl = this.eventForm.get('capacity');
     if (isPublic) {
@@ -103,20 +119,20 @@ export class EventFormComponent implements OnInit, OnChanges {
     } else {
       capacityControl?.enable();
       capacityControl?.setValue(this.eventData.capacity ?? 50);
-    } 
+    }
   }
-  
+
   setEventType(type: 'public' | 'private'): void {
     this.eventForm.patchValue({ type }, { emitEvent: false });
-    
+
     // capacity validation based on type
     const capacityControl = this.eventForm.get('capacity');
     if (type === 'private') {
       // For private events: Enable capacity with validation
       capacityControl?.enable();
       capacityControl?.setValidators([
-        Validators.required, 
-        Validators.min(1), 
+        Validators.required,
+        Validators.min(1),
         Validators.max(1000)
       ]);
     } else {
@@ -132,7 +148,7 @@ export class EventFormComponent implements OnInit, OnChanges {
     return date.toISOString().split('T')[0];
   }
   closeForm(): void {
-    this.resetForm();  
+    this.resetForm();
     this.formClose.emit();
   }
   saveEvent(): void {
@@ -142,14 +158,14 @@ export class EventFormComponent implements OnInit, OnChanges {
       });
       return;
     }
-    
+
     this.isSubmitting = true;
     const formData = this.eventForm.getRawValue();
-    
-    const finalImageUrl =  formData.imageUrl?.trim() || null;
+
+    const finalImageUrl = formData.imageUrl?.trim() || null;
     // Convert string values to numeric enum values for API
     const eventData = {
-      publicEventId: this.editMode ? this.eventData?.publicEventId : null,      
+      publicEventId: this.editMode ? this.eventData?.publicEventId : null,
       title: formData.title,
       description: formData.description,
       location: formData.location,
@@ -162,7 +178,7 @@ export class EventFormComponent implements OnInit, OnChanges {
       startDate: new Date(formData.startDate),
       endDate: new Date(formData.endDate)
     };
-    
+
     this.formSubmit.emit(eventData);
     this.isSubmitting = false;
   }

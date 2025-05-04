@@ -1,21 +1,21 @@
 <div class="fixed inset-0 z-40" *ngIf="isVisible">
   <!-- Dark backdrop -->
   <div class="absolute inset-0 bg-black bg-opacity-50"></div>
-  
+
   <!-- Modal content  -->
   <div class="fixed inset-0 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg w-[90%] max-w-[600px] max-h-[90vh] shadow-xl flex flex-col overflow-y-auto animate-[slideIn_0.3s_ease-out]">
-      
+    <div
+      class="bg-white rounded-lg w-[90%] max-w-[600px] max-h-[90vh] shadow-xl flex flex-col overflow-y-auto animate-[slideIn_0.3s_ease-out]">
+
       <!-- Modal Header -->
       <div class="flex justify-between items-center p-4 border-b border-[#eee]">
         <h2 class="m-0 text-[#333] text-[1.3rem]">{{ editMode ? 'Edit Event' : 'Create New Event' }}</h2>
-        <button 
-          class="bg-transparent border-0 text-[#777] text-[1.2rem] cursor-pointer p-1 hover:text-[#E69B6B]" 
+        <button class="bg-transparent border-0 text-[#777] text-[1.2rem] cursor-pointer p-1 hover:text-[#E69B6B]"
           (click)="closeForm()">
           <i class="fas fa-times"></i>
         </button>
       </div>
-      
+
       <!-- Modal Body -->
       <div class="p-6 overflow-y-auto">
         <form [formGroup]="eventForm" (ngSubmit)="saveEvent()">
@@ -24,76 +24,67 @@
             <label for="eventTitle" class="block mb-2 font-medium text-[#444] text-[0.9rem]">
               Event Title <span class="text-[#d32f2f]">*</span>
             </label>
-            <input 
-              type="text" 
-              id="eventTitle" 
-              formControlName="title" 
-              placeholder="Enter event title" 
+            <input type="text" id="eventTitle" formControlName="title" placeholder="Enter event title"
               class="block w-full p-2.5 border border-[#ddd] rounded-md text-[0.95rem] text-[#333] focus:outline-none focus:border-[#E69B6B] focus:ring-2 focus:ring-[rgba(230,155,107,0.2)]">
-            <div class="text-[#d32f2f] text-[0.8rem] mt-1" *ngIf="eventForm.get('title')?.touched && eventForm.get('title')?.invalid">
+            <div class="text-[#d32f2f] text-[0.8rem] mt-1"
+              *ngIf="eventForm.get('title')?.touched && eventForm.get('title')?.invalid">
               <span *ngIf="eventForm.get('title')?.errors?.['required']">Title is required</span>
             </div>
           </div>
-          
+
           <!-- Community Dropdown -->
           <div class="mb-5">
             <label for="eventCommunity" class="block mb-2 font-medium text-[#444] text-[0.9rem]">
               Community <span class="text-[#d32f2f]">*</span>
             </label>
-            <select
-              id="eventCommunity" 
-              formControlName="community" 
+            <select id="eventCommunity" formControlName="community"
               class="block w-full p-2.5 border border-[#ddd] rounded-md text-[0.95rem] text-[#333] focus:outline-none focus:border-[#E69B6B] focus:ring-2 focus:ring-[rgba(230,155,107,0.2)]">
               <option value="" disabled>Select a community</option>
-              <option *ngFor="let community of communities" [value]="community.id">
+              <option *ngFor="let community of communities" [value]="community.communityId">
                 {{ community.name }}
               </option>
             </select>
-            <div class="text-[#d32f2f] text-[0.8rem] mt-1" *ngIf="eventForm.get('community')?.touched && eventForm.get('community')?.invalid">
+            <div class="text-[#d32f2f] text-[0.8rem] mt-1"
+              *ngIf="eventForm.get('community')?.touched && eventForm.get('community')?.invalid">
               <span *ngIf="eventForm.get('community')?.errors?.['required']">Community is required</span>
             </div>
           </div>
-          
+
           <!-- Type as Dropdown-->
           <div class="mb-5">
             <label class="block mb-2 font-medium text-[#444] text-[0.9rem]">
               Event Type <span class="text-[#d32f2f]">*</span>
             </label>
             <div class="flex border border-[#ddd] rounded-md overflow-hidden">
-              <div 
-                class="flex-1 p-3 text-center cursor-pointer transition-all" 
+              <div class="flex-1 p-3 text-center cursor-pointer transition-all"
                 [ngClass]="{'bg-[#E69B6B] text-white': eventForm.get('type')?.value === 'public', 'bg-[#f9f9f9] text-[#666] hover:bg-[#f1f1f1]': eventForm.get('type')?.value !== 'public'}"
                 (click)="setEventType('public')">
                 <i class="fas fa-globe mr-2"></i> Public
               </div>
-              <div 
-                class="flex-1 p-3 text-center cursor-pointer transition-all"
+              <div class="flex-1 p-3 text-center cursor-pointer transition-all"
                 [ngClass]="{'bg-[#E69B6B] text-white': eventForm.get('type')?.value === 'private', 'bg-[#f9f9f9] text-[#666] hover:bg-[#f1f1f1]': eventForm.get('type')?.value !== 'private'}"
                 (click)="setEventType('private')">
                 <i class="fas fa-lock mr-2"></i> Private
               </div>
             </div>
           </div>
-          
+
           <!-- Capacity -->
           <div class="mb-5">
             <label for="eventCapacity" class="block mb-2 font-medium text-[#444] text-[0.9rem]">
               Capacity <span class="text-[#d32f2f]">*</span>
             </label>
             <div class="flex items-center">
-              <input 
-                type="number" 
-                id="eventCapacity" 
-                formControlName="capacity" 
-                min="1" 
+              <input type="number" id="eventCapacity" formControlName="capacity" min="1"
                 [max]="eventForm.get('type')?.value === 'private' ? 500 : 1000"
-                placeholder="Maximum number of attendees" 
+                placeholder="Maximum number of attendees"
                 class="block w-full p-2.5 border border-[#ddd] rounded-md text-[0.95rem] text-[#333] focus:outline-none focus:border-[#E69B6B] focus:ring-2 focus:ring-[rgba(230,155,107,0.2)]">
               <div class="ml-2 text-[#777]">
                 <i class="fas fa-users"></i>
               </div>
             </div>
-            <div class="text-[#d32f2f] text-[0.8rem] mt-1" *ngIf="eventForm.get('capacity')?.touched && eventForm.get('capacity')?.invalid">
+            <div class="text-[#d32f2f] text-[0.8rem] mt-1"
+              *ngIf="eventForm.get('capacity')?.touched && eventForm.get('capacity')?.invalid">
               <span *ngIf="eventForm.get('capacity')?.errors?.['required']">Capacity is required</span>
               <span *ngIf="eventForm.get('capacity')?.errors?.['min']">Capacity must be at least 1</span>
               <span *ngIf="eventForm.get('capacity')?.errors?.['max']">
@@ -101,36 +92,29 @@
               </span>
             </div>
           </div>
-          
+
           <!-- Location  -->
           <div class="mb-5">
             <label for="eventLocation" class="block mb-2 font-medium text-[#444] text-[0.9rem]">
               Location <span class="text-[#d32f2f]">*</span>
             </label>
-            <input 
-              type="text" 
-              id="eventLocation" 
-              formControlName="location" 
-              placeholder="Enter event location" 
+            <input type="text" id="eventLocation" formControlName="location" placeholder="Enter event location"
               class="block w-full p-2.5 border border-[#ddd] rounded-md text-[0.95rem] text-[#333] focus:outline-none focus:border-[#E69B6B] focus:ring-2 focus:ring-[rgba(230,155,107,0.2)]">
-            <div class="text-[#d32f2f] text-[0.8rem] mt-1" *ngIf="eventForm.get('location')?.touched && eventForm.get('location')?.invalid">
+            <div class="text-[#d32f2f] text-[0.8rem] mt-1"
+              *ngIf="eventForm.get('location')?.touched && eventForm.get('location')?.invalid">
               <span *ngIf="eventForm.get('location')?.errors?.['required']">Location is required</span>
             </div>
           </div>
-                 
+
           <!-- Cover Image -->
           <div class="mb-5">
             <label for="imageUrl" class="block mb-2 font-medium text-[#444] text-[0.9rem]">
               Image URL
             </label>
-            <input 
-              type="url" 
-              id="imageUrl" 
-              formControlName="imageUrl" 
-              placeholder="https://example.com/image.jpg" 
+            <input type="url" id="imageUrl" formControlName="imageUrl" placeholder="https://example.com/image.jpg"
               class="block w-full p-2.5 border border-[#ddd] rounded-md text-[0.95rem] text-[#333] focus:outline-none focus:border-[#E69B6B] focus:ring-2 focus:ring-[rgba(230,155,107,0.2)]">
           </div>
-          
+
           <!-- Date and Time Section -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
             <!-- Start Date -->
@@ -138,55 +122,46 @@
               <label for="startDate" class="block mb-2 font-medium text-[#444] text-[0.9rem]">
                 Start Date <span class="text-[#d32f2f]">*</span>
               </label>
-              <input 
-                type="date" 
-                id="startDate" 
-                formControlName="startDate"
+              <input type="date" id="startDate" formControlName="startDate"
                 class="block w-full p-2.5 border border-[#ddd] rounded-md text-[0.95rem] text-[#333] focus:outline-none focus:border-[#E69B6B] focus:ring-2 focus:ring-[rgba(230,155,107,0.2)]">
-              <div class="text-[#d32f2f] text-[0.8rem] mt-1" *ngIf="eventForm.get('startDate')?.touched && eventForm.get('startDate')?.invalid">
+              <div class="text-[#d32f2f] text-[0.8rem] mt-1"
+                *ngIf="eventForm.get('startDate')?.touched && eventForm.get('startDate')?.invalid">
                 <span *ngIf="eventForm.get('startDate')?.errors?.['required']">Start date is required</span>
               </div>
-            </div>    
+            </div>
             <!-- End Date -->
             <div>
               <label for="endDate" class="block mb-2 font-medium text-[#444] text-[0.9rem]">
                 End Date <span class="text-[#d32f2f]">*</span>
               </label>
-              <input 
-                type="date" 
-                id="endDate" 
-                formControlName="endDate"
+              <input type="date" id="endDate" formControlName="endDate"
                 class="block w-full p-2.5 border border-[#ddd] rounded-md text-[0.95rem] text-[#333] focus:outline-none focus:border-[#E69B6B] focus:ring-2 focus:ring-[rgba(230,155,107,0.2)]">
-              <div class="text-[#d32f2f] text-[0.8rem] mt-1" *ngIf="eventForm.get('endDate')?.touched && eventForm.get('endDate')?.invalid">
+              <div class="text-[#d32f2f] text-[0.8rem] mt-1"
+                *ngIf="eventForm.get('endDate')?.touched && eventForm.get('endDate')?.invalid">
                 <span *ngIf="eventForm.get('endDate')?.errors?.['required']">End date is required</span>
               </div>
             </div>
           </div>
-          
+
           <!-- Description -->
           <div class="mb-5">
             <label for="eventDescription" class="block mb-2 font-medium text-[#444] text-[0.9rem]">
               Description <span class="text-[#d32f2f]">*</span>
             </label>
-            <textarea 
-              id="eventDescription" 
-              formControlName="description" 
-              rows="4"
-              placeholder="Enter event description" 
+            <textarea id="eventDescription" formControlName="description" rows="4" placeholder="Enter event description"
               class="block w-full p-2.5 border border-[#ddd] rounded-md text-[0.95rem] text-[#333] focus:outline-none focus:border-[#E69B6B] focus:ring-2 focus:ring-[rgba(230,155,107,0.2)]"></textarea>
-            <div class="text-[#d32f2f] text-[0.8rem] mt-1" *ngIf="eventForm.get('description')?.touched && eventForm.get('description')?.invalid">
+            <div class="text-[#d32f2f] text-[0.8rem] mt-1"
+              *ngIf="eventForm.get('description')?.touched && eventForm.get('description')?.invalid">
               <span *ngIf="eventForm.get('description')?.errors?.['required']">Description is required</span>
             </div>
           </div>
-          
+
           <!-- Form actions -->
           <div class="flex justify-end gap-4 mt-8">
-            <button 
-              type="button" 
+            <button type="button"
               class="px-5 py-2.5 bg-white text-[#666] border border-[#ddd] rounded-md font-medium cursor-pointer transition-all hover:bg-[#f5f5f5]"
               (click)="closeForm()">Cancel</button>
-            <button 
-              type="submit" 
+            <button type="submit"
               class="px-5 py-2.5 bg-[#E69B6B] text-white border-0 rounded-md font-medium cursor-pointer transition-all hover:bg-[#d48a5a] disabled:bg-[#cccccc] disabled:cursor-not-allowed"
               [disabled]="eventForm.invalid || isSubmitting">
               <span *ngIf="!isSubmitting">{{ editMode ? 'Update Event' : 'Create Event' }}</span>

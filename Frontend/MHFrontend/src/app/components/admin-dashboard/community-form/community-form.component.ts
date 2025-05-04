@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 
 interface CommunityData {
-  id?: number;
+  publicCommunityId?: string
   name: string;
-  image?: string;
   description: string;
+  imageUrl?: string;
+  memberCount?: number;
+  createdAt?: Date;
 }
 
 @Component({
@@ -26,9 +28,8 @@ export class CommunityFormComponent implements OnInit, OnChanges {
   communityForm!: FormGroup;
   isSubmitting = false;
   imagePreview: string | null = null;
-  selectedFile: File | null = null;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder) { }
 
   ngOnInit() {
     this.initializeForm();
@@ -37,7 +38,7 @@ export class CommunityFormComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isVisible'] && this.isVisible) {
       this.initializeForm();
-      
+
       if (this.editMode && this.communityData) {
         this.populateForm();
       }
@@ -47,60 +48,53 @@ export class CommunityFormComponent implements OnInit, OnChanges {
   initializeForm() {
     this.communityForm = this.fb.group({
       name: ['', [Validators.required]],
-      description: ['', [Validators.required]]
+      description: ['', [Validators.required]],
+      imageUrl: ['']
     });
-    
+
     this.imagePreview = null;
-    this.selectedFile = null;
   }
 
   populateForm() {
     if (!this.communityData) return;
-    
+
     this.communityForm.patchValue({
       name: this.communityData.name,
       description: this.communityData.description
     });
-    
-    if (this.communityData.image) {
-      this.imagePreview = this.communityData.image;
+
+    if (this.communityData.imageUrl) {
+      this.imagePreview = this.communityData.imageUrl;
     }
   }
-
-  onImageSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.selectedFile = file;
-      
-      // Create a preview
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.imagePreview = reader.result as string;
-      };
-      reader.readAsDataURL(file);
+  previewImageFromUrl(event: any): void {
+    const url = event.target.value.trim();
+    if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+      this.imagePreview = url;
+    } else {
+      this.imagePreview = null;
     }
   }
 
   removeImage() {
     this.imagePreview = null;
-    this.selectedFile = null;
+    this.communityForm.get('imageUrl')?.setValue('');
   }
 
   saveCommunity() {
     if (this.communityForm.invalid) return;
-    
+
     this.isSubmitting = true;
-    
+
     const formValues = this.communityForm.value;
-    
+
     // Create the community data object
     const communityData: CommunityData = {
-      id: this.communityData?.id,
       name: formValues.name,
       description: formValues.description,
-      image: this.imagePreview || undefined
+      imageUrl: this.imagePreview || undefined
     };
-     
+
     this.formSubmit.emit(communityData);
     this.isSubmitting = false;
     this.closeForm();
