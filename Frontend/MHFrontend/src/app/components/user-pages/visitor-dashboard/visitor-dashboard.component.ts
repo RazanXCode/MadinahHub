@@ -5,11 +5,16 @@ import { CarouselModule } from 'primeng/carousel';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { NavbarComponent } from "../navbar/navbar.component";
-import { CommunityService, CommunityDto } from '../../../services/community/community.service';
-import { EventService, Event as AppEvent } from '../../../services/event/event.service';
-import { catchError, finalize } from 'rxjs/operators';
+import { CommunityService } from '../../../services/community/community.service';
+import { EventService } from '../../../services/event/event.service';
+import { UserService, UserCommunity, UserEvent } from '../../../services/users/users.service';
+import { BookingsService } from '../../../services/booking/booking.service';
+import { catchError, finalize, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+
 // Interface for displaying events in the UI
 interface EventDisplay {
   id: string;
@@ -25,6 +30,7 @@ interface EventDisplay {
   duration: string;
   requirements?: string;
   isPrivate: boolean;
+  publicBookingId?: string; // Added to track booking ID for cancellation
 }
 
 // Interface for displaying communities in the UI
@@ -34,14 +40,16 @@ interface CommunityDisplay {
   description: string;
   members: number;
   imageUrl?: string;
+  joinDate: string; // Added to show when user joined
 }
 
 @Component({
   selector: 'app-visitor-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, CarouselModule, ButtonModule, DialogModule, NavbarComponent], 
+  imports: [CommonModule, RouterModule, CarouselModule, ButtonModule, DialogModule, NavbarComponent, ToastModule],
   templateUrl: './visitor-dashboard.component.html',
-  styleUrl: './visitor-dashboard.component.css'
+  styleUrl: './visitor-dashboard.component.css',
+  providers: [MessageService]
 })
 export class VisitorDashboardComponent implements OnInit {
   // Modal properties
@@ -55,6 +63,7 @@ export class VisitorDashboardComponent implements OnInit {
   // Loading states
   loadingCommunities: boolean = false;
   loadingEvents: boolean = false;
+  cancellingBooking: boolean = false;
   
   // Error states
   communityError: string | null = null;
@@ -62,6 +71,7 @@ export class VisitorDashboardComponent implements OnInit {
   
   // User properties
   userName: string = '';
+  publicUserId: string = '';
 
   // Enhanced responsive options for better mobile experience
   responsiveOptions = [
@@ -95,67 +105,84 @@ export class VisitorDashboardComponent implements OnInit {
   constructor(
     private communityService: CommunityService,
     private eventService: EventService,
-    private authService: AuthService
+    private userService: UserService,
+    private bookingsService: BookingsService,
+    private authService: AuthService,
+    private messageService: MessageService
   ) {}
   
   ngOnInit(): void {
-    this.loadCommunities();
-    this.loadEvents();
-
+    // Get user profile info first, then load user-specific data
     this.authService.userProfile$.subscribe(profile => {
       if (profile) {
         this.userName = profile.username || (profile as any).userName || 'User';
+        this.publicUserId = (profile as any).publicUserId || '';
+        
+        // Load user communities and events once we have the user ID
+        if (this.publicUserId) {
+          this.loadUserCommunities();
+          this.loadUserBookedEvents();
+        }
       }
     });
   }
   
-  loadCommunities(): void {
+  loadUserCommunities(): void {
     this.loadingCommunities = true;
     this.communityError = null;
     
-    this.communityService.getAllCommunities()
+    this.userService.getUserCommunities(this.publicUserId)
       .pipe(
         catchError(error => {
-          this.communityError = 'Failed to load communities. Please try again later.';
-          console.error('Error loading communities:', error);
+          this.communityError = 'Failed to load your communities. Please try again later.';
+          console.error('Error loading user communities:', error);
           return of([]);
         }),
         finalize(() => this.loadingCommunities = false)
       )
       .subscribe(communities => {
-        this.communities = communities.map(community => this.mapCommunityToDisplay(community));
+        this.communities = communities.map(community => this.mapUserCommunityToDisplay(community));
       });
   }
   
-  loadEvents(): void {
+  loadUserBookedEvents(): void {
     this.loadingEvents = true;
     this.eventError = null;
     
-    this.eventService.getEvents()
+    this.userService.getUserBookedEvents(this.publicUserId)
       .pipe(
         catchError(error => {
-          this.eventError = 'Failed to load events. Please try again later.';
-          console.error('Error loading events:', error);
+          this.eventError = 'Failed to load your booked events. Please try again later.';
+          console.error('Error loading user booked events:', error);
           return of([]);
         }),
         finalize(() => this.loadingEvents = false)
       )
       .subscribe(events => {
-        this.events = events.map(event => this.mapEventToDisplay(event));
+        this.events = events.map(event => this.mapUserEventToDisplay(event));
       });
   }
   
-  mapCommunityToDisplay(community: CommunityDto): CommunityDisplay {
+  mapUserCommunityToDisplay(community: UserCommunity): CommunityDisplay {
+    // Format join date
+    const joinDate = new Date(community.joinDate);
+    const formattedJoinDate = joinDate.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+    
     return {
       id: community.publicCommunityId,
       name: community.name,
       description: community.description,
       members: community.memberCount,
-      imageUrl: community.imageUrl || '../../../../assets/landing3.png'
+      imageUrl: community.imageUrl || '../../../../assets/landing3.png',
+      joinDate: formattedJoinDate
     };
   }
   
-  mapEventToDisplay(event: AppEvent): EventDisplay {
+  mapUserEventToDisplay(event: UserEvent): EventDisplay {
     // Format date and time from the API date
     const startDate = new Date(event.startDate);
     const formattedDate = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -178,15 +205,24 @@ export class VisitorDashboardComponent implements OnInit {
       location: event.location,
       imageUrl: event.imageUrl || '../../../../assets/image.png',
       description: event.description,
-      organizer: 'Community Organizer', // Default value if not available
+      organizer: event.communityName || 'Community Organizer',
       attendees: Math.floor(event.capacity * 0.7), // Simulated attendees count
       capacity: event.capacity,
       duration: duration,
-      isPrivate: event.eventType === 'Private' // Assuming 'Private' is the value for private events
+      isPrivate: event.eventType === 'Private', // Correctly map the event type
+      publicBookingId: this.getBookingIdForEvent(event.publicEventId) // This would need to be implemented
     };
   }
+
+  // In a real app, you would get this from your booked events data
+  // For this implementation, we'll simulate it
+  getBookingIdForEvent(eventId: string): string {
+    // In a real implementation, you would look up the booking ID for this event
+    // For now, we'll use a placeholder
+    return `booking-${eventId}`;
+  }
   
-  showEventDetails(event: any) {
+  showEventDetails(event: EventDisplay) {
     this.selectedEvent = event;
     this.displayEventModal = true;
   }
@@ -195,5 +231,48 @@ export class VisitorDashboardComponent implements OnInit {
   getSpotsLeft(event: any): string {
     const spotsLeft = event.capacity - event.attendees;
     return `${spotsLeft} / ${event.capacity}`;
+  }
+
+  // Method to cancel a booking
+  cancelBooking(event: EventDisplay): void {
+    if (!event.publicBookingId) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Booking ID not found for this event.'
+      });
+      return;
+    }
+
+    this.cancellingBooking = true;
+    
+    this.bookingsService.cancelBooking(event.publicBookingId)
+      .pipe(
+        catchError(error => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to cancel booking. Please try again later.'
+          });
+          console.error('Error cancelling booking:', error);
+          return of(null);
+        }),
+        finalize(() => {
+          this.cancellingBooking = false;
+          this.displayEventModal = false;
+        })
+      )
+      .subscribe(response => {
+        if (response) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Booking cancelled successfully.'
+          });
+          
+          // Reload the user's booked events to refresh the list
+          this.loadUserBookedEvents();
+        }
+      });
   }
 }

@@ -1,4 +1,5 @@
 <app-navbar></app-navbar>
+<p-toast></p-toast>
 <div class="px-4 sm:px-8 md:px-16 lg:px-36">
   <h1 class="text-2xl font-bold my-8">All Events</h1>
   
@@ -48,8 +49,14 @@
   <div *ngIf="!loading && !error" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     <div 
       *ngFor="let event of filteredEvents" 
-      class="shadow-md rounded-lg overflow-hidden bg-white border border-gray-200"
+      class="shadow-md rounded-lg overflow-hidden bg-white border border-gray-200 relative"
     >
+      <!-- Event Type Badge -->
+      <div class="absolute top-2 right-2 z-10">
+        <span *ngIf="event.isPrivate" class="bg-green-200 text-gray-700 text-xs px-2 py-1 rounded-md">Private</span>
+        <span *ngIf="!event.isPrivate" class="bg-blue-200 text-gray-700 text-xs px-2 py-1 rounded-md">Public</span>
+      </div>
+      
       <!-- Event Image -->
       <div class="h-40 overflow-hidden">
         <img [src]="event.imageUrl" alt="Event image" class="w-full h-full object-cover">
@@ -115,9 +122,10 @@
       <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#434343"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
     </button>
     
-    <!-- Private badge -->
-    <div class="mb-4 text-center" *ngIf="selectedEvent.isPrivate">
-      <p class="bg-green-200 text-gray-700 text-sm inline-block px-3 py-1 rounded-md">Private</p> 
+    <!-- Event type badge -->
+    <div class="mb-4 text-center">
+      <span *ngIf="selectedEvent.isPrivate" class="bg-green-200 text-gray-700 text-sm inline-block px-3 py-1 rounded-md">Private</span>
+      <span *ngIf="!selectedEvent.isPrivate" class="bg-blue-200 text-gray-700 text-sm inline-block px-3 py-1 rounded-md">Public</span>
     </div>
     
     <!-- Event Title -->
@@ -175,14 +183,19 @@
         type="button" 
         label="Book Event" 
         class="p-button-rounded"
+        [disabled]="bookingInProgress"
         [ngStyle]="{
-          'background-color': '#E69B6B',
+          'background-color': bookingInProgress ? '#cccccc' : '#E69B6B',
           'border': 'none',
           'color': 'white',
           'font-weight': 'normal',
           'padding': '0.5rem 2rem'
         }"
-      ></button>
+        (click)="bookEvent(selectedEvent)"
+      >
+        <i *ngIf="bookingInProgress" class="pi pi-spin pi-spinner mr-2"></i>
+        {{bookingInProgress ? 'Booking...' : 'Book Event'}}
+      </button>
     </div>
   </div>
 </p-dialog>

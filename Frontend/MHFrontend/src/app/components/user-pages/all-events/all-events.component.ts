@@ -6,8 +6,11 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown';
 import { DialogModule } from 'primeng/dialog';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { EventService, Event as AppEvent } from '../../../services/event/event.service';
+import { BookingsService } from '../../../services/booking/booking.service';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 
@@ -39,10 +42,12 @@ interface EventDisplay {
     InputTextModule,
     DropdownModule,
     DialogModule,
+    ToastModule,
     NavbarComponent
   ],
   templateUrl: './all-events.component.html',
-  styleUrl: './all-events.component.css'
+  styleUrl: './all-events.component.css',
+  providers: [MessageService]
 })
 export class AllEventsComponent implements OnInit {
   // Search and filter
@@ -59,6 +64,7 @@ export class AllEventsComponent implements OnInit {
   // Loading and error states
   loading: boolean = false;
   error: string | null = null;
+  bookingInProgress: boolean = false;
   
   filterOptions = [
     { label: 'Date (Newest)', value: 'date-newest' },
@@ -67,7 +73,11 @@ export class AllEventsComponent implements OnInit {
     { label: 'Event Type', value: 'type' }
   ];
 
-  constructor(private eventService: EventService) {}
+  constructor(
+    private eventService: EventService,
+    private bookingsService: BookingsService,
+    private messageService: MessageService
+  ) {}
   
   ngOnInit(): void {
     this.loadEvents();
@@ -192,5 +202,43 @@ export class AllEventsComponent implements OnInit {
   // Retry loading events
   retryLoading(): void {
     this.loadEvents();
+  }
+
+  // Book event method
+  bookEvent(event: EventDisplay): void {
+    if (!event) return;
+    
+    this.bookingInProgress = true;
+    
+    this.bookingsService.bookEvent(event.id)
+      .pipe(
+        catchError(error => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Booking Failed',
+            detail: 'There was a problem booking this event. Please try again later.'
+          });
+          console.error('Error booking event:', error);
+          return of(null);
+        }),
+        finalize(() => {
+          this.bookingInProgress = false;
+        })
+      )
+      .subscribe(response => {
+        if (response) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Booking Successful',
+            detail: `You have successfully booked ${event.title}!`
+          });
+          
+          // Close the modal after successful booking
+          this.displayEventModal = false;
+          
+          // Optionally refresh the events list
+          this.loadEvents();
+        }
+      });
   }
 }
