@@ -19,7 +19,7 @@ namespace MHBackend.Controllers
         }
 
         [HttpPost("register")]
-        [Authorize]
+        
         public async Task<IActionResult> Register([FromBody] CreateUserRequest request)
         {
             // Verify Firebase UID from token matches the request
@@ -65,7 +65,7 @@ namespace MHBackend.Controllers
         }
 
         [HttpPost("login")]
-        [Authorize]
+        
         public async Task<IActionResult> Login()
         {
             // Token validation is handled by the authentication middleware
