@@ -80,7 +80,7 @@ namespace MHBackend.Controllers
             await _db.SaveChangesAsync();
 
 
-            return Ok("Booking Confirmed");
+            return Ok(new { message = "Booking Confirmed" });
 
 
         }
@@ -118,10 +118,11 @@ namespace MHBackend.Controllers
                 booking.Ticket.Event.Capacity++;
             }
             await _db.SaveChangesAsync();
-            return Ok("Booking Cancelled");
+            return Ok(new { message = "Booking Cancelled" });
 
 
-    }
+
+        }
 
 
 

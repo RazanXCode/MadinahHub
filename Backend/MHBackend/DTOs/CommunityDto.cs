@@ -8,6 +8,7 @@
         public int MemberCount { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? ImageUrl { get; set; }
+        public bool IsMember { get; set; }
 
 
 
