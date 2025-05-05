@@ -1,0 +1,124 @@
+<div class="max-w-5xl mx-auto px-6 py-10">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center py-10">
+    <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-2"></div>
+    <p>Loading community details...</p>
+  </div>
+    
+  
+    <!-- Error State -->
+    <div *ngIf="error && !isLoading" class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-red-700">{{ error }}</p>
+        </div>
+      </div>
+    </div>
+  
+    <div *ngIf="!isLoading && !error">
+      <!-- Welcome Message -->
+      <h1 class="text-2xl font-bold mb-6">Welcome To {{ community?.name }} Community!</h1>
+    
+      <!-- Community Header -->
+      <div class="mb-8">
+        <p class="text-sm text-gray-600 mb-4">{{ community?.description }}</p>
+        <button
+          class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded text-sm font-medium transition"
+        >
+          Join Chat room
+        </button>
+      </div>
+    
+      <!-- Events Section -->
+      <div class="mb-10">
+        <h3 class="text-lg font-semibold mb-4">Explore Upcoming Events:</h3>
+        
+        <!-- Events Loading -->
+        <div *ngIf="isLoading" class="text-center py-4">
+          <p>Loading events...</p>
+        </div>
+        
+        <!-- No Events -->
+        <div *ngIf="!isLoading && events.length === 0" class="bg-gray-50 p-6 rounded-lg text-center">
+          <p class="text-gray-500">No upcoming events scheduled</p>
+        </div>
+        
+      
+        
+        <!-- Events list -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 justify-center">
+        
+          <div
+          class="w-full max-w-[280px] bg-white rounded-xl border border-white shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+          *ngFor="let event of events">
+        
+            <!-- Image/Status  -->
+            <div class="relative h-[80px] bg-gray-200 flex items-center justify-center text-sm text-gray-500 font-medium">
+              event Image
+              <div 
+                class="absolute top-2 right-2 px-2 py-0.5 text-[11px] rounded-full font-medium capitalize"
+                [ngClass]="{
+                  'bg-green-100 text-green-700': event.status === 0,
+                  'bg-red-100 text-red-700': event.status === 1
+                }">
+                {{ event.status }}
+              </div>
+            </div>
+        
+            <!-- Card Content -->
+              <div class="p-4">
+              <h3 class="text-sm font-bold text-gray-900 mb-0.5">{{ event.title }}</h3>
+              <p class="text-[13px] text-gray-700 mb-3 line-clamp-2">{{ event.description }}</p>
+        
+              <div class="text-[11px] text-gray-500 flex justify-between items-center mb-3">
+                <span class="flex items-center">
+                  <i class="fas  fa-clock mr-1 text-[#E69B6B]"></i>
+                 
+                    Start at  {{ event.startDate| date:'MMM d, y' }}
+                  </span>
+                
+                </div>
+
+
+
+              <button
+                class="bg-orange-300 hover:bg-orange-400 text-white text-xs px-4 py-1 rounded-full transition"
+              >
+                See Details
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <!-- Leave Community Button -->
+      <div class="text-center">
+        <button
+          (click)="onLeaveCommunity()"
+          class="border border-red-400 text-red-600 px-4 py-2 rounded hover:bg-red-50 transition"
+        >
+          Leave Community
+        </button>
+      </div>
+    </div>
+  </div>
