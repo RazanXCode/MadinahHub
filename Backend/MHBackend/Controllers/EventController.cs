@@ -110,7 +110,7 @@ namespace MHBackend.Controllers
             _context.Events.Add(newEvent);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetEvent), new { id = newEvent.EventId }, newEvent);
+            return CreatedAtAction(nameof(GetEvent), new { publicEventId = newEvent.PublicEventId }, newEvent);
         }
 
 

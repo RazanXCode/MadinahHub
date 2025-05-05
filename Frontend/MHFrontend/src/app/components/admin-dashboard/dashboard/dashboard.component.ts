@@ -13,8 +13,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
-import { Router } from '@angular/router';
-
+import { Router, RouterModule } from '@angular/router';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -25,7 +24,8 @@ import { Router } from '@angular/router';
     ManageCommunitiesComponent,
     CommunityFormComponent,
     EventFormComponent,
-    ManageEventsComponent
+    ManageEventsComponent,
+    RouterModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
