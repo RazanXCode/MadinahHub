@@ -7,12 +7,14 @@
   <!-- Sidebar Navigation -->
   <aside [ngClass]="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}"
     class="fixed md:static md:translate-x-0 top-0 left-0 h-full w-[320px] bg-white text-[#333] flex flex-col shadow-md z-10 transition-transform duration-300">
-    <div class="p-4 text-center border-b border-[#eee] flex flex-row items-center justify-center">
-      <img src="assets/images/logo.png" alt="Madinah Hub Logo" class="h-[70px] w-auto">
-      <span class="text-lg font-bold">
-        <span class="text-[#343a40]">Madinah </span>
-        <span class="text-[#E69B6B]">Hub</span>
-      </span>
+    <div class="p-4 text-center border-b border-[#eee]">
+      <a [routerLink]="['/landing']" class="flex flex-row items-center justify-center cursor-pointer">
+        <img src="assets/images/logo.png" alt="Madinah Hub Logo" class="h-[70px] w-auto">
+        <span class="text-lg font-bold">
+          <span class="text-[#343a40]">Madinah </span>
+          <span class="text-[#E69B6B]">Hub</span>
+        </span>
+      </a>
     </div>
 
     <nav class="flex-1 p-6">

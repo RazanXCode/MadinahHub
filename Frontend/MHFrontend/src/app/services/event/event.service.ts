@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, throwError, of, from } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
+import { AuthService } from '../auth.service';
 // Event read model matching backend EventReadDto
 export interface Event {
   publicEventId: string;
@@ -52,7 +53,10 @@ export interface EventUpdate {
 export class EventService {
   private apiUrl = 'http://localhost:5063/api/Event';
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) { }
 
   /**
    * Get all events
@@ -72,7 +76,31 @@ export class EventService {
    * Create a new event
    */
   createEvent(event: EventCreate): Observable<Event> {
-    return this.http.post<Event>(this.apiUrl, event);
+    return from(this.authService.getIdToken()).pipe(
+      switchMap(token => {
+        const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+        const eventForApi = {
+          ...event,
+          startDate: this.formatDateForApi(event.startDate),
+          endDate: this.formatDateForApi(event.endDate)
+        };
+
+        return this.http.post<Event>(this.apiUrl, eventForApi, { headers }).pipe(
+          catchError(error => {
+            // Check for 500 error with serialization issues
+            if (error.status === 500 && error.error?.includes('publicEventId')) {
+              // Extract just the ID using regex
+              const match = /publicEventId":"([^"]+)/.exec(error.error);
+              if (match) {
+                // Return constructed event
+                return of({ ...eventForApi, publicEventId: match[1] } as unknown as Event);
+              }
+            }
+            return throwError(() => error);
+          })
+        );
+      })
+    );
   }
 
   /**
