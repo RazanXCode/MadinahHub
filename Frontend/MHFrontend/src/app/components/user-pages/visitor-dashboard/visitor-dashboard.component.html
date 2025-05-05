@@ -101,11 +101,18 @@
         
         <!-- Updated event card to match all-events component -->
         <ng-template pTemplate="item" let-event>
-          <div class="mx-1 sm:mx-2 shadow-md rounded-lg overflow-hidden bg-white border border-gray-200 h-auto sm:h-[22rem]">
+          <div class="mx-1 sm:mx-2 shadow-md rounded-lg overflow-hidden bg-white border border-gray-200 h-auto sm:h-[22rem] relative">
             <!-- Event Type Badge -->
-            <div class="absolute top-2 right-2">
+            <div class="absolute top-2 right-2 z-10">
               <span *ngIf="event.isPrivate" class="bg-green-200 text-gray-700 text-xs px-2 py-1 rounded-md">Private</span>
               <span *ngIf="!event.isPrivate" class="bg-blue-200 text-gray-700 text-xs px-2 py-1 rounded-md">Public</span>
+            </div>
+            
+            <!-- Event Status Badge -->
+            <div class="absolute top-2 left-2 z-10">
+              <span *ngIf="event.status === 'Active'" class="bg-green-500 text-white text-xs px-2 py-1 rounded-md">Active</span>
+              <span *ngIf="event.status === 'Finished'" class="bg-gray-500 text-white text-xs px-2 py-1 rounded-md">Finished</span>
+              <span *ngIf="event.status === 'Upcoming'" class="bg-yellow-500 text-white text-xs px-2 py-1 rounded-md">Upcoming</span>
             </div>
             
             <!-- Event Image -->
@@ -175,10 +182,16 @@
       >
       <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#434343"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>    </button>
       
-      <!-- Event type badge -->
-      <div class="mb-3 sm:mb-4 text-center">
-        <span *ngIf="selectedEvent.isPrivate" class="bg-green-200 text-gray-700 text-xs sm:text-sm inline-block px-2 sm:px-3 py-1 rounded-md">Private</span>
-        <span *ngIf="!selectedEvent.isPrivate" class="bg-blue-200 text-gray-700 text-xs sm:text-sm inline-block px-2 sm:px-3 py-1 rounded-md">Public</span>
+      <!-- Event type and status badges -->
+      <div class="mb-3 sm:mb-4 flex justify-center gap-2">
+        <!-- Event type badge -->
+        <span *ngIf="selectedEvent.isPrivate" class="bg-green-200 text-gray-700 text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-md">Private</span>
+        <span *ngIf="!selectedEvent.isPrivate" class="bg-blue-200 text-gray-700 text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-md">Public</span>
+        
+        <!-- Event status badge -->
+        <span *ngIf="selectedEvent.status === 'Active'" class="bg-green-500 text-white text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-md">Active</span>
+        <span *ngIf="selectedEvent.status === 'Finished'" class="bg-gray-500 text-white text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-md">Finished</span>
+        <span *ngIf="selectedEvent.status === 'Upcoming'" class="bg-yellow-500 text-white text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-md">Upcoming</span>
       </div>
       
       <!-- Event Title -->
@@ -228,9 +241,9 @@
           type="button" 
           label="Cancel Booking" 
           class="p-button-rounded"
-          [disabled]="cancellingBooking"
+          [disabled]="cancellingBooking || selectedEvent.status === 'Finished'"
           [ngStyle]="{
-            'background-color': cancellingBooking ? '#cccccc' : '#E69B6B',
+            'background-color': (cancellingBooking || selectedEvent.status === 'Finished') ? '#cccccc' : '#E69B6B',
             'border': 'none',
             'color': 'white',
             'font-weight': 'normal',
@@ -238,7 +251,10 @@
             'font-size': '0.875rem'
           }"
           (click)="cancelBooking(selectedEvent)"
-        ></button>
+        >
+          <i *ngIf="cancellingBooking" class="pi pi-spin pi-spinner mr-2"></i>
+          {{cancellingBooking ? 'Cancelling...' : (selectedEvent.status === 'Finished' ? 'Event Ended' : 'Cancel Booking')}}
+        </button>
       </div>
     </div>
   </p-dialog>

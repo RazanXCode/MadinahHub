@@ -9,7 +9,7 @@ import { CommunityService } from '../../../services/community/community.service'
 import { EventService } from '../../../services/event/event.service';
 import { UserService, UserCommunity, UserEvent } from '../../../services/users/users.service';
 import { BookingsService } from '../../../services/booking/booking.service';
-import { catchError, finalize, switchMap } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { ToastModule } from 'primeng/toast';
@@ -30,6 +30,7 @@ interface EventDisplay {
   duration: string;
   requirements?: string;
   isPrivate: boolean;
+  status: string; // Added status field to match backend enum
   publicBookingId?: string; // Added to track booking ID for cancellation
 }
 
@@ -40,7 +41,7 @@ interface CommunityDisplay {
   description: string;
   members: number;
   imageUrl?: string;
-  joinDate: string; // Added to show when user joined
+  joinDate: string;
 }
 
 @Component({
@@ -54,7 +55,7 @@ interface CommunityDisplay {
 export class VisitorDashboardComponent implements OnInit {
   // Modal properties
   displayEventModal: boolean = false;
-  selectedEvent: any = null;
+  selectedEvent: EventDisplay | null = null;
   
   // Data arrays
   communities: CommunityDisplay[] = [];
@@ -209,16 +210,15 @@ export class VisitorDashboardComponent implements OnInit {
       attendees: Math.floor(event.capacity * 0.7), // Simulated attendees count
       capacity: event.capacity,
       duration: duration,
-      isPrivate: event.eventType === 'Private', // Correctly map the event type
-      publicBookingId: this.getBookingIdForEvent(event.publicEventId) // This would need to be implemented
+      isPrivate: event.eventType === 'Private',
+      status: event.status, // Use the status directly from the API
+      publicBookingId: this.getBookingIdForEvent(event.publicEventId)
     };
   }
 
   // In a real app, you would get this from your booked events data
-  // For this implementation, we'll simulate it
   getBookingIdForEvent(eventId: string): string {
     // In a real implementation, you would look up the booking ID for this event
-    // For now, we'll use a placeholder
     return `booking-${eventId}`;
   }
   
@@ -228,9 +228,10 @@ export class VisitorDashboardComponent implements OnInit {
   }
   
   // Helper method to get spots left text
-  getSpotsLeft(event: any): string {
+  getSpotsLeft(event: EventDisplay): string {
+    if (!event.capacity) return 'Unlimited';
     const spotsLeft = event.capacity - event.attendees;
-    return `${spotsLeft} / ${event.capacity}`;
+    return spotsLeft <= 0 ? 'Full' : `${spotsLeft} / ${event.capacity}`;
   }
 
   // Method to cancel a booking
