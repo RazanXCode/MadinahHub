@@ -5,6 +5,8 @@ import { AllEventsComponent } from './components/user-pages/all-events/all-event
 import { VisitorDashboardComponent } from './components/user-pages/visitor-dashboard/visitor-dashboard.component';
 import { LandingPageComponent } from './components/user-pages/landing-page/landing-page.component';
 import { DashboardComponent } from './components/admin-dashboard/dashboard/dashboard.component';
+import { CommunitesComponent } from './components/user-pages/communites/communites.component';
+import { CommunityDetailsComponent } from './components/user-pages/community-details/community-details.component';
 
 export const routes: Routes = [
   // { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -15,4 +17,7 @@ export const routes: Routes = [
   { path: 'dashboard', component: VisitorDashboardComponent },
   { path: 'landing', component: LandingPageComponent },
   { path: 'admin', component: DashboardComponent },
+  {path: 'communities', component: CommunitesComponent},
+  { path: 'community/:id', component: CommunityDetailsComponent }
+
 ];

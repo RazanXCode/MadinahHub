@@ -39,7 +39,7 @@ export interface UserProfile {
 export class AuthService {
   private auth = getAuth(initializeApp(firebaseConfig));
   private currentUserSubject = new BehaviorSubject<User | null>(null);
-  private apiUrl = 'http://localhost:5063/api';
+  private apiUrl = 'https://localhost:44367/api';
   private userProfileSubject = new BehaviorSubject<UserProfile | null>(null);
   private isNewlyRegistered = false;
 
@@ -82,13 +82,33 @@ export class AuthService {
     return this.userProfileSubject.value;
   }
 
+  /*
   async getIdToken(): Promise<string> {
     const user = this.auth.currentUser;
     if (!user) {
       throw new Error('No user logged in');
     }
     return user.getIdToken();
-  }
+  } */
+    async getIdToken(): Promise<string> {
+      if (this.auth.currentUser) {
+        return this.auth.currentUser.getIdToken();
+      }
+    
+      // Wait for user to be available via onAuthStateChanged
+      return new Promise((resolve, reject) => {
+        const unsubscribe = onAuthStateChanged(this.auth, async (user) => {
+          unsubscribe(); 
+          if (user) {
+            const token = await user.getIdToken();
+            resolve(token);
+          } else {
+            reject('No user logged in');
+          }
+        });
+      });
+    }
+    
 
   register(email: string, password: string): Observable<UserCredential> {
     // Set the flag to indicate a new registration

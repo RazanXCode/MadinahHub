@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Community } from '../../../models/community.model';
+import { CommunityDto, CommunityService } from '../../../services/community/community.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-communites',
@@ -9,46 +11,62 @@ import { Community } from '../../../models/community.model';
   styleUrl: './communites.component.css'
 })
 export class CommunitesComponent  implements OnInit {
-  communities: Community[] = [];
+  communities: CommunityDto[] = [];
+
+
+
+  constructor(private communityService: CommunityService, private router: Router
+      
+  ) { }
 
   ngOnInit(): void {
-   
-    this.communities = [
-        {
-          id: '1',
-          name: 'Angular Enthusiasts',
-          description: 'For developers passionate about Angular framework',
-          imageUrl: 'https://cdn.worldvectorlogo.com/logos/angular-icon-1.svg',
-          membersCount: 1250,
-          createdAt: new Date('2023-01-01'),
+    
+    this.loadCommunities();
+  }
+
+  
+  loadCommunities(): void {
+    this.communityService.getAllCommunities().subscribe({
+      next: (communities) => {
+        this.communities = communities;
+      },
+      error: (err) => {
+        console.error('Failed to load communities', err);
+      }
+    });
+  }
+
+  // This function will check if the user is a member of the community
+  handelIsMember(community: CommunityDto): void {
+    if (community.isMember) {
+      // Navigate to community details
+      this.router.navigate(['/community', community.publicCommunityId]);
+    } else {
+      // Join community then navigate to details
+      this.communityService.joinCommunity(community.publicCommunityId).subscribe({
+        next: () => {
+          this.loadCommunities();
+          this.router.navigate(['/community', community.publicCommunityId]);
         },
-        {
-          id: '2',
-          name: 'Nature Photographers',
-          description: 'Share and discuss beautiful nature photography',
-          imageUrl: '',
-          membersCount: 842,
-          createdAt: new Date('2023-02-01'),
-        },
-        {
-          id: '3',
-          name: 'Healthy Cooking',
-          description: 'Recipe sharing and cooking tips for a healthy lifestyle',
-          imageUrl: '',
-          membersCount: 1567,
-          createdAt: new Date('2023-03-01'),
-        },
-        {
-          id: '4',
-          name: 'Startup Founders',
-          description: 'Network with fellow entrepreneurs',
-          imageUrl: '',
-          membersCount: 723,
-          createdAt: new Date('2023-04-01'),
-        },
-        
-    ];
-      
-    //TODO: joinCommunity
+        error: (err) => {
+          console.error('Failed to join community', err);
+        }
+      });
+  
+  
+}
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+  
