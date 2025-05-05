@@ -93,6 +93,13 @@ namespace MHBackend.Controllers
         [HttpGet("getAllCommunities")]
         public async Task<IActionResult> GetAllCommunities()
         {
+            // Grt current user from token
+            var firebaseUid = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(firebaseUid))
+                return Unauthorized("User not authenticated");
+
+            var user = await _userRepository.GetByFirebaseUidAsync(firebaseUid);
+
             var communities = await _db.Communities
                 .Select(c => new CommunityDto
                 {
@@ -101,7 +108,8 @@ namespace MHBackend.Controllers
                     Description = c.Description,
                     MemberCount = c.MemberCount,
                     CreatedAt = c.CreatedAt,
-                    ImageUrl = c.ImageUrl
+                    ImageUrl = c.ImageUrl,
+                    IsMember = _db.UserCommunities.Any(uc => uc.CommunityId == c.CommunityId && uc.UserId == user.UserId)
                 })
                 .ToListAsync();
             return Ok(communities);
@@ -179,7 +187,7 @@ namespace MHBackend.Controllers
             await _db.SaveChangesAsync();
 
 
-            return Ok("Joined community successfully");
+            return Ok(new { message = "Joined community" });
 
         }
 
@@ -212,7 +220,7 @@ namespace MHBackend.Controllers
             // Decrement member count
             community.MemberCount--;
             await _db.SaveChangesAsync();
-            return Ok("Left community successfully");
+            return Ok(new { message = "left community" });
         }
 
 
@@ -253,6 +261,27 @@ namespace MHBackend.Controllers
             }).ToListAsync();
             return Ok(events);
         }
+
+
+        // GET: api/communities/my-communities
+        [HttpGet("user-communities")]
+        public async Task<IActionResult> GetUserCommunities()
+        {
+            var firebaseUid = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(firebaseUid))
+                return Unauthorized("User not authenticated");
+
+            var user = await _userRepository.GetByFirebaseUidAsync(firebaseUid);
+
+            var communityIds = await _db.UserCommunities
+                .Where(uc => uc.UserId == user.UserId)
+                .Select(uc => uc.Community.CommunityId)
+                .ToListAsync();
+
+            return Ok(communityIds);
+        }
+
+
 
 
 
