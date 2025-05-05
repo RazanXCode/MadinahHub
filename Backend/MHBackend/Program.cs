@@ -55,6 +55,15 @@ builder.Services.AddAuthentication(options =>
 })
 .AddScheme<AuthenticationSchemeOptions, FirebaseAuthenticationHandler>("Firebase", null);
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminRole", policy =>
+    policy.RequireRole("Admin"));
+
+    options.AddPolicy("UserRole", policy =>
+    policy.RequireRole("User", "Admin"));
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

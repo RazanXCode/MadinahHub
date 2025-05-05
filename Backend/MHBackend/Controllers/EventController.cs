@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using MHBackend.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MHBackend.Controllers
 {
@@ -78,6 +79,7 @@ namespace MHBackend.Controllers
 
         // POST: api/Events : Create event 
         [HttpPost]
+        [Authorize(Policy = "AdminRole")]
         public async Task<ActionResult<Event>> CreateEvent(EventCreateDto dto)
         {
             // Get Firebase UID from token claims

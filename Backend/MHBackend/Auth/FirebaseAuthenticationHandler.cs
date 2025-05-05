@@ -3,18 +3,23 @@ using System.Text.Encodings.Web;
 using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
+using MHBackend.Repositories;
 
 namespace MHBackend.Auth
 {
     public class FirebaseAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
+        private readonly IUserRepository _userRepository;
+
         public FirebaseAuthenticationHandler(
             IOptionsMonitor<AuthenticationSchemeOptions> options,
             ILoggerFactory logger,
             UrlEncoder encoder,
-            ISystemClock clock)
+            ISystemClock clock,
+            IUserRepository userRepository)
             : base(options, logger, encoder, clock)
         {
+            _userRepository = userRepository;
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -35,11 +40,20 @@ namespace MHBackend.Auth
             try
             {
                 var firebaseToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(token);
+                
+                // Get the user from database to fetch their role
+                var user = await _userRepository.GetByFirebaseUidAsync(firebaseToken.Uid);
+                
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.NameIdentifier, firebaseToken.Uid),
-                    new Claim(ClaimTypes.Email, firebaseToken.Claims.ContainsKey("email") ? firebaseToken.Claims["email"].ToString() : "")
+                    new Claim(ClaimTypes.NameIdentifier, firebaseToken.Uid)
                 };
+                
+                if (user != null)
+                {
+                    // Convert enum to string for the claim
+                    claims.Add(new Claim(ClaimTypes.Role, user.Role.ToString()));
+                }
 
                 var identity = new ClaimsIdentity(claims, Scheme.Name);
                 var principal = new ClaimsPrincipal(identity);
