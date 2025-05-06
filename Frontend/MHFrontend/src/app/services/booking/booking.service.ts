@@ -11,16 +11,7 @@ export interface BookingDto {
   status: string;
   eventTitle: string;
   communityName: string;
-}
-
-export interface BookingTicketDto {
-  publicTicketId: string;
-  qrCode: string;
-  createdAt: Date;
-  status: string;
-  eventTitle: string;
-  communityName: string;
-  publicBookingId: string;
+  publicEventId: string;
 }
 
 export interface BookingCreateResponse {
@@ -78,8 +69,7 @@ export class BookingsService {
   }
 
   /**
-   * Get user's bookings
-   * This method is optional but useful to have for displaying user's bookings
+   * Get current user's bookings
    */
   getUserBookings(): Observable<BookingDto[]> {
     return from(this.authService.getIdToken()).pipe(
@@ -92,6 +82,4 @@ export class BookingsService {
       })
     );
   }
-
- 
 }

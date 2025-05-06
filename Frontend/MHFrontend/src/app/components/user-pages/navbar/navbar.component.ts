@@ -20,13 +20,13 @@ import { AuthService } from '../../../services/auth.service';
 
           <!-- Desktop Links -->
           <div class="hidden md:flex space-x-6 items-center">
-          <a routerLink="/home" class="px-3 py-2 rounded-lg text-xl text-primary hover:bg-primary hover:text-white hover:opacity-80 transition">
+          <a routerLink="/dashboard" class="px-3 py-2 rounded-lg text-xl text-primary hover:bg-primary hover:text-white hover:opacity-80 transition">
           Home
             </a>
-            <a routerLink="/Communities" class="px-3 py-2 rounded-lg text-xl text-secondary hover:bg-primary hover:text-white hover:opacity-80 transition">
+            <a routerLink="/communities" class="px-3 py-2 rounded-lg text-xl text-secondary hover:bg-primary hover:text-white hover:opacity-80 transition">
               Communities
             </a>
-            <a routerLink="/Events" class="px-3 py-2 rounded-lg text-xl text-secondary hover:bg-primary hover:text-white hover:opacity-80 transition">
+            <a routerLink="/events" class="px-3 py-2 rounded-lg text-xl text-secondary hover:bg-primary hover:text-white hover:opacity-80 transition">
               Events
             </a>
             <!-- Logout Button -->
@@ -70,14 +70,14 @@ import { AuthService } from '../../../services/auth.service';
           Home
         </a>
         <a
-          routerLink="/about"
+          routerLink="/communities"
           (click)="toggleMenu()"
           class="block px-4 py-2 text-secondary hover:bg-primary hover:text-white hover:opacity-80 transition"
         >
         Communities
         </a>
         <a
-          routerLink="/contact"
+          routerLink="/events"
           (click)="toggleMenu()"
           class="block px-4 py-2 text-secondary hover:bg-primary hover:text-white hover:opacity-80 transition"
         >

@@ -151,7 +151,8 @@ namespace MHBackend.Controllers
                     CreatedAt = t.CreatedAt,
                     Status = t.Status.ToString(),
                     EventTitle = t.Event.Title,
-                    CommunityName = t.Event.Community.Name
+                    CommunityName = t.Event.Community.Name,
+                    PublicBookingId = t.Booking.PublicBookingId // Added this line 
                 })
                 .ToListAsync();
 

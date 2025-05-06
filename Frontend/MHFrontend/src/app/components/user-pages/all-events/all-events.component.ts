@@ -180,7 +180,7 @@ export class AllEventsComponent implements OnInit {
   
   // Helper method to get spots left text
   getSpotsLeft(event: EventDisplay): string {
-    if (!event.capacity) return 'Unlimited';
+    if (!event.capacity) return 'Public';
     const spotsLeft = event.capacity - event.attendees;
     return spotsLeft <= 0 ? 'Full' : `${spotsLeft} / ${event.capacity}`;
   }
