@@ -6,12 +6,15 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown';
 import { DialogModule } from 'primeng/dialog';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { EventService, Event as AppEvent } from '../../../services/event/event.service';
+import { BookingsService } from '../../../services/booking/booking.service';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 
-// Interface for event display format
+// Simplified interface for event display format
 interface EventDisplay {
   id: string;
   title: string;
@@ -20,12 +23,12 @@ interface EventDisplay {
   location: string;
   imageUrl: string;
   description: string;
-  organizer: string;
   attendees: number;
   capacity: number;
   duration: string;
   requirements?: string;
   isPrivate: boolean;
+  status: string;
 }
 
 @Component({
@@ -39,13 +42,15 @@ interface EventDisplay {
     InputTextModule,
     DropdownModule,
     DialogModule,
+    ToastModule,
     NavbarComponent
   ],
   templateUrl: './all-events.component.html',
-  styleUrl: './all-events.component.css'
+  styleUrl: './all-events.component.css',
+  providers: [MessageService]
 })
 export class AllEventsComponent implements OnInit {
-  // Search and filter
+  // Search and filter properties
   searchTerm: string = '';
   filterBy: string = '';
   
@@ -59,6 +64,7 @@ export class AllEventsComponent implements OnInit {
   // Loading and error states
   loading: boolean = false;
   error: string | null = null;
+  bookingInProgress: boolean = false;
   
   filterOptions = [
     { label: 'Date (Newest)', value: 'date-newest' },
@@ -67,7 +73,11 @@ export class AllEventsComponent implements OnInit {
     { label: 'Event Type', value: 'type' }
   ];
 
-  constructor(private eventService: EventService) {}
+  constructor(
+    private eventService: EventService,
+    private bookingsService: BookingsService,
+    private messageService: MessageService
+  ) {}
   
   ngOnInit(): void {
     this.loadEvents();
@@ -88,7 +98,6 @@ export class AllEventsComponent implements OnInit {
       )
       .subscribe(events => {
         this.events = events.map(event => this.mapEventToDisplay(event));
-        this.applyFilter(); // Apply any selected filter
       });
   }
   
@@ -107,10 +116,6 @@ export class AllEventsComponent implements OnInit {
       duration = `${durationHours} hours`;
     }
     
-    // Calculate estimated attendees (for demo purposes)
-    // In a real app, you'd get this from an API endpoint
-    const estimatedAttendees = Math.floor(event.capacity * 0.7);
-    
     return {
       id: event.publicEventId,
       title: event.title,
@@ -119,65 +124,55 @@ export class AllEventsComponent implements OnInit {
       location: event.location,
       imageUrl: event.imageUrl || '../../../../assets/image.png',
       description: event.description,
-      organizer: 'Event Organizer', // Default value if not available
-      attendees: estimatedAttendees,
+      status: event.status,
+      attendees: Math.floor(event.capacity * 0.7), // Estimated for display
       capacity: event.capacity,
       duration: duration,
-      requirements: 'No special requirements', // Default value if not available
-      isPrivate: event.eventType === 'Private' // Assuming 'Private' is the value for private events
+      requirements: 'No special requirements',
+      isPrivate: event.eventType === 'Private'
     };
   }
 
-  // Method to filter events based on search term
+  // Getter for filtered events - applied on the fly
   get filteredEvents() {
-    if (this.loading) {
-      return [];
-    }
+    if (this.loading) return [];
     
     let filtered = this.events;
     
     // Apply search term filter
     if (this.searchTerm) {
+      const term = this.searchTerm.toLowerCase();
       filtered = filtered.filter(event => 
-        event.title.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        event.location.toLowerCase().includes(this.searchTerm.toLowerCase())
+        event.title.toLowerCase().includes(term) ||
+        event.location.toLowerCase().includes(term)
       );
     }
     
     // Apply dropdown filter
     if (this.filterBy) {
-      filtered = this.applyDropdownFilter(filtered);
+      switch(this.filterBy) {
+        case 'date-newest':
+          filtered = [...filtered].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          break;
+        case 'date-oldest':
+          filtered = [...filtered].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          break;
+        case 'location':
+          filtered = [...filtered].sort((a, b) => a.location.localeCompare(b.location));
+          break;
+        case 'type':
+          filtered = [...filtered].sort((a, b) => {
+            if (a.isPrivate === b.isPrivate) return 0;
+            return a.isPrivate ? -1 : 1;
+          });
+          break;
+      }
     }
     
     return filtered;
   }
-  
-  // Apply selected filter from dropdown
-  applyDropdownFilter(events: EventDisplay[]): EventDisplay[] {
-    switch(this.filterBy) {
-      case 'date-newest':
-        return [...events].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-      case 'date-oldest':
-        return [...events].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      case 'location':
-        return [...events].sort((a, b) => a.location.localeCompare(b.location));
-      case 'type':
-        return [...events].sort((a, b) => {
-          if (a.isPrivate === b.isPrivate) return 0;
-          return a.isPrivate ? -1 : 1;
-        });
-      default:
-        return events;
-    }
-  }
-  
-  // Apply current filter
-  applyFilter(): void {
-    // This method is intentionally empty as filtering is done in the getter
-    // It's called after loading data to ensure filters are applied
-  }
 
-  // Method to open the modal with event details
+  // Show event details in modal
   showEventDetails(event: EventDisplay) {
     this.selectedEvent = event;
     this.displayEventModal = true;
@@ -185,12 +180,59 @@ export class AllEventsComponent implements OnInit {
   
   // Helper method to get spots left text
   getSpotsLeft(event: EventDisplay): string {
+    if (!event.capacity) return 'Public';
     const spotsLeft = event.capacity - event.attendees;
-    return `${spotsLeft} / ${event.capacity}`;
+    return spotsLeft <= 0 ? 'Full' : `${spotsLeft} / ${event.capacity}`;
   }
   
   // Retry loading events
   retryLoading(): void {
     this.loadEvents();
+  }
+
+  // Book event method
+  bookEvent(event: EventDisplay): void {
+    if (!event) return;
+    
+    this.bookingInProgress = true;
+    
+    this.bookingsService.bookEvent(event.id)
+      .pipe(
+        catchError(error => {
+          let errorMessage = 'Unable to book this event.';
+          
+          if (error.status === 400) {
+            if (error.error === 'Event is not available for booking') {
+              errorMessage = 'This event is not available for booking. It may be full, already started, or canceled.';
+            } else if (typeof error.error === 'string') {
+              errorMessage = error.error;
+            }
+          }
+          
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Booking Failed',
+            detail: errorMessage
+          });
+          
+          console.error('Error booking event:', error);
+          return of(null);
+        }),
+        finalize(() => {
+          this.bookingInProgress = false;
+        })
+      )
+      .subscribe(response => {
+        if (response) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Booking Successful',
+            detail: `You have successfully booked ${event.title}!`
+          });
+          
+          this.displayEventModal = false;
+          this.loadEvents();
+        }
+      });
   }
 }

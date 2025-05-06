@@ -39,7 +39,7 @@ export interface UserProfile {
 export class AuthService {
   private auth = getAuth(initializeApp(firebaseConfig));
   private currentUserSubject = new BehaviorSubject<User | null>(null);
-  private apiUrl = 'https://localhost:44367/api';
+  private apiUrl = 'http://localhost:5063/api';
   private userProfileSubject = new BehaviorSubject<UserProfile | null>(null);
   private isNewlyRegistered = false;
 

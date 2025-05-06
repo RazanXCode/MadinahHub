@@ -8,6 +8,7 @@ namespace MHBackend.DTOs
         public string Status { get; set; }
         public string EventTitle { get; set; }
         public string CommunityName { get; set; }
+        public string PublicBookingId { get; set; } // Added This line 
 
     }
 }

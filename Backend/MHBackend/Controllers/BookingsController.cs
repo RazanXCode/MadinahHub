@@ -129,9 +129,41 @@ namespace MHBackend.Controllers
 
         }
 
+//Get: Booking/GetUserBookings
+[HttpGet("GetUserBookings")]
+public async Task<IActionResult> GetUserBookings()
+{
+    // Get current user from token
+    var firebaseUid = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    if (string.IsNullOrEmpty(firebaseUid))
+        return Unauthorized("User not authenticated");
 
+    var user = await _userRepository.GetByFirebaseUidAsync(firebaseUid);
+    if (user == null)
+        return NotFound("User not found");
 
+    // Get bookings for this user with event details
+    var bookings = await _db.Bookings
+        .Include(b => b.Ticket)
+            .ThenInclude(t => t.Event)
+                .ThenInclude(e => e.Community)
+        .Where(b => b.UserId == user.UserId)
+        .Select(b => new BookingDto
+        {
+            PublicBookingId = b.PublicBookingId,
+            BookingDate = b.BookingDate,
+            Status = b.Status.ToString(),
+            EventTitle = b.Ticket.Event.Title,
+            CommunityName = b.Ticket.Event.Community.Name ?? "Unknown Community",
+            PublicEventId = b.Ticket.Event.PublicEventId
+        })
+        .ToListAsync();
 
+    if (!bookings.Any())
+        return Ok(new List<BookingDto>()); // Return empty list instead of 404
 
-    }
+    return Ok(bookings);
 }
+}
+}
+

@@ -1,15 +1,27 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CarouselModule } from 'primeng/carousel';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
-import { NavbarComponent } from "../navbar/navbar.component";
-import { CommunityService, CommunityDto } from '../../../services/community/community.service';
-import { EventService, Event as AppEvent } from '../../../services/event/event.service';
+import { NavbarComponent } from '../navbar/navbar.component';
+import { CommunityService } from '../../../services/community/community.service';
+import { EventService } from '../../../services/event/event.service';
+import {
+  UserService,
+  UserCommunity,
+  UserEvent,
+} from '../../../services/users/users.service';
+import {
+  BookingsService,
+  BookingDto,
+} from '../../../services/booking/booking.service';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+
 // Interface for displaying events in the UI
 interface EventDisplay {
   id: string;
@@ -25,6 +37,8 @@ interface EventDisplay {
   duration: string;
   requirements?: string;
   isPrivate: boolean;
+  status: string;
+  publicBookingId?: string;
 }
 
 // Interface for displaying communities in the UI
@@ -34,142 +48,249 @@ interface CommunityDisplay {
   description: string;
   members: number;
   imageUrl?: string;
+  joinDate: string;
 }
 
 @Component({
   selector: 'app-visitor-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, CarouselModule, ButtonModule, DialogModule, NavbarComponent], 
+  imports: [
+    CommonModule,
+    RouterModule,
+    CarouselModule,
+    ButtonModule,
+    DialogModule,
+    NavbarComponent,
+    ToastModule,
+  ],
   templateUrl: './visitor-dashboard.component.html',
-  styleUrl: './visitor-dashboard.component.css'
+  styleUrl: './visitor-dashboard.component.css',
+  providers: [MessageService],
 })
 export class VisitorDashboardComponent implements OnInit {
   // Modal properties
   displayEventModal: boolean = false;
-  selectedEvent: any = null;
-  
+  selectedEvent: EventDisplay | null = null;
+
   // Data arrays
   communities: CommunityDisplay[] = [];
   events: EventDisplay[] = [];
-  
+  userBookings: BookingDto[] = [];
+
   // Loading states
   loadingCommunities: boolean = false;
   loadingEvents: boolean = false;
-  
+  loadingBookings: boolean = false;
+  cancellingBooking: boolean = false;
+
   // Error states
   communityError: string | null = null;
   eventError: string | null = null;
-  
+  bookingError: string | null = null;
+
   // User properties
   userName: string = '';
+  publicUserId: string = '';
 
   // Enhanced responsive options for better mobile experience
   responsiveOptions = [
     {
       breakpoint: '1400px',
       numVisible: 3,
-      numScroll: 1
+      numScroll: 1,
     },
     {
       breakpoint: '1200px',
       numVisible: 3,
-      numScroll: 1
+      numScroll: 1,
     },
     {
       breakpoint: '992px',
       numVisible: 2,
-      numScroll: 1
+      numScroll: 1,
     },
     {
       breakpoint: '768px',
       numVisible: 1,
-      numScroll: 1
+      numScroll: 1,
     },
     {
       breakpoint: '576px',
       numVisible: 1,
-      numScroll: 1
-    }
+      numScroll: 1,
+    },
   ];
-  
+
   constructor(
     private communityService: CommunityService,
     private eventService: EventService,
-    private authService: AuthService
+    private userService: UserService,
+    private bookingsService: BookingsService,
+    private authService: AuthService,
+    private messageService: MessageService,
+    private router: Router
   ) {}
-  
-  ngOnInit(): void {
-    this.loadCommunities();
-    this.loadEvents();
 
-    this.authService.userProfile$.subscribe(profile => {
+  ngOnInit(): void {
+    // Get user profile info first, then load user-specific data
+    this.authService.userProfile$.subscribe((profile) => {
       if (profile) {
         this.userName = profile.username || (profile as any).userName || 'User';
+        this.publicUserId = (profile as any).publicUserId || '';
+
+        // Load user communities, events, and bookings once we have the user ID
+        if (this.publicUserId) {
+          this.loadUserCommunities();
+          this.loadUserBookedEvents();
+          this.loadUserBookings();
+        }
       }
     });
   }
-  
-  loadCommunities(): void {
+
+  loadUserCommunities(): void {
     this.loadingCommunities = true;
     this.communityError = null;
-    
-    this.communityService.getAllCommunities()
+
+    this.userService
+      .getUserCommunities(this.publicUserId)
       .pipe(
-        catchError(error => {
-          this.communityError = 'Failed to load communities. Please try again later.';
-          console.error('Error loading communities:', error);
+        catchError((error) => {
+          this.communityError =
+            'Failed to load your communities. Please try again later.';
+          console.error('Error loading user communities:', error);
           return of([]);
         }),
-        finalize(() => this.loadingCommunities = false)
+        finalize(() => (this.loadingCommunities = false))
       )
-      .subscribe(communities => {
-        this.communities = communities.map(community => this.mapCommunityToDisplay(community));
+      .subscribe((communities) => {
+        this.communities = communities.map((community) =>
+          this.mapUserCommunityToDisplay(community)
+        );
       });
   }
-  
-  loadEvents(): void {
+
+  loadUserBookedEvents(): void {
     this.loadingEvents = true;
     this.eventError = null;
-    
-    this.eventService.getEvents()
+
+    this.userService
+      .getUserBookedEvents(this.publicUserId)
       .pipe(
-        catchError(error => {
-          this.eventError = 'Failed to load events. Please try again later.';
-          console.error('Error loading events:', error);
+        catchError((error) => {
+          this.eventError =
+            'Failed to load your booked events. Please try again later.';
+          console.error('Error loading user booked events:', error);
           return of([]);
         }),
-        finalize(() => this.loadingEvents = false)
+        finalize(() => (this.loadingEvents = false))
       )
-      .subscribe(events => {
-        this.events = events.map(event => this.mapEventToDisplay(event));
+      .subscribe((events) => {
+        this.events = events.map((event) => this.mapUserEventToDisplay(event));
+
+        // Associate bookings with events once both are loaded
+        if (this.userBookings.length > 0) {
+          this.associateBookingsWithEvents();
+        }
       });
   }
-  
-  mapCommunityToDisplay(community: CommunityDto): CommunityDisplay {
+
+  loadUserBookings(): void {
+    this.loadingBookings = true;
+    this.bookingError = null;
+
+    this.bookingsService
+      .getUserBookings()
+      .pipe(
+        catchError((error) => {
+          this.bookingError = 'Failed to load your bookings.';
+          console.error('Error loading user bookings:', error);
+          return of([]);
+        }),
+        finalize(() => (this.loadingBookings = false))
+      )
+      .subscribe((bookings) => {
+        this.userBookings = bookings;
+        console.log('User bookings loaded:', this.userBookings);
+
+        // Associate bookings with events if events are already loaded
+        if (this.events.length > 0) {
+          this.associateBookingsWithEvents();
+        }
+      });
+  }
+
+  navigateToCommunity(communityId: string): void {
+    this.router.navigate(['/community', communityId]);
+  }
+  // associateBookingsWithEvents method with this:
+  associateBookingsWithEvents(): void {
+    if (!this.events.length || !this.userBookings.length) return;
+
+    // Create a booking lookup map by event ID
+    const bookingsByEventId = new Map<string, BookingDto>();
+    this.userBookings.forEach((booking) => {
+      // Only include confirmed bookings (not cancelled ones)
+      if (booking.publicEventId && booking.status === 'Confirmed') {
+        bookingsByEventId.set(booking.publicEventId, booking);
+      }
+    });
+
+    // Filter events to only those with confirmed bookings
+    this.events = this.events
+      .filter((event) => bookingsByEventId.has(event.id))
+      .map((event) => {
+        const booking = bookingsByEventId.get(event.id);
+        return {
+          ...event,
+          publicBookingId: booking?.publicBookingId,
+        };
+      });
+
+    console.log('Events with confirmed bookings:', this.events);
+  }
+
+  mapUserCommunityToDisplay(community: UserCommunity): CommunityDisplay {
+    // Format join date
+    const joinDate = new Date(community.joinDate);
+    const formattedJoinDate = joinDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+
     return {
       id: community.publicCommunityId,
       name: community.name,
       description: community.description,
       members: community.memberCount,
-      imageUrl: community.imageUrl || '../../../../assets/landing3.png'
+      imageUrl: community.imageUrl || '../../../../assets/landing3.png',
+      joinDate: formattedJoinDate,
     };
   }
-  
-  mapEventToDisplay(event: AppEvent): EventDisplay {
+
+  mapUserEventToDisplay(event: UserEvent): EventDisplay {
     // Format date and time from the API date
     const startDate = new Date(event.startDate);
-    const formattedDate = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const formattedTime = startDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-    
+    const formattedDate = startDate.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    });
+    const formattedTime = startDate.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+
     // Calculate duration if endDate is available
     let duration = '2 hours'; // Default
     if (event.endDate) {
       const endDate = new Date(event.endDate);
       const durationMs = endDate.getTime() - startDate.getTime();
-      const durationHours = Math.round(durationMs / (1000 * 60 * 60) * 10) / 10;
+      const durationHours =
+        Math.round((durationMs / (1000 * 60 * 60)) * 10) / 10;
       duration = `${durationHours} hours`;
     }
-    
+
     return {
       id: event.publicEventId,
       title: event.title,
@@ -178,22 +299,74 @@ export class VisitorDashboardComponent implements OnInit {
       location: event.location,
       imageUrl: event.imageUrl || '../../../../assets/image.png',
       description: event.description,
-      organizer: 'Community Organizer', // Default value if not available
+      organizer: event.communityName || 'Community Organizer',
       attendees: Math.floor(event.capacity * 0.7), // Simulated attendees count
       capacity: event.capacity,
       duration: duration,
-      isPrivate: event.eventType === 'Private' // Assuming 'Private' is the value for private events
+      isPrivate: event.eventType === 'Private',
+      status: event.status,
+      // publicBookingId will be set in associateBookingsWithEvents
     };
   }
-  
-  showEventDetails(event: any) {
+
+  showEventDetails(event: EventDisplay) {
     this.selectedEvent = event;
     this.displayEventModal = true;
   }
-  
+
   // Helper method to get spots left text
-  getSpotsLeft(event: any): string {
+  getSpotsLeft(event: EventDisplay): string {
+    if (!event.capacity) return 'Unlimited';
     const spotsLeft = event.capacity - event.attendees;
-    return `${spotsLeft} / ${event.capacity}`;
+    return spotsLeft <= 0 ? 'Full' : `${spotsLeft} / ${event.capacity}`;
+  }
+
+  // Cancel a booking using the actual publicBookingId
+  cancelBooking(event: EventDisplay): void {
+    if (!event.publicBookingId) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail:
+          'Booking ID not found for this event. Please try refreshing the page.',
+      });
+      return;
+    }
+
+    this.cancellingBooking = true;
+    console.log(`Cancelling booking with ID: ${event.publicBookingId}`);
+
+    this.bookingsService
+      .cancelBooking(event.publicBookingId)
+      .pipe(
+        catchError((error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to cancel booking. Please try again later.',
+          });
+          console.error('Error cancelling booking:', error);
+          return of(null);
+        }),
+        finalize(() => {
+          this.cancellingBooking = false;
+        })
+      )
+      .subscribe((response) => {
+        if (response) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Booking cancelled successfully.',
+          });
+
+          // Close the modal
+          this.displayEventModal = false;
+
+          // Reload the user's booked events and bookings to refresh the list
+          this.loadUserBookedEvents();
+          this.loadUserBookings();
+        }
+      });
   }
 }
