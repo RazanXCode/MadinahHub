@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventFormComponent } from '../event-form/event-form.component';
 import { EventService, Event, EventCreate, EventUpdate } from '../../../services/event/event.service';
-
+import { AuthService } from '../../../services/auth.service'; 
 @Component({
   selector: 'app-manage-events',
   standalone: true,
@@ -36,7 +36,7 @@ export class ManageEventsComponent implements OnInit {
   error: string | null = null;
   successMessage: string | null = null;
 
-  constructor(private eventService: EventService) { }
+  constructor(private eventService: EventService, private authService: AuthService ) { }
   ngOnInit(): void {
     this.loadEvents();
   }
@@ -146,11 +146,11 @@ export class ManageEventsComponent implements OnInit {
       });
     } else {
       // Add new event
+      const userProfile = this.authService.userProfileValue;
       const createData: EventCreate = {
         ...eventData,
         eventType: eventData.eventType === 'public' ? 0 : 1,
-        //TODO: createBy should be set to the logged-in user's ID
-        createdBy: 1, // Hardcoded user ID
+        createdBy: userProfile?.userIdPublic,
       };
       this.eventService.createEvent(createData).subscribe({
         next: (createdEvent) => {
