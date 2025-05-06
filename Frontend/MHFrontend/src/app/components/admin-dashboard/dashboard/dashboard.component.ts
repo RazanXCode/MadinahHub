@@ -204,12 +204,12 @@ export class DashboardComponent {
   private generatePDF(data: Record<string, any[]>): void {
     const doc = new jsPDF();
 
-    // Add title 
+    // Add title
     doc.setFontSize(22);
-    doc.setTextColor(230, 155, 107); 
+    doc.setTextColor(230, 155, 107);
     doc.text('Madinah Hub Data Export', 105, 20, { align: 'center' });
 
-    // Add date 
+    // Add date
     doc.setFontSize(11);
     doc.setTextColor(100, 100, 100);
     doc.text(`Generated on ${new Date().toLocaleDateString()}`, 105, 30, { align: 'center' });
@@ -223,7 +223,7 @@ export class DashboardComponent {
 
     // Add each data section
     Object.entries(data).forEach(([section, items]) => {
-      // Add section title 
+      // Add section title
       doc.setFontSize(16);
       doc.setTextColor(80, 80, 80);
       doc.text(section.charAt(0).toUpperCase() + section.slice(1), 14, yPosition);

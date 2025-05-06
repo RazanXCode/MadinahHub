@@ -9,8 +9,8 @@ import { CommunityService } from '../../../services/community/community.service'
 import { EventService } from '../../../services/event/event.service';
 import {
   UserService,
-  UserCommunity,
-  UserEvent,
+  UserCommunityDto,
+  UserEventDto,
 } from '../../../services/users/users.service';
 import {
   BookingsService,
@@ -250,7 +250,7 @@ export class VisitorDashboardComponent implements OnInit {
     console.log('Events with confirmed bookings:', this.events);
   }
 
-  mapUserCommunityToDisplay(community: UserCommunity): CommunityDisplay {
+  mapUserCommunityToDisplay(community: UserCommunityDto): CommunityDisplay {
     // Format join date
     const joinDate = new Date(community.joinDate);
     const formattedJoinDate = joinDate.toLocaleDateString('en-US', {
@@ -269,7 +269,7 @@ export class VisitorDashboardComponent implements OnInit {
     };
   }
 
-  mapUserEventToDisplay(event: UserEvent): EventDisplay {
+  mapUserEventToDisplay(event: UserEventDto): EventDisplay {
     // Format date and time from the API date
     const startDate = new Date(event.startDate);
     const formattedDate = startDate.toLocaleDateString('en-US', {

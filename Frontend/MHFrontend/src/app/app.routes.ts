@@ -7,6 +7,7 @@ import { LandingPageComponent } from './components/user-pages/landing-page/landi
 import { DashboardComponent } from './components/admin-dashboard/dashboard/dashboard.component';
 import { CommunitesComponent } from './components/user-pages/communites/communites.component';
 import { CommunityDetailsComponent } from './components/user-pages/community-details/community-details.component';
+import { roleGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
    { path: '', redirectTo: 'landing', pathMatch: 'full' },
@@ -14,10 +15,14 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   // { path: '**', redirectTo: 'login' },
   { path: 'events', component: AllEventsComponent },
-  { path: 'dashboard', component: VisitorDashboardComponent },
+  { path: 'dashboard', component: VisitorDashboardComponent,
+ },
   { path: 'landing', component: LandingPageComponent },
   { path: 'admin', component: DashboardComponent },
   {path: 'communities', component: CommunitesComponent},
-  { path: 'community/:id', component: CommunityDetailsComponent }
+  { path: 'community/:id', component: CommunityDetailsComponent },
+
+  { path: '**', redirectTo: '/login' }
+
 
 ];

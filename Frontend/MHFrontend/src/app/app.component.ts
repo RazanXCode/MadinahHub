@@ -14,13 +14,8 @@ import { AllEventsComponent } from './components/user-pages/all-events/all-event
   standalone: true,
   imports: [
     RouterOutlet,
-    RouterLink,
     CommonModule,
-    DashboardComponent,
-    LandingPageComponent,
-    NavbarComponent,
-    VisitorDashboardComponent,
-    AllEventsComponent
+
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
