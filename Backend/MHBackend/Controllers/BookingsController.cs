@@ -44,9 +44,11 @@ namespace MHBackend.Controllers
                 return BadRequest("Event is not available for booking"); 
 
             // Check capacity 
-            if (eventToBook.Capacity.HasValue &&
-                eventToBook.Tickets.Count(t => t.Status == TicketStatus.Valid) >= eventToBook.Capacity.Value)
-                return BadRequest("Event is Fully Booked");
+            if (eventToBook.EventType != EventType.Public){
+                if (eventToBook.Capacity.HasValue &&
+                    eventToBook.Tickets.Count(t => t.Status == TicketStatus.Valid) >= eventToBook.Capacity.Value)
+                    return BadRequest("Event is Fully Booked");
+            }
             // Check if user already has a booking
             var userBooking = await _db.Bookings
                 .Include(b => b.Ticket)
@@ -74,7 +76,10 @@ namespace MHBackend.Controllers
                 Booking = newBooking,
                 QRCode =  _qRCodeService.GenerateQRCodeAsync($"{newBooking.PublicBookingId}{eventToBook.Title}{eventToBook.Location}"),
             };
-            eventToBook.Capacity--;
+            if (eventToBook.EventType != EventType.Public && eventToBook.Capacity.HasValue)
+            {
+                eventToBook.Capacity--;
+            }
             //  Save to database
             await _db.Tickets.AddAsync(newTicket);
             await _db.SaveChangesAsync();
