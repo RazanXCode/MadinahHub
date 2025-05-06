@@ -130,7 +130,6 @@ namespace MHBackend.Controllers
         }
 
 //Get: Booking/GetUserBookings
-//Get: Booking/GetUserBookings
 [HttpGet("GetUserBookings")]
 public async Task<IActionResult> GetUserBookings()
 {
