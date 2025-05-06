@@ -123,6 +123,15 @@ namespace MHBackend.Controllers
 
     }
 
+ //Get: Booking/GetAllBookings
+ [HttpGet("GetAllBookings")]
+ public async Task<IActionResult> GetAllBookings()
+ {  var booking = await _db.Bookings.Select(b => b.PublicBookingId).ToListAsync();
+     if (booking == null)
+         return NotFound("No bookings found");
+     return Ok(booking);
+ }
+
 
 
 
