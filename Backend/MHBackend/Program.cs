@@ -51,6 +51,14 @@ builder.Services.AddSingleton<IQRCodeService, QRCodeService>();
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+// Register ISmsService and SmsService
+builder.Services.Configure<TwilioSettings>(options => {
+    options.AccountSid = Environment.GetEnvironmentVariable("TWILIO_ACCOUNT_SID");
+    options.AuthToken = Environment.GetEnvironmentVariable("TWILIO_AUTH_TOKEN");
+    options.PhoneNumber = Environment.GetEnvironmentVariable("TWILIO_PHONE_NUMBER");
+});
+builder.Services.AddScoped<ISmsService, SmsService>();
+
 // Add Firebase authentication
 builder.Services.AddAuthentication(options =>
 {

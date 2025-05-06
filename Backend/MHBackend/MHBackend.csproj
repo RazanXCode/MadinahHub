@@ -17,6 +17,7 @@
     </PackageReference>
     <PackageReference Include="QRCoder" Version="1.6.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
+    <PackageReference Include="Twilio" Version="7.11.0" />
   </ItemGroup>
 
 </Project>
