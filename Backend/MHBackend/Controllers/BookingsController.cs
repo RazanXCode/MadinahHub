@@ -69,9 +69,13 @@ namespace MHBackend.Controllers
                 BookingDate = DateTime.UtcNow
             };
 
-            string qrBase64 = _qRCodeService.GenerateQRCodeAsync(
-                $"{newBooking.PublicBookingId}-{eventToBook.Title}-{eventToBook.Location}"
-            );
+            //Generate QR code
+            string qrCodeContent = $"{newBooking.PublicBookingId}-{eventToBook.Title}-{eventToBook.Location}";
+            string qrBase64 = _qRCodeService.GenerateQRCodeAsync(qrCodeContent);
+
+
+            // Convert base64 string to bytes for email attatchment
+            byte[] qrCodeBytes = Convert.FromBase64String(qrBase64);
 
             // Create the ticket
             var newTicket = new Ticket
@@ -92,19 +96,56 @@ namespace MHBackend.Controllers
             await _db.Tickets.AddAsync(newTicket);
             await _db.SaveChangesAsync();
 
+            //well formatted HTML email with the QR code 
+            var htmlBody = $@"
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset='utf-8'>
+                <title>Event Ticket Confirmation</title>
+                <style>
+                    body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                    .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                    .header {{ background-color: #f8f9fa; padding: 20px; text-align: center; }}
+                    .content {{ padding: 20px; }}
+                    .qr-code {{ text-align: center; margin: 30px 0; }}
+                    .footer {{ font-size: 12px; text-align: center; margin-top: 30px; color: #777; }}
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <div class='header'>
+                        <h1>Booking Confirmation</h1>
+                    </div>
+                    <div class='content'>
+                        <p>Hi {user.UserName},</p>
+                        <p>Your booking for <strong>{eventToBook.Title}</strong> has been confirmed!</p>
+                        <p><strong>Date:</strong> {eventToBook.StartDate:dddd, MMMM d, yyyy}</p>
+                        <p><strong>Location:</strong> {eventToBook.Location}</p>
+                        
+                        <div class='qr-code'>
+                            <p>Scan this QR code at the event:</p>
+                            <img src='data:image/png;base64,{qrCodeBytes}' alt='QR Code' style='max-width: 200px;' />
+                            <p>Booking Reference: {newBooking.PublicBookingId}</p>
+                        </div>
+                        
+                        <p>We look forward to seeing you at the event!</p>
+                    </div>
+                    <div class='footer'>
+                        <p>This is an automated message. Please do not reply to this email.</p>
+                    </div>
+                </div>
+            </body>
+            </html>";
 
-            var htmlBody =$@"
-            <p>Hi {user.UserName},</p>
-            <p>Your booking for <strong>{eventToBook.Title}</strong> is confirmed!</p>
-            <p>Scan this QR code at the event:</p>
-            <img src=""data:image/png;base64,{qrBase64}"" alt=""QR Code""/>
-            ";
-            await _emailService.SendTicketEmailAsync(
-                User.FindFirst(ClaimTypes.Email)?.Value,
-                "Your Event Ticket",
+
+            string userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+            bool emailSent = await _emailService.SendTicketEmailAsync(
+                userEmail,
+                $"Your Ticket for {eventToBook.Title}",
                 htmlBody,
-                null,
-                null
+                qrCodeBytes,
+                $"ticket-{eventToBook.Title}-qrcode.png"
             );
 
             return Ok(new { message = "Booking Confirmed" });
