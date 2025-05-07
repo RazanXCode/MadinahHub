@@ -7,7 +7,7 @@ namespace MHBackend.DTOs{
         public string PublicUserId {get; set;}
         public string UserName {get; set;}
         public string Address {get; set;}
-        public Role Role {get; set;}
+        public string Role {get; set;}
         public string PhoneNumber {get; set;}
         public DateTime CreatedAt {get; set;}
     }
