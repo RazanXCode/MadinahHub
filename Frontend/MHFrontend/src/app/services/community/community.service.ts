@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, from, Observable, of, switchMap } from 'rxjs';
 import { AuthService } from '../auth.service';
+import { Event } from '../event/event.service';
+
 
 // DTOs
 export interface CreateCommunityDto {
@@ -26,9 +28,13 @@ export interface CommunityEventDto {
   description: string;
   location: string;
   startDate: Date;
-  status: number;
+  status: string;
   imageUrl?: string;
+  capacity?: number;
+  EventType: string;
+  isPrivate: boolean;
 }
+
 
 export interface CommunityNameDto {
   communityId: number;
@@ -39,7 +45,7 @@ export interface CommunityNameDto {
   providedIn: 'root'
 })
 export class CommunityService {
-  private apiUrl = `http://localhost:5063/communities`;
+  private apiUrl = `https://localhost:44367/communities`;
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
@@ -116,7 +122,7 @@ export class CommunityService {
   
 
   // Get events for a specific community
-  getCommunityEvents(publicCommunityId: string): Observable<CommunityEventDto[]> {
-    return this.http.get<CommunityEventDto[]>(`${this.apiUrl}/events/${publicCommunityId}`);
+  getCommunityEvents(publicCommunityId: string): Observable<Event[]> {
+    return this.http.get<Event[]>(`${this.apiUrl}/events/${publicCommunityId}`);
   }
 }

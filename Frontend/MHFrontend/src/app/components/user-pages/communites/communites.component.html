@@ -1,3 +1,5 @@
+<app-navbar></app-navbar>
+
 <div class="px-6 py-8">
   <h2 class="text-2xl font-bold mb-2">Communities Made for You!</h2>
   <p class="text-sm font-semibold mb-8 text-gray-600">Explore, join, and connect with like-minded people.</p>
@@ -8,10 +10,12 @@
       class="bg-white shadow-md rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl"
     >
       <!-- Image  -->
-      <div class="relative h-[80px] bg-gray-200 flex items-center justify-center text-sm text-gray-500 font-medium">
-        Community Image
-        
-      </div>
+      <div
+  class="relative h-[80px] bg-cover bg-center flex items-center justify-center text-sm text-gray-500 font-medium"
+  style="background-image: url('{{ community.imageUrl }}')"
+>
+ 
+</div>
 
       <!-- Card Content -->
       <div class="p-4 space-y-2">

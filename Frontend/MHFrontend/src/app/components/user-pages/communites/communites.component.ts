@@ -3,10 +3,12 @@ import { Component, OnInit } from '@angular/core';
 import { Community } from '../../../models/community.model';
 import { CommunityDto, CommunityService } from '../../../services/community/community.service';
 import { Router } from '@angular/router';
+import { NavbarComponent } from "../navbar/navbar.component";
 
 @Component({
   selector: 'app-communites',
-  imports: [CommonModule],
+  standalone: true,
+  imports: [CommonModule, NavbarComponent],
   templateUrl: './communites.component.html',
   styleUrl: './communites.component.css'
 })
