@@ -3,10 +3,14 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withInterceptorsFromDi } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { providePrimeNG } from 'primeng/config';
 import { MyPreset } from '../assets/themes/mytheme';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { authInterceptor } from './interceptors/auth-interceptor';
+import { AuthService } from './services/auth.service';
+import { UserService } from './services/users/users.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [    providePrimeNG({
@@ -22,8 +26,11 @@ export const appConfig: ApplicationConfig = {
       },
     },
   }),
-  provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), provideClientHydration(withEventReplay()),
+  provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes),
   provideRouter(routes),
-  provideHttpClient(withInterceptorsFromDi()),
-  importProvidersFrom(ReactiveFormsModule)]
+  provideAnimationsAsync(),
+  importProvidersFrom(ReactiveFormsModule),
+  provideHttpClient(withInterceptors([authInterceptor]))
+
+  ],
 };

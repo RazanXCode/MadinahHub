@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
+import { finalize, catchError, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -15,6 +16,7 @@ export class RegisterComponent {
   registerForm: FormGroup;
   loading = false;
   error = '';
+  roles = ['User', 'Admin']; // Add roles list for selection
 
   constructor(
     private formBuilder: FormBuilder,
@@ -26,7 +28,8 @@ export class RegisterComponent {
       password: ['', [Validators.required, Validators.minLength(6)]],
       username: ['', Validators.required],
       address: ['', Validators.required],
-      phoneNumber: ['', Validators.required]
+      phoneNumber: ['', Validators.required],
+      role: ['User', Validators.required] // Default role is 'User'
     });
   }
 
@@ -38,28 +41,55 @@ export class RegisterComponent {
     this.loading = true;
     this.error = '';
 
-    const { email, password, username, address, phoneNumber } = this.registerForm.value;
+    const { email, password, username, address, phoneNumber, role } = this.registerForm.value;
 
     this.authService.register(email, password)
-      .subscribe({
-        next: (userCredential) => {
-          this.authService.createUserInBackend({ username, address, phoneNumber })
-            .subscribe({
-              next: () => {
-                this.loading = false;
-                this.router.navigate(['/']);
-              },
-              error: (err) => {
-                this.loading = false;
-                this.error = err.error || 'Failed to create user in database';
-                console.error('Backend error:', err);
-              }
-            });
-        },
-        error: (err) => {
-          this.loading = false;
-          this.error = this.getFirebaseErrorMessage(err.code);
+      .pipe(
+        catchError(err => {
           console.error('Firebase error:', err);
+          this.error = this.getFirebaseErrorMessage(err.code);
+          this.loading = false;
+          return of(null);
+        }),
+        switchMap(credential => {
+          if (!credential) return of(null);
+
+          console.log('Firebase registration successful, creating backend user');
+
+          return this.authService.createUserInBackend({
+            username,
+            address,
+            phoneNumber,
+            role
+          }).pipe(
+            catchError(err => {
+              console.error('Backend error:', err);
+              this.error = err.error || 'Failed to create user in database';
+              return of(null);
+            })
+          );
+        }),
+        finalize(() => {
+          this.loading = false;
+        })
+      )
+      .subscribe({
+        next: userProfile => {
+          if (!userProfile) return;
+
+          console.log('Registration successful, redirecting based on role');
+
+          // Store user role in local storage for easy access in guards
+          localStorage.setItem('userRole', userProfile.role);
+
+          // Add a brief timeout to let Angular complete its cycle
+          setTimeout(() => {
+            if (userProfile.role === 'Admin') {
+              this.router.navigate(['/admin']);
+            } else {
+              this.router.navigate(['/dashboard']);
+            }
+          }, 100);
         }
       });
   }

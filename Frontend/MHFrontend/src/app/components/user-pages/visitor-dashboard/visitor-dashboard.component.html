@@ -1,0 +1,447 @@
+<app-navbar></app-navbar>
+<p-toast></p-toast>
+<div class="p-4 sm:p-6">
+  <h1 class="text-xl sm:text-2xl font-bold mb-8 sm:mb-16">
+    Welcome Back, {{ userName }}!
+  </h1>
+
+  <div class="mb-6 sm:mb-8">
+    <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-8">
+      Your Communities:
+    </h2>
+  </div>
+
+  <!-- Loading state for communities -->
+  <div *ngIf="loadingCommunities" class="text-center py-8">
+    <p class="text-gray-600">Loading your communities...</p>
+  </div>
+
+  <!-- Error state for communities -->
+  <div *ngIf="communityError" class="text-center py-8 text-red-500">
+    <p>{{ communityError }}</p>
+    <button
+      (click)="loadUserCommunities()"
+      class="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+    >
+      Try Again
+    </button>
+  </div>
+
+  <!-- PrimeNG Carousel with Tailwind classes -->
+  <div
+    *ngIf="!loadingCommunities && !communityError && communities.length > 0"
+    class="relative px-2 sm:px-8"
+  >
+    <p-carousel
+      [value]="communities"
+      [numVisible]="3"
+      [numScroll]="1"
+      [responsiveOptions]="responsiveOptions"
+      styleClass="communities-carousel"
+      [showNavigators]="true"
+      [showIndicators]="false"
+    >
+      <ng-template pTemplate="item" let-community>
+        <div
+          class="mx-1 sm:mx-2 shadow-md rounded-lg overflow-hidden bg-white border border-gray-200 max-w-full lg:max-w-96 min-h-48"
+        >
+          <!-- Card Header with Chip Icon -->
+          <div class="flex items-center justify-center">
+            <img
+              [src]="community.imageUrl"
+              alt="Community image"
+              class="max-h-fit"
+            />
+          </div>
+
+          <!-- Card Content -->
+          <div class="p-3 sm:p-4 text-center mt-2 sm:mt-4">
+            <h3 class="text-lg sm:text-xl font-medium mb-2">
+              {{ community.name }}
+            </h3>
+            <p class="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4">
+              {{ community.description }}
+            </p>
+
+            <!-- Member Count -->
+            <div class="flex justify-center items-center mb-2">
+              <i class="pi pi-users mr-1 text-gray-600"></i>
+              <span class="text-sm text-black font-bold"
+                >x{{ community.members }}</span
+              >
+            </div>
+
+            <button
+              pButton
+              type="button"
+              label="View"
+              class="p-button-rounded"
+              [ngStyle]="{
+                'background-color': '#e9d18c',
+                border: 'none',
+                color: 'black',
+                'font-weight': 'normal',
+                padding: '0.3rem 1.2rem',
+                'font-size': '0.875rem'
+              }"
+              (click)="navigateToCommunity(community.id)"
+            ></button>
+          </div>
+        </div>
+      </ng-template>
+    </p-carousel>
+  </div>
+
+  <!-- Empty state for communities -->
+  <div
+    *ngIf="!loadingCommunities && !communityError && communities.length === 0"
+    class="text-center py-8"
+  >
+    <p class="text-gray-600">You haven't joined any communities yet.</p>
+  </div>
+</div>
+
+<!-- Booked events  -->
+<div class="p-4 sm:p-6">
+  <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-8">
+    Your Booked Events:
+  </h2>
+
+  <!-- Loading state for events -->
+  <div *ngIf="loadingEvents" class="text-center py-8">
+    <p class="text-gray-600">Loading your booked events...</p>
+  </div>
+
+  <!-- Error state for events -->
+  <div *ngIf="eventError" class="text-center py-8 text-red-500">
+    <p>{{ eventError }}</p>
+    <button
+      (click)="loadUserBookedEvents()"
+      class="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+    >
+      Try Again
+    </button>
+  </div>
+
+  <!-- PrimeNG Carousel for Events -->
+  <div
+    *ngIf="!loadingEvents && !eventError && events.length > 0"
+    class="relative px-2 sm:px-8"
+  >
+    <p-carousel
+      [value]="events"
+      [numVisible]="3"
+      [numScroll]="1"
+      [responsiveOptions]="responsiveOptions"
+      styleClass="events-carousel"
+      [showNavigators]="true"
+      [showIndicators]="false"
+    >
+      <!-- Updated event card to match all-events component -->
+      <ng-template pTemplate="item" let-event>
+        <div
+          class="mx-1 sm:mx-2 shadow-md rounded-lg overflow-hidden bg-white border border-gray-200 h-auto sm:h-[22rem] relative max-w-full lg:max-w-96"
+        >
+          <!-- Event Type Badge -->
+          <div class="absolute top-2 right-2 z-10">
+            <span
+              *ngIf="event.isPrivate"
+              class="bg-green-200 text-gray-700 text-xs px-2 py-1 rounded-md"
+              >Private</span
+            >
+            <span
+              *ngIf="!event.isPrivate"
+              class="bg-blue-200 text-gray-700 text-xs px-2 py-1 rounded-md"
+              >Public</span
+            >
+          </div>
+
+          <!-- Event Status Badge -->
+          <div class="absolute top-2 left-2 z-10">
+            <span
+              *ngIf="event.status === 'Active'"
+              class="bg-green-300 text-white text-xs px-2 py-1 rounded-md"
+              >Active</span
+            >
+            <span
+              *ngIf="event.status === 'Finished'"
+              class="bg-gray-300 text-white text-xs px-2 py-1 rounded-md"
+              >Finished</span
+            >
+            <span
+              *ngIf="event.status === 'Upcoming'"
+              class="bg-yellow-300 text-white text-xs px-2 py-1 rounded-md"
+              >Upcoming</span
+            >
+          </div>
+
+          <!-- Event Image -->
+          <div class="h-32 sm:h-40 overflow-hidden">
+            <img
+              [src]="event.imageUrl"
+              alt="Event image"
+              class="w-full h-full object-cover"
+            />
+          </div>
+
+          <!-- Event Content -->
+          <div class="p-3 sm:p-4 text-center">
+            <h3 class="text-lg sm:text-xl font-bold mb-1 sm:mb-2">
+              {{ event.title }}
+            </h3>
+
+            <!-- Date and Time -->
+            <div class="flex justify-center items-center mb-1 sm:mb-2">
+              <span class="text-xs sm:text-sm text-gray-600"
+                >{{ event.date }}, {{ event.time }}</span
+              >
+            </div>
+
+            <!-- Location -->
+            <div class="flex justify-center items-center mb-3 sm:mb-4">
+              <span class="text-xs sm:text-sm text-gray-600">{{
+                event.location
+              }}</span>
+            </div>
+
+            <!-- See Details Button -->
+            <button
+              pButton
+              type="button"
+              label="See Details"
+              class="p-button-rounded"
+              [ngStyle]="{
+                'background-color': '#E69B6B',
+                border: 'none',
+                color: 'white',
+                'font-weight': 'normal',
+                padding: '0.3rem 1.2rem',
+                'font-size': '0.875rem'
+              }"
+              (click)="showEventDetails(event)"
+            ></button>
+          </div>
+        </div>
+      </ng-template>
+    </p-carousel>
+  </div>
+
+  <!-- Empty state for events -->
+  <div
+    *ngIf="!loadingEvents && !eventError && events.length === 0"
+    class="text-center py-8"
+  >
+    <p class="text-gray-600">You haven't booked any events yet.</p>
+  </div>
+</div>
+
+<!-- Event Details Modal (updated) -->
+<p-dialog
+  [(visible)]="displayEventModal"
+  [modal]="true"
+  [style]="{ width: '90vw', maxWidth: '450px' }"
+  [draggable]="false"
+  [resizable]="false"
+  [closeOnEscape]="true"
+  [showHeader]="false"
+  styleClass="p-0"
+>
+  <div class="relative p-4 sm:p-6" *ngIf="selectedEvent">
+    <!-- Close button -->
+    <button
+      type="button"
+      class="absolute top-3 sm:top-5 right-1 text-gray-600 hover:text-gray-800 bg-transparent border-0"
+      (click)="displayEventModal = false"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        height="24px"
+        viewBox="0 -960 960 960"
+        width="24px"
+        fill="#434343"
+      >
+        <path
+          d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"
+        />
+      </svg>
+    </button>
+
+    <!-- Event type and status badges -->
+    <div class="mb-3 sm:mb-4 flex justify-center gap-2">
+      <!-- Event type badge -->
+      <span
+        *ngIf="selectedEvent.isPrivate"
+        class="bg-green-200 text-gray-700 text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-md"
+        >Private</span
+      >
+      <span
+        *ngIf="!selectedEvent.isPrivate"
+        class="bg-blue-200 text-gray-700 text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-md"
+        >Public</span
+      >
+
+      <!-- Event status badge -->
+      <span
+        *ngIf="selectedEvent.status === 'Active'"
+        class="bg-green-500 text-white text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-md"
+        >Active</span
+      >
+      <span
+        *ngIf="selectedEvent.status === 'Finished'"
+        class="bg-gray-500 text-white text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-md"
+        >Finished</span
+      >
+      <span
+        *ngIf="selectedEvent.status === 'Upcoming'"
+        class="bg-yellow-500 text-white text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-md"
+        >Upcoming</span
+      >
+    </div>
+
+    <!-- Event Title -->
+    <h2 class="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+      {{ selectedEvent.title }}
+    </h2>
+
+    <!-- Event Description -->
+    <p class="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
+      {{ selectedEvent.description }}
+    </p>
+
+    <!-- Community Organizer -->
+    <div
+      class="flex items-center justify-center mb-4 sm:mb-6 border-[1px] bg-gray-100 rounded-lg border-gray-200 hover:border-gray-300"
+    >
+      <div
+        class="flex items-center justify-center w-6 sm:w-8 h-6 sm:h-8 mr-2 sm:mr-3"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#434343"
+        >
+          <path
+            d="M0-240v-63q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H0Zm240 0v-65q0-32 17.5-62t48-49.5T369-450q32-11 65-11 33 0 65.5 11t63.5 33.5 48 49.5 17 62v65H240Zm540 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v63H780Zm-455-80h311q-10-20-29-35t-43-23.5q-24-8.5-51.5-13T434-396q-26 0-53 4.5T329-378q-25 8.5-43.5 23.5T255-320ZM160-440q-33 0-56.5-23.5T80-520q0-33 23.5-56.5T160-600q33 0 56.5 23.5T240-520q0 33-23.5 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-33 23.5-56.5T800-600q33 0 56.5 23.5T880-520q0 33-23.5 56.5T800-440Zm-480-80q0 66 47 113t113 47q66 0 113-47t47-113q0-66-47-113t-113-47q-66 0-113 47t-47 113Zm80 0q0-33 23.5-56.5T480-600q33 0 56.5 23.5T560-520q0 33-23.5 56.5T480-440q-33 0-56.5-23.5T400-520Zm80 40Z"
+          />
+        </svg>
+      </div>
+      <span class="text-sm sm:text-base text-gray-800">{{
+        selectedEvent.organizer
+      }}</span>
+    </div>
+
+    <!-- Date & Time -->
+    <div
+      class="flex items-center justify-center mb-4 sm:mb-6 border-[1px] bg-gray-100 rounded-lg border-gray-200 hover:border-gray-300"
+    >
+      <div
+        class="flex items-center justify-center w-6 sm:w-8 h-6 sm:h-8 mr-2 sm:mr-3"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#434343"
+        >
+          <path
+            d="M580-240q-42 0-71-29t-29-71q0-42 29-71t71-29q42 0 71 29t29 71q0 42-29 71t-71 29ZM200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"
+          />
+        </svg>
+      </div>
+      <span class="text-sm sm:text-base text-gray-800"
+        >{{ selectedEvent.date }}, {{ selectedEvent.time }}</span
+      >
+    </div>
+
+    <!-- Location -->
+    <div
+      class="flex items-center justify-center mb-4 sm:mb-6 border-[1px] bg-gray-100 rounded-lg border-gray-200 hover:border-gray-300"
+    >
+      <div
+        class="flex items-center justify-center w-6 sm:w-8 h-6 sm:h-8 mr-2 sm:mr-3"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#434343"
+        >
+          <path
+            d="M480-480q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Zm0 294q122-112 181-203.5T720-552q0-109-69.5-178.5T480-800q-101 0-170.5 69.5T240-552q0 71 59 162.5T480-186Zm0 106Q319-217 239.5-334.5T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 100-79.5 217.5T480-80Zm0-480Z"
+          />
+        </svg>
+      </div>
+      <span class="text-sm sm:text-base text-gray-800">{{
+        selectedEvent.location
+      }}</span>
+    </div>
+
+    <!-- Spots left -->
+    <div
+      class="flex items-center justify-center mb-4 sm:mb-6 border-[1px] bg-gray-100 rounded-lg border-gray-200 hover:border-gray-300"
+    >
+      <div
+        class="flex items-center justify-center w-6 sm:w-8 h-6 sm:h-8 mr-2 sm:mr-3"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#434343"
+        >
+          <path
+            d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"
+          />
+        </svg>
+      </div>
+      <span class="text-sm sm:text-base text-gray-800"
+        >Spots left: {{ getSpotsLeft(selectedEvent) }}</span
+      >
+    </div>
+
+    <!-- Cancel Booking Button -->
+    <div class="text-center">
+      <button
+        pButton
+        type="button"
+        label=""
+        class="p-button-rounded"
+        [disabled]="
+          cancellingBooking ||
+          selectedEvent.status === 'Finished' ||
+          !selectedEvent.publicBookingId
+        "
+        [ngStyle]="{
+          'background-color':
+            cancellingBooking ||
+            selectedEvent.status === 'Finished' ||
+            !selectedEvent.publicBookingId
+              ? '#cccccc'
+              : '#E69B6B',
+          border: 'none',
+          color: 'white',
+          'font-weight': 'normal',
+          padding: '0.4rem 1.5rem',
+          'font-size': '0.875rem'
+        }"
+        (click)="cancelBooking(selectedEvent)"
+      >
+        <i *ngIf="cancellingBooking" class="pi pi-spin pi-spinner mr-2"></i>
+        {{
+          cancellingBooking
+            ? "Cancelling..."
+            : selectedEvent.status === "Finished"
+            ? "Event Ended"
+            : !selectedEvent.publicBookingId
+            ? "No Booking Found"
+            : "Cancel Booking"
+        }}
+      </button>
+    </div>
+  </div>
+</p-dialog>

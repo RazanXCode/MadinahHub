@@ -6,7 +6,7 @@ using Google.Apis.Auth.OAuth2;
 using MHBackend.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using MHBackend.Services;
-
+using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 // Initialize Firebase Admin SDK
@@ -17,7 +17,11 @@ FirebaseApp.Create(new AppOptions
 
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.AddEndpointsApiExplorer();
 
 

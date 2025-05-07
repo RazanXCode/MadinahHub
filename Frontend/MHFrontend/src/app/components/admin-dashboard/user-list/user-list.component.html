@@ -3,10 +3,10 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
       <div class="w-full sm:max-w-[350px]">
         <div class="flex w-full">
-          <input 
-            type="text" 
-            placeholder="Search users..." 
-            [(ngModel)]="searchTerm" 
+          <input
+            type="text"
+            placeholder="Search users..."
+            [(ngModel)]="searchTerm"
             (input)="filterUsers()"
             class="flex-1 px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:border-[#E69B6B] focus:ring-2 focus:ring-[rgba(230,155,107,0.2)]">
           <button class="bg-[#E69B6B] text-white border-0 rounded-r-md px-3 py-2 cursor-pointer">
@@ -14,11 +14,11 @@
           </button>
         </div>
       </div>
-      
+
       <!-- Items per page  -->
       <div class="flex items-center">
-        <select 
-          [(ngModel)]="itemsPerPage" 
+        <select
+          [(ngModel)]="itemsPerPage"
           (change)="updatePagination()"
           class="p-2 border border-gray-300 rounded-md outline-none text-sm">
           <option [value]="10">10 per page</option>
@@ -28,27 +28,27 @@
         </select>
       </div>
     </div>
-  
+
     <!-- Desktop Table View (hidden on small screens) -->
     <div class="hidden sm:block overflow-x-auto rounded-lg border border-gray-200">
       <table class="w-full border-collapse text-sm">
         <thead>
           <tr class="bg-gray-50">
-            <th class="p-4 text-left border-b-2 border-gray-200 text-gray-600 font-semibold cursor-pointer hover:text-[#E69B6B] transition-colors" 
-                (click)="sortBy('name')">
+            <th class="p-4 text-left border-b-2 border-gray-200 text-gray-600 font-semibold cursor-pointer hover:text-[#E69B6B] transition-colors"
+                (click)="sortBy('userName')">
               <div class="flex items-center">
                 <span>Username</span>
                 <i class="fas fa-sort ml-2 text-gray-400"></i>
               </div>
             </th>
-            <th class="p-4 text-left border-b-2 border-gray-200 text-gray-600 font-semibold cursor-pointer hover:text-[#E69B6B] transition-colors" 
-                (click)="sortBy('phone')">
+            <th class="p-4 text-left border-b-2 border-gray-200 text-gray-600 font-semibold cursor-pointer hover:text-[#E69B6B] transition-colors"
+                (click)="sortBy('phoneNumber')">
               <div class="flex items-center">
                 <span>Phone Number</span>
                 <i class="fas fa-sort ml-2 text-gray-400"></i>
               </div>
             </th>
-            <th class="p-4 text-left border-b-2 border-gray-200 text-gray-600 font-semibold cursor-pointer hover:text-[#E69B6B] transition-colors" 
+            <th class="p-4 text-left border-b-2 border-gray-200 text-gray-600 font-semibold cursor-pointer hover:text-[#E69B6B] transition-colors"
                 (click)="sortBy('createdAt')">
               <div class="flex items-center">
                 <span>Created At</span>
@@ -58,75 +58,99 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let user of paginatedUsers; let i = index" 
+          <tr *ngFor="let user of paginatedUsers; let i = index"
               [ngClass]="{'bg-gray-50': i % 2 === 1}"
               class="hover:bg-[#fff8f3] transition-colors">
-            <td class="p-4 border-t border-gray-200 text-[#E69B6B] font-medium">{{ user.name }}</td>
-            <td class="p-4 border-t border-gray-200">{{ user.phone }}</td>
+            <td class="p-4 border-t border-gray-200 text-[#E69B6B] font-medium">{{ user.userName }}</td>
+            <td class="p-4 border-t border-gray-200">{{ user.phoneNumber }}</td>
             <td class="p-4 border-t border-gray-200">{{ formatDate(user.createdAt) }}</td>
           </tr>
         </tbody>
       </table>
     </div>
-    
+
     <!-- Mobile Card View (shown only on small screens) -->
     <div class="sm:hidden space-y-4">
-      <div 
-        *ngFor="let user of paginatedUsers" 
+      <div
+        *ngFor="let user of paginatedUsers"
         class="border border-gray-200 rounded-lg p-4 shadow-sm">
         <div class="flex justify-between items-center mb-2">
-          <span class="font-medium text-[#E69B6B]">{{ user.name }}</span>
+          <span class="font-medium text-[#E69B6B]">{{ user.userName }}</span>
         </div>
         <div class="space-y-2 text-sm">
           <div class="flex items-start">
             <span class="w-24 text-gray-500">Phone:</span>
-            <span>{{ user.phone }}</span>
+            <span>{{ user.phoneNumber }}</span>
           </div>
           <div class="flex items-start">
-            <span class="w-24 text-gray-500">Email:</span>
+            <span class="w-24 text-gray-500">Created At</span>
             <span class="break-all">{{ formatDate(user.createdAt) }}</span>
           </div>
         </div>
       </div>
     </div>
-    
-    <!-- Empty State -->
-    <div class="py-12 px-4 text-center text-gray-600" *ngIf="paginatedUsers.length === 0">
-      <div class="text-5xl text-gray-300 mb-4">
-        <i class="fas fa-users-slash"></i>
-      </div>
-      <h3 class="mb-2 text-gray-800 text-xl">No Users Found</h3>
-      <p class="max-w-[300px] mx-auto">Try adjusting your search or filter to find what you're looking for.</p>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading" class="py-12 px-4 text-center">
+    <div class="flex justify-center mb-4">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#E69B6B]"></div>
     </div>
-  
+    <p class="text-gray-600">Loading users...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && error" class="py-10 px-4 text-center">
+    <div class="text-5xl text-red-300 mb-4">
+      <i class="fas fa-users-slash"></i>
+    </div>
+    <h3 class="mb-2 text-gray-800 text-xl">Failed to load users</h3>
+    <p class="max-w-[350px] mx-auto mb-4 text-gray-600">{{ error }}</p>
+    <button
+      (click)="loadUsers()"
+      class="px-4 py-2 bg-[#E69B6B] text-white rounded-md hover:bg-[#d58a5b] transition-colors">
+      Try Again
+    </button>
+  </div>
+
+  <!-- Empty State - Only show when not loading and there are no users -->
+  <div class="py-12 px-4 text-center text-gray-600"
+      *ngIf="!isLoading && !error && paginatedUsers.length === 0">
+    <div class="text-5xl text-gray-300 mb-4">
+      <i class="fas fa-users-slash"></i>
+    </div>
+
+    <h3 class="mb-2 text-gray-800 text-xl">No Users Found</h3>
+    <p class="max-w-[300px] mx-auto">Try adjusting your search or filter to find what you're looking for.</p>
+  </div>
+
     <!-- Pagination -->
 <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 text-sm">
     <div class="text-gray-600 text-center sm:text-left order-2 sm:order-1 text-xs sm:text-sm">
       Showing {{ startIndex + 1 }} to {{ endIndex }} of {{ filteredUsers.length }} users
     </div>
-    
+
     <div class="flex gap-1 order-1 sm:order-2">
       <!-- First page button  -->
-      <button 
-        [disabled]="currentPage === 1" 
+      <button
+        [disabled]="currentPage === 1"
         (click)="goToPage(1)"
         class="hidden xs:flex w-8 h-8 rounded-md border border-gray-300 bg-white text-gray-800 items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
         <i class="fas fa-angle-double-left"></i>
       </button>
-      
+
       <!-- Previous page button -->
-      <button 
-        [disabled]="currentPage === 1" 
+      <button
+        [disabled]="currentPage === 1"
         (click)="goToPage(currentPage - 1)"
         class="w-8 h-8 rounded-md border border-gray-300 bg-white text-gray-800 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
         <i class="fas fa-angle-left"></i>
       </button>
-      
+
       <!-- Page numbers -->
       <ng-container *ngFor="let page of getVisiblePageNumbers()">
-        <button 
+        <button
           [ngClass]="{
-            'bg-[#E69B6B] text-white border-[#E69B6B]': currentPage === page, 
+            'bg-[#E69B6B] text-white border-[#E69B6B]': currentPage === page,
             'bg-white text-gray-800 border-gray-300': currentPage !== page
           }"
           (click)="goToPage(page)"
@@ -134,18 +158,18 @@
           {{ page }}
         </button>
       </ng-container>
-      
+
       <!-- Next page button -->
-      <button 
-        [disabled]="currentPage === totalPages" 
+      <button
+        [disabled]="currentPage === totalPages"
         (click)="goToPage(currentPage + 1)"
         class="w-8 h-8 rounded-md border border-gray-300 bg-white text-gray-800 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
         <i class="fas fa-angle-right"></i>
       </button>
-      
+
       <!-- Last page button  -->
-      <button 
-        [disabled]="currentPage === totalPages" 
+      <button
+        [disabled]="currentPage === totalPages"
         (click)="goToPage(totalPages)"
         class="hidden xs:flex w-8 h-8 rounded-md border border-gray-300 bg-white text-gray-800 items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
         <i class="fas fa-angle-double-right"></i>

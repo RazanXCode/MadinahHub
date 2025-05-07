@@ -4,6 +4,8 @@ using MHBackend.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using MHBackend.Repositories;
 
 namespace MHBackend.Controllers
 {
@@ -13,9 +15,12 @@ namespace MHBackend.Controllers
     {
         private readonly MyAppDbContext _context;
 
-        public EventController(MyAppDbContext context)
+        private readonly IUserRepository _userRepository;
+
+        public EventController(MyAppDbContext context, IUserRepository userRepository)
         {
             _context = context;
+            _userRepository = userRepository;
         }
 
         // Get: api/Event : Return All events 
@@ -75,6 +80,16 @@ namespace MHBackend.Controllers
         [HttpPost]
         public async Task<ActionResult<Event>> CreateEvent(EventCreateDto dto)
         {
+            // Get Firebase UID from token claims
+            var firebaseUid = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(firebaseUid))
+                return Unauthorized("User not authenticated");
+
+            // Get user from Firebase UID
+            var user = await _userRepository.GetByFirebaseUidAsync(firebaseUid);
+            if (user == null)
+                return NotFound("User not found");
+
             var newEvent = new Event
             {
                 PublicEventId = Guid.NewGuid().ToString(),
@@ -86,7 +101,7 @@ namespace MHBackend.Controllers
                 EndDate = dto.EndDate,
                 Status = dto.Status,
                 EventType = dto.EventType,
-                CreatedBy = 1, // should be replaced with firbaseUID later when firbase auth is implemented
+                CreatedBy = user.UserId, 
                 CommunityId = dto.CommunityId,
                 ImageUrl = dto.ImageUrl,
                 CreatedAt = DateTime.UtcNow
@@ -95,8 +110,9 @@ namespace MHBackend.Controllers
             _context.Events.Add(newEvent);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetEvent), new { id = newEvent.EventId }, newEvent);
+            return CreatedAtAction(nameof(GetEvent), new { publicEventId = newEvent.PublicEventId }, newEvent);
         }
+
 
         // PUT: api/Events/{publicEventId}: Update an event 
         [HttpPut("{publicEventId}")]

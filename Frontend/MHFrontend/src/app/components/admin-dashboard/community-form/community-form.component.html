@@ -1,80 +1,77 @@
 <div class="fixed inset-0 z-40" *ngIf="isVisible">
-    <!-- Dark backdrop -->
-    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
-    
-    <!-- Modal content -->
-    <div class="fixed inset-0 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg w-full max-w-2xl shadow-xl">
-        <!-- Header -->
-        <div class="flex justify-between items-center p-4 border-b">
-          <h2 class="text-xl font-semibold text-gray-800">{{ editMode ? 'Edit Community' : 'Create New Community' }}</h2>
-          <button type="button" class="text-gray-400 hover:text-gray-600" (click)="closeForm()">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        
-        <!-- Body -->
-        <div class="p-6">
-          <form [formGroup]="communityForm" (ngSubmit)="saveCommunity()">
-            <!-- Community Name -->
-            <div class="mb-5">
-              <label for="communityName" class="block mb-2 text-sm font-medium text-gray-700">Community Name *</label>
-              <input type="text" id="communityName" formControlName="name" 
-                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-primary"
-                     placeholder="Enter community name">
-              <div class="mt-1 text-sm text-red-600" *ngIf="communityForm.get('name')?.touched && communityForm.get('name')?.invalid">
-                <span *ngIf="communityForm.get('name')?.errors?.['required']">Community name is required</span>
-              </div>
+  <!-- Dark backdrop -->
+  <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+
+  <!-- Modal content -->
+  <div class="fixed inset-0 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg w-full max-w-2xl shadow-xl">
+      <!-- Header -->
+      <div class="flex justify-between items-center p-4 border-b">
+        <h2 class="text-xl font-semibold text-gray-800">{{ editMode ? 'Edit Community' : 'Create New Community' }}</h2>
+        <button type="button" class="text-gray-400 hover:text-gray-600" (click)="closeForm()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6">
+        <form [formGroup]="communityForm" (ngSubmit)="saveCommunity()">
+          <!-- Community Name -->
+          <div class="mb-5">
+            <label for="communityName" class="block mb-2 text-sm font-medium text-gray-700">Community Name *</label>
+            <input type="text" id="communityName" formControlName="name"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-primary"
+              placeholder="Enter community name">
+            <div class="mt-1 text-sm text-red-600"
+              *ngIf="communityForm.get('name')?.touched && communityForm.get('name')?.invalid">
+              <span *ngIf="communityForm.get('name')?.errors?.['required']">Community name is required</span>
             </div>
-                 
-            <!-- Community Image -->
-            <div class="mb-5">
-              <label class="block mb-2 text-sm font-medium text-gray-700">Community Image</label>
-              <div class="border-2 border-dashed border-gray-300 rounded-md p-4">
-                <div class="relative" *ngIf="imagePreview">
-                  <img [src]="imagePreview" alt="Community image preview" class="w-full h-auto max-h-48 rounded-md">
-                  <button type="button" 
-                          class="absolute top-0 right-0 mt-2 mr-2 bg-black bg-opacity-50 text-white p-1 rounded-full hover:bg-opacity-75" 
-                          (click)="removeImage()">
-                    <i class="fas fa-times"></i>
-                  </button>
-                </div>
-                <div class="text-center" *ngIf="!imagePreview">
-                  <label class="cursor-pointer inline-flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
-                    <i class="fas fa-cloud-upload-alt mr-2"></i> Upload Image
-                    <input type="file" accept="image/*" (change)="onImageSelected($event)" class="hidden">
-                  </label>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Community Description -->
-            <div class="mb-5">
-              <label for="communityDescription" class="block mb-2 text-sm font-medium text-gray-700">Description *</label>
-              <textarea id="communityDescription" formControlName="description" rows="4" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-primary"
-                        placeholder="Enter community description"></textarea>
-              <div class="mt-1 text-sm text-red-600" *ngIf="communityForm.get('description')?.touched && communityForm.get('description')?.invalid">
-                <span *ngIf="communityForm.get('description')?.errors?.['required']">Description is required</span>
-              </div>
-            </div>
-            
-            <!-- Form actions -->
-            <div class="flex justify-end space-x-3 mt-8">
-              <button type="button" 
-                      class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100" 
-                      (click)="closeForm()">Cancel</button>
-              <button type="submit" 
-                      class="px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                      [disabled]="communityForm.invalid || isSubmitting">
-                <span *ngIf="!isSubmitting">{{ editMode ? 'Update Community' : 'Create Community' }}</span>
-                <span *ngIf="isSubmitting" class="flex items-center">
-                  <i class="fas fa-spinner fa-spin mr-2"></i> Saving...
-                </span>
+          </div>
+
+          <!-- Community Image -->
+          <div class="mb-4">
+            <label for="imageUrl" class="block mb-2 text-sm font-medium text-gray-700">Image URL</label>
+            <input type="url" id="imageUrl" formControlName="imageUrl" (input)="previewImageFromUrl($event)"
+              placeholder="https://example.com/image.jpg"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#E69B6B]">
+
+            <!-- Image Preview -->
+            <div *ngIf="imagePreview" class="mt-3 relative">
+              <img [src]="imagePreview" alt="Community image preview" class="max-h-40 object-contain rounded-md">
+              <button type="button" (click)="removeImage()"
+                class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
+                <i class="fas fa-times"></i>
               </button>
             </div>
-          </form>
-        </div>
+          </div>
+
+          <!-- Community Description -->
+          <div class="mb-5">
+            <label for="communityDescription" class="block mb-2 text-sm font-medium text-gray-700">Description *</label>
+            <textarea id="communityDescription" formControlName="description" rows="4"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-primary"
+              placeholder="Enter community description"></textarea>
+            <div class="mt-1 text-sm text-red-600"
+              *ngIf="communityForm.get('description')?.touched && communityForm.get('description')?.invalid">
+              <span *ngIf="communityForm.get('description')?.errors?.['required']">Description is required</span>
+            </div>
+          </div>
+
+          <!-- Form actions -->
+          <div class="flex justify-end space-x-3 mt-8">
+            <button type="button" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
+              (click)="closeForm()">Cancel</button>
+            <button type="submit"
+              class="px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              [disabled]="communityForm.invalid || isSubmitting">
+              <span *ngIf="!isSubmitting">{{ editMode ? 'Update Community' : 'Create Community' }}</span>
+              <span *ngIf="isSubmitting" class="flex items-center">
+                <i class="fas fa-spinner fa-spin mr-2"></i> Saving...
+              </span>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+</div>
