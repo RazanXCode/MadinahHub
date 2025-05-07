@@ -18,12 +18,14 @@ namespace MHBackend.Controllers
         private readonly MyAppDbContext _db;
         private readonly IQRCodeService _qRCodeService;
         private readonly IUserRepository _userRepository;
+        private IEmailService _emailService;
 
-        public BookingsController(MyAppDbContext db, IQRCodeService qRCodeService,       IUserRepository userRepository)
+        public BookingsController(MyAppDbContext db, IQRCodeService qRCodeService, IUserRepository userRepository, IEmailService emailService)
         {
             _db = db;
             _qRCodeService = qRCodeService;
             _userRepository = userRepository;
+            _emailService = emailService;
         }
 
         //POST: Booking/BookEvent/{PublicEventId}
@@ -67,6 +69,10 @@ namespace MHBackend.Controllers
                 BookingDate = DateTime.UtcNow
             };
 
+            string qrBase64 = _qRCodeService.GenerateQRCodeAsync(
+                $"{newBooking.PublicBookingId}-{eventToBook.Title}-{eventToBook.Location}"
+            );
+
             // Create the ticket
             var newTicket = new Ticket
             {
@@ -74,7 +80,9 @@ namespace MHBackend.Controllers
                 EventId = eventToBook.EventId,
                 Status = TicketStatus.Valid,
                 Booking = newBooking,
-                QRCode =  _qRCodeService.GenerateQRCodeAsync($"{newBooking.PublicBookingId}{eventToBook.Title}{eventToBook.Location}"),
+                // QRCode =  _qRCodeService.GenerateQRCodeAsync($"{newBooking.PublicBookingId}{eventToBook.Title}{eventToBook.Location}"),
+                QRCode = qrBase64,
+                CreatedAt = DateTime.UtcNow
             };
             if (eventToBook.EventType != EventType.Public && eventToBook.Capacity.HasValue)
             {
@@ -84,6 +92,20 @@ namespace MHBackend.Controllers
             await _db.Tickets.AddAsync(newTicket);
             await _db.SaveChangesAsync();
 
+
+            var htmlBody =$@"
+            <p>Hi {user.UserName},</p>
+            <p>Your booking for <strong>{eventToBook.Title}</strong> is confirmed!</p>
+            <p>Scan this QR code at the event:</p>
+            <img src=""data:image/png;base64,{qrBase64}"" alt=""QR Code""/>
+            ";
+            await _emailService.SendTicketEmailAsync(
+                User.FindFirst(ClaimTypes.Email)?.Value,
+                "Your Event Ticket",
+                htmlBody,
+                null,
+                null
+            );
 
             return Ok(new { message = "Booking Confirmed" });
 

@@ -47,6 +47,8 @@ builder.Services.AddDbContext<MyAppDbContext>(options =>
 
 // Add Services
 builder.Services.AddSingleton<IQRCodeService, QRCodeService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
