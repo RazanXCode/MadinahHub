@@ -19,13 +19,15 @@ namespace MHBackend.Controllers
         private readonly IQRCodeService _qRCodeService;
         private readonly IUserRepository _userRepository;
         private IEmailService _emailService;
+        private readonly ISmsService _smsService;
 
-        public BookingsController(MyAppDbContext db, IQRCodeService qRCodeService, IUserRepository userRepository, IEmailService emailService)
+        public BookingsController(MyAppDbContext db, IQRCodeService qRCodeService, IUserRepository userRepository, IEmailService emailService, ISmsService smsService)
         {
             _db = db;
             _qRCodeService = qRCodeService;
             _userRepository = userRepository;
             _emailService = emailService;
+            _smsService = smsService;
         }
 
         //POST: Booking/BookEvent/{PublicEventId}
@@ -95,6 +97,13 @@ namespace MHBackend.Controllers
             //  Save to database
             await _db.Tickets.AddAsync(newTicket);
             await _db.SaveChangesAsync();
+
+            // Send SMS notification to the user
+            if (!string.IsNullOrEmpty(user.PhoneNumber))
+            {
+                var message = $"Dear {user.UserName}, your booking for \"{eventToBook.Title}\" is confirmed. Date: {eventToBook.StartDate:g}. Location: {eventToBook.Location}";
+                await _smsService.SendAsync(user.PhoneNumber, message);
+            }
 
             //well formatted HTML email with the QR code 
             var htmlBody = $@"
@@ -186,6 +195,13 @@ namespace MHBackend.Controllers
                 booking.Ticket.Event.Capacity++;
             }
             await _db.SaveChangesAsync();
+            
+            // Send SMS notification about booking cancellation
+            if (!string.IsNullOrEmpty(user.PhoneNumber))
+            {
+                var message = $"Dear {user.UserName}, your booking for \"{booking.Ticket.Event.Title}\" has been cancelled successfully.";
+                await _smsService.SendAsync(user.PhoneNumber, message);
+            }
             return Ok(new { message = "Booking Cancelled" });
 
 
