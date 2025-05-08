@@ -55,7 +55,7 @@ namespace MHBackend.Controllers
                 UserId = user.UserId,
                 UserName = user.UserName,
                 Address = user.Address,
-                Role = user.Role,
+                Role = user.Role.ToString(),
                 PhoneNumber = user.PhoneNumber,
                 PublicUserId = user.PublicUserId,
                 CreatedAt = user.CreatedAt
@@ -83,7 +83,7 @@ namespace MHBackend.Controllers
                 UserId = user.UserId,
                 UserName = user.UserName,
                 Address = user.Address,
-                Role = user.Role,
+                Role = user.Role.ToString(),
                 PhoneNumber = user.PhoneNumber,
                 PublicUserId = user.PublicUserId,
                 CreatedAt = user.CreatedAt

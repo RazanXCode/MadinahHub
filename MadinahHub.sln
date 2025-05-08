@@ -6,6 +6,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{1AE8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MHBackend", "Backend\MHBackend\MHBackend.csproj", "{1DD038A9-DBC2-ACAE-EB24-61A8946EADAF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MHBackend.Tests", "MHBackend.Tests\MHBackend.Tests.csproj", "{58B02F42-E161-40AD-BA84-D90F9309E4DA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -16,12 +18,17 @@ Global
 		{1DD038A9-DBC2-ACAE-EB24-61A8946EADAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DD038A9-DBC2-ACAE-EB24-61A8946EADAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DD038A9-DBC2-ACAE-EB24-61A8946EADAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58B02F42-E161-40AD-BA84-D90F9309E4DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58B02F42-E161-40AD-BA84-D90F9309E4DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58B02F42-E161-40AD-BA84-D90F9309E4DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58B02F42-E161-40AD-BA84-D90F9309E4DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1DD038A9-DBC2-ACAE-EB24-61A8946EADAF} = {1AE8ACA6-933B-BF2A-3671-3E2EAC007D16}
+		{58B02F42-E161-40AD-BA84-D90F9309E4DA} = {1AE8ACA6-933B-BF2A-3671-3E2EAC007D16}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1B5F2F8E-4F40-495E-8302-3D236740C75E}

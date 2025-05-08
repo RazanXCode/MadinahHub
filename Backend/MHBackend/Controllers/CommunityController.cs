@@ -248,7 +248,6 @@ namespace MHBackend.Controllers
             //Get events for the community
             var events = await _db.Events
            .Where(e => e.Community.CommunityId == community.CommunityId)
-           .Where(e => e.StartDate >= DateTime.UtcNow) // to select only future events
             .Select(e => new CommunityEventDto
             {
             PublicEventId = e.PublicEventId,
@@ -256,8 +255,10 @@ namespace MHBackend.Controllers
             Description = e.Description,
             Location = e.Location,
             StartDate = e.StartDate,
-            Status = e.Status,
-            ImageUrl = e.ImageUrl
+            Status = e.Status.ToString(),
+            ImageUrl = e.ImageUrl,
+            Capacity = e.Capacity,
+            EventType = e.EventType.ToString()
             }).ToListAsync();
             return Ok(events);
         }
