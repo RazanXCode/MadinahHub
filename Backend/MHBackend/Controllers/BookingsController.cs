@@ -20,14 +20,16 @@ namespace MHBackend.Controllers
         private readonly IUserRepository _userRepository;
         private IEmailService _emailService;
         private readonly ISmsService _smsService;
+        private readonly INotificationService _notificationService;
 
-        public BookingsController(MyAppDbContext db, IQRCodeService qRCodeService, IUserRepository userRepository, IEmailService emailService, ISmsService smsService)
+        public BookingsController(MyAppDbContext db, IQRCodeService qRCodeService, IUserRepository userRepository, IEmailService emailService, ISmsService smsService, INotificationService notificationService)
         {
             _db = db;
             _qRCodeService = qRCodeService;
             _userRepository = userRepository;
             _emailService = emailService;
             _smsService = smsService;
+            _notificationService = notificationService;
         }
 
         //POST: Booking/BookEvent/{PublicEventId}
@@ -156,7 +158,13 @@ namespace MHBackend.Controllers
                 qrCodeBytes,
                 $"ticket-{eventToBook.Title}-qrcode.png"
             );
-
+            
+            // Create a notification for the booking
+            await _notificationService.CreateBookingNotificationAsync(
+                user.UserId, 
+                newBooking.BookingId,  
+                "Confirmed"
+            );
             return Ok(new { message = "Booking Confirmed" });
 
 
@@ -202,6 +210,11 @@ namespace MHBackend.Controllers
                 var message = $"Dear {user.UserName}, your booking for \"{booking.Ticket.Event.Title}\" has been cancelled successfully.";
                 await _smsService.SendAsync(user.PhoneNumber, message);
             }
+            await _notificationService.CreateBookingNotificationAsync(
+                user.UserId,
+                booking.BookingId,
+                "Cancelled"
+            );
             return Ok(new { message = "Booking Cancelled" });
 
 

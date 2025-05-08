@@ -13,6 +13,7 @@ import { EventService, Event as AppEvent } from '../../../services/event/event.s
 import { BookingsService } from '../../../services/booking/booking.service';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { FirebaseMessagingService } from '../../../services/firebase-messaging/firebase-messaging.service';
 
 // Simplified interface for event display format
 interface EventDisplay {
@@ -76,11 +77,15 @@ export class AllEventsComponent implements OnInit {
   constructor(
     private eventService: EventService,
     private bookingsService: BookingsService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private fcmService: FirebaseMessagingService
   ) {}
   
   ngOnInit(): void {
     this.loadEvents();
+  // Initialize Firebase Cloud Messaging
+  this.fcmService.requestPermission();
+  this.fcmService.receiveMessage();
   }
   
   loadEvents(): void {
@@ -230,6 +235,12 @@ export class AllEventsComponent implements OnInit {
             detail: `You have successfully booked ${event.title}!`
           });
           
+          // Firebase Messaging notification
+          this.fcmService.showLocalNotification({
+            title: 'Event Booked',
+            body: `You have successfully booked "${event.title}"`,
+            icon: event.imageUrl || '../../../../assets/images/logo.png'
+          });
           this.displayEventModal = false;
           this.loadEvents();
         }
