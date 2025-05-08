@@ -55,9 +55,9 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // Register ISmsService and SmsService
 builder.Services.Configure<TwilioSettings>(options => {
-    options.AccountSid = "AC60ac9ab1c3f6ec094769a44ac87d227a";
-    options.AuthToken = "e09322f9545f5815111070ddeba274c0";
-    options.PhoneNumber = "+13367042386";
+    options.AccountSid = Environment.GetEnvironmentVariable("TWILIO_ACCOUNT_SID");
+    options.AuthToken = Environment.GetEnvironmentVariable("TWILIO_AUTH_TOKEN");
+    options.PhoneNumber = Environment.GetEnvironmentVariable("TWILIO_PHONE_NUMBER");
 });
 builder.Services.AddScoped<ISmsService, SmsService>();
 
