@@ -18,16 +18,16 @@ namespace MHBackend.Controllers
         private readonly MyAppDbContext _db;
         private readonly IQRCodeService _qRCodeService;
         private readonly IUserRepository _userRepository;
-        private readonly ISmsService _smsService;
         private IEmailService _emailService;
+        private readonly ISmsService _smsService;
 
-        public BookingsController(MyAppDbContext db, IQRCodeService qRCodeService, IUserRepository userRepository, ISmsService smsService, IEmailService emailService)
+        public BookingsController(MyAppDbContext db, IQRCodeService qRCodeService, IUserRepository userRepository, IEmailService emailService, ISmsService smsService)
         {
             _db = db;
             _qRCodeService = qRCodeService;
             _userRepository = userRepository;
-            _smsService = smsService;
             _emailService = emailService;
+            _smsService = smsService;
         }
 
         //POST: Booking/BookEvent/{PublicEventId}
@@ -104,6 +104,7 @@ namespace MHBackend.Controllers
                 var message = $"Dear {user.UserName}, your booking for \"{eventToBook.Title}\" is confirmed. Date: {eventToBook.StartDate:g}. Location: {eventToBook.Location}";
                 await _smsService.SendAsync(user.PhoneNumber, message);
             }
+
             //well formatted HTML email with the QR code 
             var htmlBody = $@"
             <!DOCTYPE html>
@@ -194,7 +195,7 @@ namespace MHBackend.Controllers
                 booking.Ticket.Event.Capacity++;
             }
             await _db.SaveChangesAsync();
-
+            
             // Send SMS notification about booking cancellation
             if (!string.IsNullOrEmpty(user.PhoneNumber))
             {
