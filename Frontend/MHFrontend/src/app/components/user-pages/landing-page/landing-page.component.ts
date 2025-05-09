@@ -4,10 +4,10 @@ import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service'; 
 import { UserService } from '../../../services/users/users.service';
-
+import { FooterComponent } from '../../footer/footer.component';
 @Component({
   selector: 'app-landing-page',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FooterComponent],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.css',
 
