@@ -21,6 +21,7 @@ import { of } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { FirebaseMessagingService } from '../../../services/firebase-messaging/firebase-messaging.service';
 
 // Interface for displaying events in the UI
 interface EventDisplay {
@@ -128,7 +129,8 @@ export class VisitorDashboardComponent implements OnInit {
     private bookingsService: BookingsService,
     private authService: AuthService,
     private messageService: MessageService,
-    private router: Router
+    private router: Router,
+    private fcmService: FirebaseMessagingService
   ) {}
 
   ngOnInit(): void {
@@ -146,6 +148,9 @@ export class VisitorDashboardComponent implements OnInit {
         }
       }
     });
+    // Initialize Firebase Cloud Messaging
+    this.fcmService.requestPermission();
+    this.fcmService.receiveMessage();
   }
 
   loadUserCommunities(): void {
@@ -360,6 +365,12 @@ export class VisitorDashboardComponent implements OnInit {
             detail: 'Booking cancelled successfully.',
           });
 
+          // Firebase Messaging notification
+          this.fcmService.showLocalNotification({
+            title: 'Booking Cancelled',
+            body: `Your booking for "${this.selectedEvent?.title}" has been cancelled`,
+            icon: this.selectedEvent?.imageUrl || '../../../../assets/images/logo.png'
+          });
           // Close the modal
           this.displayEventModal = false;
 

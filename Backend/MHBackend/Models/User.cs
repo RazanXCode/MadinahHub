@@ -33,6 +33,7 @@ namespace MHBackend.Models
         public ICollection<Message> Messages { get; set; } = new List<Message>();
         public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
         public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+        public ICollection<DeviceToken> DeviceTokens { get; set; } = new List<DeviceToken>();
 
 
     }

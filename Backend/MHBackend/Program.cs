@@ -61,6 +61,9 @@ builder.Services.Configure<TwilioSettings>(options => {
 });
 builder.Services.AddScoped<ISmsService, SmsService>();
 
+// Register INotificationService and NotificationService
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
 // Add Firebase authentication
 builder.Services.AddAuthentication(options =>
 {

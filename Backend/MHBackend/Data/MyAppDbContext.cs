@@ -17,7 +17,7 @@ namespace MHBackend.Data
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Message> Messages { get; set; }
-
+        public DbSet<DeviceToken> DeviceTokens { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -121,6 +121,13 @@ namespace MHBackend.Data
                 .WithMany(c => c.Messages)
                 .HasForeignKey(m => m.CommunityId)
                 .OnDelete(DeleteBehavior.Cascade);  // On delete, remove all related Message entries
+
+            // DeviceToken - User (Many-to-1)
+            modelBuilder.Entity<DeviceToken>()
+                .HasOne(dt => dt.User)
+                .WithMany(u => u.DeviceTokens)
+                .HasForeignKey(dt => dt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
         }
     }
