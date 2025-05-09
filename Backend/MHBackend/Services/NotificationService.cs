@@ -57,12 +57,6 @@ namespace MHBackend.Services
             await CreateNotificationAsync(userId, content, bookingId);
         }
 
-        public async Task CreateCommunityNotificationAsync(int userId, string communityName, string action)
-        {
-            string content = $"The community '{communityName}' has been {action}.";
-            await CreateNotificationAsync(userId, content);
-        }
-
         private async Task<bool> SendPushNotificationAsync(int userId, string title, string body)
         {
             try
