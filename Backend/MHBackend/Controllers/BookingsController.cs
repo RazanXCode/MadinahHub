@@ -1,4 +1,4 @@
-using MHBackend.Data;
+﻿using MHBackend.Data;
 using MHBackend.DTOs;
 using MHBackend.Models;
 using MHBackend.Repositories;
@@ -108,7 +108,7 @@ namespace MHBackend.Controllers
             }
 
             //well formatted HTML email with the QR code 
-            var htmlBody = $@"
+           var htmlBody = $@"
             <!DOCTYPE html>
             <html>
             <head>
@@ -136,7 +136,7 @@ namespace MHBackend.Controllers
                         
                         <div class='qr-code'>
                             <p>Scan this QR code at the event:</p>
-                            <img src='data:image/png;base64,{qrCodeBytes}' alt='QR Code' style='max-width: 200px;' />
+                            <img src='cid:qrcode' alt='QR Code' style='max-width: 200px;' />
                             <p>Booking Reference: {newBooking.PublicBookingId}</p>
                         </div>
                         
