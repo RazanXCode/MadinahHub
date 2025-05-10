@@ -1,0 +1,90 @@
+<p-toast></p-toast>
+
+<div class="flex flex-col h-[500px] border border-gray-200 rounded-lg overflow-hidden bg-gray-50 shadow-sm">
+  <!-- Loading state -->
+  <div *ngIf="loading" class="flex flex-col items-center justify-center h-64 text-gray-600 text-center p-4">
+    <div class="w-10 h-10 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+    <p>Connecting to chat...</p>
+  </div>
+  
+  <!-- Error state -->
+  <div *ngIf="error && !loading" class="bg-red-50 border-l-4 border-red-500 p-4 m-4">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-red-700">{{ error }}</p>
+        <button 
+          (click)="connectToChat()" 
+          class="mt-2 px-3 py-1 text-xs bg-red-100 text-red-800 rounded hover:bg-red-200 transition">
+          Retry
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Chat messages -->
+  <div #messageContainer class="flex-1 overflow-y-auto p-4 flex flex-col" *ngIf="!loading">
+    <div *ngIf="messages.length === 0 && !error" class="flex-1 flex items-center justify-center text-gray-500 italic">
+      <p>No messages yet. Start the conversation!</p>
+    </div>
+    
+    <div *ngFor="let message of messages" 
+         [ngClass]="isOwnMessage(message) ? 'self-end' : 'self-start'"
+         class="max-w-[80%] group mb-3">
+      
+      <!-- Message content -->
+      <div [ngClass]="isOwnMessage(message) ? 'bg-[#C2C179] text-white' : 'bg-gray-300 text-gray-800'"
+           class="px-3 py-2 rounded-lg shadow-sm">
+        
+        <!-- Message header -->
+        <div class="flex text-xs mb-1">
+          <span class="font-medium pr-4" [ngClass]="isOwnMessage(message) ? 'text-secondary' : 'text-gray-700'">
+            {{ message.userName }}
+          </span>
+          <span class="ml-auto text-end text-gray-500">{{ getTimeString(message.timestamp) }}</span>
+          
+          <!-- Delete button (only for own messages) -->
+          <button *ngIf="isOwnMessage(message)" 
+                  class="ml-2 text-gray-400 hover:text-red-500 invisible group-hover:visible transition-all"
+                  (click)="deleteMessage(message.messageId)" 
+                  title="Delete message">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Message text -->
+        <div class="text-sm break-words whitespace-pre-wrap">
+          {{ message.content }}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Message input form -->
+  <form [formGroup]="messageForm" (ngSubmit)="sendMessage()" class="border-t border-gray-200 p-3 bg-white">
+    <div class="relative">
+      <textarea 
+        formControlName="content"
+        placeholder="Type your message..."
+        rows="2"
+        [disabled]="!connected || loading"
+        (keydown)="handleKeyDown($event)"
+        class="w-full resize-none p-2 pr-12 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#C2C179] focus:border-[#C2C179] disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
+      ></textarea>
+      
+      <button 
+        type="submit" 
+        [disabled]="messageForm.invalid || !connected || loading"
+        class="absolute right-2 bottom-2 text-[#C2C179] hover:text-blue-700 p-1 rounded disabled:text-gray-400 disabled:cursor-not-allowed">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentcolor"><path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/></svg>
+      </button>
+    </div>
+    <p class="text-xs text-gray-500 mt-1">Press Enter to send, Shift+Enter for new line</p>
+  </form>
+</div>
