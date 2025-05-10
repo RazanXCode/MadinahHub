@@ -11,12 +11,20 @@ import { NavbarComponent } from "../navbar/navbar.component";
 import { Event } from '../../../services/event/event.service';
 import { forkJoin } from 'rxjs';
 import { BookingsService } from '../../../services/booking/booking.service';
-
+import { CommunityChatComponent } from '../community-chat/community-chat.component';
 
 @Component({
   selector: 'app-community-details',
   standalone: true,
-  imports: [CommonModule, DialogModule, ButtonModule, ToastModule, NavbarComponent, RouterModule], 
+  imports: [
+    CommonModule, 
+    DialogModule, 
+    ButtonModule, 
+    ToastModule, 
+    NavbarComponent, 
+    RouterModule,
+    CommunityChatComponent
+  ], 
   templateUrl: './community-details.component.html',
   styleUrl: './community-details.component.css',
   providers: [MessageService]
@@ -29,147 +37,140 @@ export class CommunityDetailsComponent implements OnInit {
   bookingInProgress: boolean = false;
   isLoading = true;
   error: string | null = null;
+  showChat = false;
 
+  constructor(
+    private route: ActivatedRoute,
+    private communityService: CommunityService,
+    private router: Router,
+    private bookingsService: BookingsService,
+    private messageService: MessageService
+  ) {}
 
-    constructor(
-      private route: ActivatedRoute,
-      private communityService: CommunityService,
-      private router: Router,
-      private bookingsService: BookingsService,
-      private messageService: MessageService
-    ) {}
-  
-    ngOnInit(): void {
-      const id = this.route.snapshot.paramMap.get('id');
-      if (id) {
-        this.loadCommunity(id);
-      } else {
-        this.error = 'Invalid community ID';
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.loadCommunity(id);
+    } else {
+      this.error = 'Invalid community ID';
+      this.isLoading = false;
+    }
+  }
+
+  private loadCommunity(id: string): void {
+    forkJoin([
+      this.communityService.getCommunity(id),
+    ]).subscribe({
+      next: ([community]) => {
+        this.community = community;
+        this.loadCommunityEvents(id);
+      },
+      error: (err) => {
+        console.error('Failed to load community or bookings', err);
+        this.error = 'Failed to load community details';
         this.isLoading = false;
       }
-    }
-
-
-    private loadCommunity(id: string): void {
-      forkJoin([
-        this.communityService.getCommunity(id),
-      ]).subscribe({
-        next: ([community]) => {
-          this.community = community;
-          this.loadCommunityEvents(id);
-        },
-        error: (err) => {
-          console.error('Failed to load community or bookings', err);
-          this.error = 'Failed to load community details';
-          this.isLoading = false;
-        }
-      });
-    }
-      private loadCommunityEvents(communityId: string): void {
-        this.communityService.getCommunityEvents(communityId).subscribe({
-          next: (events) => {
-            this.events = events;
-            this.isLoading = false;
-          },
-          error: (err) => {
-            console.error('Failed to load community events', err);
-            this.error = 'Failed to load community events';
-            this.isLoading = false;
-          }
-        });
-      }
-
-      onLeaveCommunity(): void {
-        if (!this.community?.publicCommunityId) {
-          this.error = 'Invalid community ID';
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Invalid community ID',
-            life: 3000
-          });
-          return;
-        }
-      
-        this.communityService.leaveCommunity(this.community.publicCommunityId).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Left Community',
-              detail: 'You have successfully left the community.',
-              life: 3000
-            });
-      
-            // Delay navigation to allow user to see the message
-            setTimeout(() => {
-              this.router.navigate(['/communities']);
-            }, 3000);
-          },
-        }
-      );
-    }
-      
+    });
+  }
     
-   // Show event details in modal
+  private loadCommunityEvents(communityId: string): void {
+    this.communityService.getCommunityEvents(communityId).subscribe({
+      next: (events) => {
+        this.events = events;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load community events', err);
+        this.error = 'Failed to load community events';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  onLeaveCommunity(): void {
+    if (!this.community?.publicCommunityId) {
+      this.error = 'Invalid community ID';
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Invalid community ID',
+        life: 3000
+      });
+      return;
+    }
+  
+    this.communityService.leaveCommunity(this.community.publicCommunityId).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Left Community',
+          detail: 'You have successfully left the community.',
+          life: 3000
+        });
+  
+        // Delay navigation to allow user to see the message
+        setTimeout(() => {
+          this.router.navigate(['/communities']);
+        }, 3000);
+      },
+    });
+  }
+    
+  // Show event details in modal
   showEventDetails(event: Event) {
     this.selectedEvent = event;
     this.displayEventModal = true;
   }
 
-
-   // Book event method
-    bookEvent(event: Event): void {
-      if (!event) return;
-      
-      this.bookingInProgress = true;
-      
-      this.bookingsService.bookEvent(event.publicEventId)
-        .pipe(
-          catchError(error => {
-            let errorMessage = 'Unable to book this event.';
-            
-            if (error.status === 400) {
-              if (error.error === 'Event is not available for booking') {
-                errorMessage = 'This event is not available for booking. It may be full, already started, or canceled.';
-              } else if (typeof error.error === 'string') {
-                errorMessage = error.error;
-              }
-            }
-            
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Booking Failed',
-              detail: errorMessage
-            });
-            
-            console.error('Error booking event:', error);
-            return of(null);
-          }),
-          finalize(() => {
-            this.bookingInProgress = false;
-          })
-        )
-        .subscribe(response => {
-          if (response) {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Booking Successful',
-              detail: `You have successfully booked ${event.title}!`
-            });
-            
-            this.displayEventModal = false;
-            //reload events after booking
-            this.loadCommunityEvents(this.community.publicCommunityId);
-          }
-        });
-    }
-
-
-    /*
-  hasUserBookedEvent(eventId: string): boolean {
-    return this.userBookings.some(booking => booking.publicEventId === eventId);
+  // Toggle chat visibility
+  toggleChat() {
+    this.showChat = !this.showChat;
   }
-*/
- 
-  
+
+  // Book event method
+  bookEvent(event: Event): void {
+    if (!event) return;
+    
+    this.bookingInProgress = true;
+    
+    this.bookingsService.bookEvent(event.publicEventId)
+      .pipe(
+        catchError(error => {
+          let errorMessage = 'Unable to book this event.';
+          
+          if (error.status === 400) {
+            if (error.error === 'Event is not available for booking') {
+              errorMessage = 'This event is not available for booking. It may be full, already started, or canceled.';
+            } else if (typeof error.error === 'string') {
+              errorMessage = error.error;
+            }
+          }
+          
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Booking Failed',
+            detail: errorMessage
+          });
+          
+          console.error('Error booking event:', error);
+          return of(null);
+        }),
+        finalize(() => {
+          this.bookingInProgress = false;
+        })
+      )
+      .subscribe(response => {
+        if (response) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Booking Successful',
+            detail: `You have successfully booked ${event.title}!`
+          });
+          
+          this.displayEventModal = false;
+          //reload events after booking
+          this.loadCommunityEvents(this.community.publicCommunityId);
+        }
+      });
+  }
 }
