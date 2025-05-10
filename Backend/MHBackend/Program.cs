@@ -7,6 +7,8 @@ using MHBackend.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using MHBackend.Services;
 using System.Text.Json.Serialization;
+using MHBackend.Hubs; // Add this for SignalR Hubs
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Initialize Firebase Admin SDK
@@ -14,7 +16,6 @@ FirebaseApp.Create(new AppOptions
 {
     Credential = GoogleCredential.FromFile("./Secrets/fir-fbe50-firebase-adminsdk-fbsvc-d437111a10.json"),
 });
-
 
 // Add services to the container.
 builder.Services.AddControllers()
@@ -24,7 +25,12 @@ builder.Services.AddControllers()
     });
 builder.Services.AddEndpointsApiExplorer();
 
-
+// Add SignalR
+builder.Services.AddSignalR(options =>
+{
+    // Make hub methods wait for authentication
+    options.EnableDetailedErrors = true; // Enable detailed errors for debugging
+});
 // Add CORS for Angular frontend
 builder.Services.AddCors(options =>
 {
@@ -32,23 +38,22 @@ builder.Services.AddCors(options =>
     builder => builder
             .WithOrigins("http://localhost:4200")
             .AllowAnyHeader()
-            .AllowAnyMethod());
-
+            .AllowAnyMethod()
+            .AllowCredentials()); // Important for SignalR
 });
 
 // Add Swagger for API documentation
 builder.Services.AddSwaggerGen();
 
-
 // Register Database service
 builder.Services.AddDbContext<MyAppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")) // Note: Add your own Connection string in appsettings.json
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
 // Add Services
 builder.Services.AddSingleton<IQRCodeService, QRCodeService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-
+builder.Services.AddScoped<IChatService, ChatService>();
 
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -81,7 +86,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
-
     });
 }
 
@@ -91,6 +95,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ChatHub>("/chatHub"); // Map SignalR hub
 app.UseCors("AllowAngularApp");
 
 app.Run();
