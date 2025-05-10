@@ -22,6 +22,7 @@ import { AuthService } from '../../../services/auth.service';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { FirebaseMessagingService } from '../../../services/firebase-messaging/firebase-messaging.service';
+import { FooterComponent } from '../../footer/footer.component';
 
 // Interface for displaying events in the UI
 interface EventDisplay {
@@ -63,6 +64,7 @@ interface CommunityDisplay {
     DialogModule,
     NavbarComponent,
     ToastModule,
+    FooterComponent,
   ],
   templateUrl: './visitor-dashboard.component.html',
   styleUrl: './visitor-dashboard.component.css',

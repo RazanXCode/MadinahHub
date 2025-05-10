@@ -4,11 +4,11 @@ import { Community } from '../../../models/community.model';
 import { CommunityDto, CommunityService } from '../../../services/community/community.service';
 import { Router } from '@angular/router';
 import { NavbarComponent } from "../navbar/navbar.component";
-
+import { FooterComponent } from "../../footer/footer.component";
 @Component({
   selector: 'app-communites',
   standalone: true,
-  imports: [CommonModule, NavbarComponent],
+  imports: [CommonModule, NavbarComponent, FooterComponent],
   templateUrl: './communites.component.html',
   styleUrl: './communites.component.css'
 })

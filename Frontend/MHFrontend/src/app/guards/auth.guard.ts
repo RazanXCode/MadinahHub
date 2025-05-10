@@ -16,6 +16,9 @@ export const roleGuard: CanActivateFn = (route, state) => {
     if (requiredRole && storedRole !== requiredRole) {
       if (storedRole === 'Admin') {
         router.navigate(['/admin']);
+      } else if (state.url.includes('/admin')) {
+        // If non-admin user is trying to access admin routes
+        router.navigate(['/landing']);
       } else {
         router.navigate(['/dashboard']);
       }
@@ -45,6 +48,9 @@ export const roleGuard: CanActivateFn = (route, state) => {
         // Redirect based on actual role
         if (userProfile.role === 'Admin') {
           router.navigate(['/admin']);
+        } else if (state.url.includes('/admin')) {
+          //If non-admin user is trying to access admin routes
+          router.navigate(['/landing']);
         } else {
           router.navigate(['/dashboard']);
         }

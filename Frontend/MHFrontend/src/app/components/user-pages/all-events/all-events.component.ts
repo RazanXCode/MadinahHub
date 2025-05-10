@@ -14,7 +14,7 @@ import { BookingsService } from '../../../services/booking/booking.service';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FirebaseMessagingService } from '../../../services/firebase-messaging/firebase-messaging.service';
-
+import { FooterComponent } from '../../footer/footer.component';
 // Simplified interface for event display format
 interface EventDisplay {
   id: string;
@@ -44,7 +44,8 @@ interface EventDisplay {
     DropdownModule,
     DialogModule,
     ToastModule,
-    NavbarComponent
+    NavbarComponent,
+    FooterComponent
   ],
   templateUrl: './all-events.component.html',
   styleUrl: './all-events.component.css',

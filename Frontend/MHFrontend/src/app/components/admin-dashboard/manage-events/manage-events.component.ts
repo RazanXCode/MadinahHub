@@ -186,8 +186,11 @@ export class ManageEventsComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error deleting event:', err);
+      if (err.error && err.error.includes && err.error.includes('FK_Tickets_Events_EventId')) {
+        this.error = 'Cannot delete this event because it has tickets associated with it.';
+      } else {
         this.error = 'Failed to delete event. Please try again.';
-        setTimeout(() => this.error = null, 5000);
+      }        setTimeout(() => this.error = null, 5000);
         this.pendingDeleteEvent = null;
       }
     });

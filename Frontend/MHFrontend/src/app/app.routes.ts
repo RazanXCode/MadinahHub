@@ -18,7 +18,12 @@ export const routes: Routes = [
   { path: 'dashboard', component: VisitorDashboardComponent,
  },
   { path: 'landing', component: LandingPageComponent },
-  { path: 'admin', component: DashboardComponent },
+  { 
+    path: 'admin', 
+    component: DashboardComponent,
+    canActivate: [roleGuard],
+    data: { roles: ['Admin'] }  
+  },  
   {path: 'communities', component: CommunitesComponent},
   { path: 'community/:id', component: CommunityDetailsComponent },
 
