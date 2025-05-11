@@ -274,9 +274,19 @@ export class CommunityChatComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  isOwnMessage(message: Message): boolean {
-    return message.userId === this.currentUserId;
+  isOwnMessage(message: any): boolean {
+  if (!this.currentUserId) return false;
+  
+  // Check both possible property names
+  const messageUserId = message.userId || message.userPublicId;
+  
+  if (!messageUserId) {
+    console.warn('Message has no userId or userPublicId property:', message);
+    return false;
   }
+  
+  return messageUserId === this.currentUserId;
+}
 
   getTimeString(timestamp: Date): string {
     if (!timestamp) return '';
