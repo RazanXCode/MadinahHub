@@ -184,7 +184,9 @@ export class AllEventsComponent implements OnInit {
     this.displayEventModal = true;
   }
   
-
+  getCompacity(event: EventDisplay): string {
+    return  `${event.capacity}`;
+  }
   
   // Retry loading events
   retryLoading(): void {

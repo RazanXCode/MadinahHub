@@ -321,7 +321,9 @@ export class VisitorDashboardComponent implements OnInit {
     this.displayEventModal = true;
   }
 
-
+  getCompacity(event: EventDisplay): string {
+    return  `${event.capacity}`;
+  }
 
   // Cancel a booking using the actual publicBookingId
   cancelBooking(event: EventDisplay): void {
