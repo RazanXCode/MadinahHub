@@ -184,12 +184,7 @@ export class AllEventsComponent implements OnInit {
     this.displayEventModal = true;
   }
   
-  // Helper method to get spots left text
-  getSpotsLeft(event: EventDisplay): string {
-    if (!event.capacity) return 'Public';
-    const spotsLeft = event.capacity - event.attendees;
-    return spotsLeft <= 0 ? 'Full' : `${spotsLeft} / ${event.capacity}`;
-  }
+
   
   // Retry loading events
   retryLoading(): void {
