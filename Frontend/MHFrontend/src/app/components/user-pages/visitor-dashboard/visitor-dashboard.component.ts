@@ -321,11 +321,8 @@ export class VisitorDashboardComponent implements OnInit {
     this.displayEventModal = true;
   }
 
-  // Helper method to get spots left text
-  getSpotsLeft(event: EventDisplay): string {
-    if (!event.capacity) return 'Unlimited';
-    const spotsLeft = event.capacity - event.attendees;
-    return spotsLeft <= 0 ? 'Full' : `${spotsLeft} / ${event.capacity}`;
+  getCompacity(event: EventDisplay): string {
+    return  `${event.capacity}`;
   }
 
   // Cancel a booking using the actual publicBookingId
