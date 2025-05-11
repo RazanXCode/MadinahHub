@@ -65,9 +65,9 @@
         
             <!-- Image/Status  -->
             <div class="relative h-[80px] bg-gray-200 flex items-center justify-center text-sm text-gray-500 font-medium"
-            style="background-image: url('{{ event.imageUrl }}')">
+            style="background-image: url('{{ event.imageUrl }}'); background-size: cover; background-position: center;">
 
-              event Image
+  <span *ngIf="!event.imageUrl">event Image</span>
 <div 
   class="absolute top-2 right-2 px-2 py-0.5 text-[11px] rounded-full font-medium capitalize"
   [ngClass]="{
@@ -247,3 +247,4 @@ styleClass="p-0"
       </div>
     </div>
   </div>
+  <app-footer></app-footer>

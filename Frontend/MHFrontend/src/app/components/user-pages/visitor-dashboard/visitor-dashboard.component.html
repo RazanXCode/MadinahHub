@@ -1,13 +1,21 @@
 <app-navbar></app-navbar>
 <p-toast></p-toast>
-<div class="p-4 sm:p-6">
-  <h1 class="text-xl sm:text-2xl font-bold mb-8 sm:mb-16">
-    Welcome Back, {{ userName }}!
-  </h1>
 
-  <div class="mb-6 sm:mb-8">
+<div class="py-5 border-b border-gray-200 mb-8 px-4 sm:px-8">
+  <div class="flex items-start gap-3">
+    <div class="w-1 h-8 rounded" style="background-color: #e69a6c;"></div>
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">
+        Welcome Back, <span class="text-amber-600">{{ userName }}</span>!
+      </h1>
+      <p class="text-sm text-gray-500 mt-1">We're glad to see you again.</p>
+    </div>
+  </div>
+</div>
+<div class="container mx-auto px-6 py-8 flex-grow">
+  <div class="mb-4">
     <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-8">
-      Your Communities:
+      Your Communities
     </h2>
   </div>
 
@@ -30,7 +38,7 @@
   <!-- PrimeNG Carousel with Tailwind classes -->
   <div
     *ngIf="!loadingCommunities && !communityError && communities.length > 0"
-    class="relative px-2 sm:px-8"
+    class="relative overflow-hidden"
   >
     <p-carousel
       [value]="communities"
@@ -43,14 +51,14 @@
     >
       <ng-template pTemplate="item" let-community>
         <div
-          class="mx-1 sm:mx-2 shadow-md rounded-lg overflow-hidden bg-white border border-gray-200 max-w-full lg:max-w-96 min-h-48"
+          class="mx-1 shadow-md rounded-lg overflow-hidden bg-white border border-gray-200 h-full min-h-[280px] sm:min-h-[320px] flex flex-col"
         >
           <!-- Card Header with Chip Icon -->
-          <div class="flex items-center justify-center">
+          <div class="h-28 sm:h-32 md:h-40 overflow-hidden">
             <img
               [src]="community.imageUrl"
               alt="Community image"
-              class="max-h-fit"
+              class="w-full h-full object-cover"
             />
           </div>
 
@@ -102,9 +110,9 @@
 </div>
 
 <!-- Booked events  -->
-<div class="p-4 sm:p-6">
-  <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-8">
-    Your Booked Events:
+<div class="container mx-auto px-6 py-8 flex-grow">
+  <h2 class="text-xl sm:text-2xl font-bold mb-4">
+    Your Booked Events
   </h2>
 
   <!-- Loading state for events -->
@@ -126,7 +134,7 @@
   <!-- PrimeNG Carousel for Events -->
   <div
     *ngIf="!loadingEvents && !eventError && events.length > 0"
-    class="relative px-2 sm:px-8"
+    class="relative px-0 overflow-hidden"
   >
     <p-carousel
       [value]="events"
@@ -140,7 +148,7 @@
       <!-- Updated event card to match all-events component -->
       <ng-template pTemplate="item" let-event>
         <div
-          class="mx-1 sm:mx-2 shadow-md rounded-lg overflow-hidden bg-white border border-gray-200 h-auto sm:h-[22rem] relative max-w-full lg:max-w-96"
+          class="mx-1 sm:mx-2 shadow-md rounded-lg overflow-hidden bg-white border border-gray-200 h-full min-h-[280px] sm:min-h-[320px] flex flex-col relative"
         >
           <!-- Event Type Badge -->
           <div class="absolute top-2 right-2 z-10">
@@ -160,17 +168,17 @@
           <div class="absolute top-2 left-2 z-10">
             <span
               *ngIf="event.status === 'Active'"
-              class="bg-green-300 text-white text-xs px-2 py-1 rounded-md"
+              class="bg-green-300 text-gray text-xs px-2 py-1 rounded-md"
               >Active</span
             >
             <span
               *ngIf="event.status === 'Finished'"
-              class="bg-gray-300 text-white text-xs px-2 py-1 rounded-md"
+              class="bg-gray-300 text-gray text-xs px-2 py-1 rounded-md"
               >Finished</span
             >
             <span
               *ngIf="event.status === 'Upcoming'"
-              class="bg-yellow-300 text-white text-xs px-2 py-1 rounded-md"
+              class="bg-yellow-300 text-gray text-xs px-2 py-1 rounded-md"
               >Upcoming</span
             >
           </div>
@@ -244,7 +252,7 @@
   [resizable]="false"
   [closeOnEscape]="true"
   [showHeader]="false"
-  styleClass="p-0"
+  styleClass="p-0 mx-auto"
 >
   <div class="relative p-4 sm:p-6" *ngIf="selectedEvent">
     <!-- Close button -->
@@ -304,7 +312,7 @@
     </h2>
 
     <!-- Event Description -->
-    <p class="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
+    <p class="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 line-clamp-3">
       {{ selectedEvent.description }}
     </p>
 
@@ -400,7 +408,7 @@
         </svg>
       </div>
       <span class="text-sm sm:text-base text-gray-800"
-        >Compacity: {{ getCompacity(selectedEvent) }}</span
+        >{{ getCompacity(selectedEvent) }}</span
       >
     </div>
 
