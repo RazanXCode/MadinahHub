@@ -20,13 +20,13 @@ import { AuthService } from '../../../services/auth.service';
 
           <!-- Desktop Links -->
           <div class="hidden md:flex space-x-6 items-center">
-          <a routerLink="/dashboard" class="px-3 py-2 rounded-lg text-xl text-primary hover:bg-primary hover:text-white hover:opacity-80 transition">
+          <a routerLink="/dashboard" class="px-3 py-2 rounded-lg text-base text-primary hover:bg-primary hover:text-white hover:opacity-80 transition">
           Home
             </a>
-            <a routerLink="/communities" class="px-3 py-2 rounded-lg text-xl text-secondary hover:bg-primary hover:text-white hover:opacity-80 transition">
+            <a routerLink="/communities" class="px-3 py-2 rounded-lg text-base text-secondary hover:bg-primary hover:text-white hover:opacity-80 transition">
               Communities
             </a>
-            <a routerLink="/events" class="px-3 py-2 rounded-lg text-xl text-secondary hover:bg-primary hover:text-white hover:opacity-80 transition">
+            <a routerLink="/events" class="px-3 py-2 rounded-lg text-base text-secondary hover:bg-primary hover:text-white hover:opacity-80 transition">
               Events
             </a>
             <!-- Logout Button -->
@@ -34,7 +34,7 @@ import { AuthService } from '../../../services/auth.service';
               <a 
                 href="#" 
                 (click)="logout($event)" 
-                class="px-3 py-2 rounded-lg text-xl text-white transition"
+                class="px-3 py-2 rounded-lg text-base text-white transition"
                 style="background-color: #E69B6B; hover: background-color:rgb(233, 195, 174);"              >
                 Logout
               </a>

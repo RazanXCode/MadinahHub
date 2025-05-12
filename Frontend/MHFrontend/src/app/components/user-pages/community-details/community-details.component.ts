@@ -12,6 +12,8 @@ import { Event } from '../../../services/event/event.service';
 import { forkJoin } from 'rxjs';
 import { BookingsService } from '../../../services/booking/booking.service';
 import { CommunityChatComponent } from '../community-chat/community-chat.component';
+import { FooterComponent } from '../../footer/footer.component';
+import { FirebaseMessagingService } from '../../../services/firebase-messaging/firebase-messaging.service';
 
 @Component({
   selector: 'app-community-details',
@@ -23,7 +25,8 @@ import { CommunityChatComponent } from '../community-chat/community-chat.compone
     ToastModule, 
     NavbarComponent, 
     RouterModule,
-    CommunityChatComponent
+    CommunityChatComponent,
+    FooterComponent
   ], 
   templateUrl: './community-details.component.html',
   styleUrl: './community-details.component.css',
@@ -44,7 +47,8 @@ export class CommunityDetailsComponent implements OnInit {
     private communityService: CommunityService,
     private router: Router,
     private bookingsService: BookingsService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private fcmService: FirebaseMessagingService
   ) {}
 
   ngOnInit(): void {
@@ -55,6 +59,9 @@ export class CommunityDetailsComponent implements OnInit {
       this.error = 'Invalid community ID';
       this.isLoading = false;
     }
+    // Initialize Firebase Cloud Messaging
+    this.fcmService.requestPermission();
+    this.fcmService.receiveMessage();
   }
 
   private loadCommunity(id: string): void {
@@ -166,11 +173,17 @@ export class CommunityDetailsComponent implements OnInit {
             summary: 'Booking Successful',
             detail: `You have successfully booked ${event.title}!`
           });
-          
+          // Firebase Messaging notification
+          this.fcmService.showLocalNotification({
+            title: 'Event Booked',
+            body: `You have successfully booked "${event.title}"`,
+            icon: event.imageUrl || '../../../../assets/images/logo.png'
+          });
           this.displayEventModal = false;
           //reload events after booking
           this.loadCommunityEvents(this.community.publicCommunityId);
         }
       });
+      
   }
 }
