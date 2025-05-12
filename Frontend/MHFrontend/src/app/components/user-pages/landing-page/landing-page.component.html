@@ -1,92 +1,226 @@
-<nav class="flex items-center px-6 py-4">
-  <div>
-    <a routerLink="/landing">
-      <img src="../../../../assets/logo.png" alt="Madinah Hub" class="w-48">
+<nav class="sticky top-0 z-50 bg-[#f8f5f0] shadow-sm px-6 py-4 border-b-2 border-[#c7a36f]">
+  <div class="container mx-auto flex justify-between items-center">
+    <a (click)="scrollToSection('hero')" class="flex items-center cursor-pointer">
+      <img src="../../../../assets/logo.png" alt="Madinah Hub" class="w-40 md:w-48">
     </a>
+
+    <div class="hidden md:flex items-center space-x-8">
+      <a (click)="scrollToSection('about')" [class]="activeSection === 'about' ? 
+                     'text-[#8b714a] border-b-2 border-[#8b714a] font-medium' : 
+                     'text-[#5a4e42] hover:text-[#8b714a] transition-colors font-medium'"
+        class="cursor-pointer pb-1">About
+        Us</a>
+      <a (click)="scrollToSection('communities')" [class]="activeSection === 'communities' ? 
+                     'text-[#8b714a] border-b-2 border-[#8b714a] font-medium' : 
+                     'text-[#5a4e42] hover:text-[#8b714a] transition-colors font-medium'"
+        class="cursor-pointer pb-1">Communities</a>
+
+      <a (click)="scrollToSection('events')" [class]="activeSection === 'events' ? 
+                     'text-[#8b714a] border-b-2 border-[#8b714a] font-medium' : 
+                     'text-[#5a4e42] hover:text-[#8b714a] transition-colors font-medium'"
+        class="cursor-pointer pb-1">Events</a>
+    </div>
+
+    <button class="md:hidden text-[#5a4e42]" (click)="toggleMobileMenu()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile menu - hidden by default -->
+  <div class="md:hidden" [class.hidden]="!mobileMenuOpen">
+    
+    <div class="px-2 pt-2 pb-3 space-y-1 bg-[#f8f5f0] border-t border-[#e0d5c1]">
+            <a (click)="scrollToSection('about'); toggleMobileMenu()" [class]="activeSection === 'about' ? 
+                             'text-[#8b714a] block px-3 py-2 font-medium' : 
+                             'text-[#5a4e42] hover:text-[#8b714a] block px-3 py-2 font-medium'"
+              class="cursor-pointer rounded-md">About Us</a>
+            <a (click)="scrollToSection('communities'); toggleMobileMenu()" [class]="activeSection === 'communities' ? 
+                             'text-[#8b714a] block px-3 py-2 font-medium' : 
+                             'text-[#5a4e42] hover:text-[#8b714a] block px-3 py-2 font-medium'"
+              class="cursor-pointer rounded-md">Communities</a>
+            
+            <a (click)="scrollToSection('events'); toggleMobileMenu()" [class]="activeSection === 'events' ? 
+                             'text-[#8b714a] block px-3 py-2 font-medium' : 
+                             'text-[#5a4e42] hover:text-[#8b714a] block px-3 py-2 font-medium'"
+              class="cursor-pointer rounded-md">Events</a>
+    </div>
   </div>
 </nav>
 
-<div class="container mx-auto flex flex-wrap items-center px-6 py-12 ">
-  <div class="w-full backdrop-blur-sm bg-white/20  z-10 pr-8 md:w-1/2   md:ml-28 rounded-xl" id="Content">
-    <h1 class="text-4xl font-bold mb-6">Connect, Explore, and Belong — All in One Hub</h1>
-    
-    <p class="text-lg mb-8">
-      Welcome to Medina Hub System — the ultimate digital space
-      for visitors to discover local communities, book events, and
-      engage with others in real time. Whether you're here for a
-      short stay or an extended visit, Medina Hub helps you feel right
-      at home by making every experience more meaningful and
-      connected.
-    </p>
-    
-    <div class="space-y-4 text-center ">
-      <button class="bg-accent hover:bg-opacity-70 active:bg-opacity-30 text-white font-medium py-3 px-8 rounded-md transition duration-300"
-        (click)="onGetStarted()">
-        Get Started
-      </button>
-      
-      <div class="mt-4 ">
-        <button class="border border-accent hover:bg-opacity-70 hover:bg-accent hover:text-white active:bg-opacity-30 text-foreground font-medium py-3 px-8 rounded-md transition duration-300"
-        (click)="onExploreCommunities()">
-          Explore Communities
-        </button>
+<div id="hero" class="relative w-full overflow-hidden h-[700px]">
+  <!-- frame border -->
+  <div class="absolute inset-6 border border-white/30 rounded-sm pointer-events-none z-20"></div>
+  <div class="absolute inset-8 border border-white/20 rounded-sm pointer-events-none z-20"></div>
+
+  <!-- Slides Container -->
+  <div class="absolute inset-0 w-full h-full flex transition-transform duration-700 ease-in-out"
+    [style.transform]="'translateX(-' + currentSlide * 100 + '%)'">
+    <div *ngFor="let slide of slides" class="relative min-w-full h-full flex-shrink-0">
+      <!-- Background Image -->
+      <img [src]="slide.image" [alt]="slide.alt" class="absolute inset-0 w-full h-full object-cover">
+
+      <!-- Gradient Overlay -->
+      <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/70"></div>
+
+      <!-- Content section in the slider -->
+      <div class="absolute inset-0 flex items-center">
+<div class="container mx-auto px-6 max-w-7xl">
+            <div class="max-w-2xl text-white">
+            <!-- Decorative element above heading -->
+            <div class="w-16 h-1 bg-[#e0c688] mb-8"></div>
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
+              {{slide.caption}}
+            </h1>
+
+            <!-- First paragraph -->
+            <p class="text-xl mb-6 leading-relaxed font-bold">
+              <span class="px-3 py-2 rounded-md box-decoration-clone">
+                Welcome to Madinah Hub — where tradition meets modern connection. Have you ever wondered what lies
+                beyond the tourist path in this ancient city?
+              </span>
+            </p>
+
+            <!-- Second paragraph -->
+            <p class="text-xl mb-10 leading-relaxed font-bold">
+              <span class="px-3 py-2 rounded-md box-decoration-clone">
+                Join us to discover authentic communities, cultural treasures, and meaningful experiences that reveal
+                the true heart of Madinah.
+                <span class="italic">Your journey begins here.</span>
+              </span>
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center sm:space-x-6 space-y-4 sm:space-y-0">
+              <button
+                class="w-full sm:w-auto bg-[#a48a69] hover:bg-[#8b714a] text-white font-medium py-4 px-10 rounded-md border border-[#e0d5c1]/30 transition-all duration-300 shadow-md hover:shadow-lg"
+                (click)="onGetStarted()">
+                Begin Your Journey
+              </button>
+
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <div class="lg:w-1/2 md:w-2/3 w-full absolute top-20 right-0 blur-sm md:blur-0 ">
-    <img src="../../../../assets/landing1.png" alt="People connecting" class="w-full">
+
+  <!-- Navigation Arrows -->
+  <button (click)="prevSlide()"
+    class="absolute top-1/2 left-8 -translate-y-1/2 w-14 h-14 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center focus:outline-none z-20 backdrop-blur-sm border border-white/10">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+    </svg>
+  </button>
+
+  <button (click)="nextSlide()"
+    class="absolute top-1/2 right-8 -translate-y-1/2 w-14 h-14 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center focus:outline-none z-20 backdrop-blur-sm border border-white/10">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+    </svg>
+  </button>
+
+  <!-- Dot Indicators -->
+  <div class="absolute bottom-12 left-0 right-0 flex justify-center space-x-4 z-20">
+    <button *ngFor="let slide of slides; let i = index" (click)="goToSlide(i)"
+      class="w-3 h-3 rounded-full transition-all duration-300 focus:outline-none"
+      [class]="currentSlide === i ? 'bg-[#c7a36f] scale-125' : 'bg-white/50 hover:bg-white/70'"></button>
   </div>
-  
-  
 </div>
-<!-- Second section -->
-<div class="container w-5/6 mx-auto px-4 py-16">
-  <h2 class="text-3xl font-bold mb-12 text-center md:text-left">Why Choosing Madinah Hub ?</h2>
-  
-  <!-- Discover Local Communities -->
-  <div class="shadow-lg border border-gray-200 rounded-xl w-full flex flex-col md:flex-row mb-8 overflow-hidden">
-    <div class="w-full md:w-1/2 p-6">
-      <img src="../../../../assets/landing2.png" alt="People in a workshop" class="w-full h-full object-cover">
-    </div>
-    <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
-      <h3 class="text-2xl font-semibold mb-4">Discover Local Communities</h3>
-      <p class="text-gray-700">
-        Dive into the heart of Medina by joining dynamic local communities tailored to your interests. Whether 
-        you're passionate about art, food, technology, or culture — there's a place for you here. Connect, share, 
-        and participate with people who share your passion.
-      </p>
-    </div>
+
+<div id="about" class="bg-[#f8f4ec] py-20 relative">
+  <!-- decorative top border -->
+  <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-[#c7a36f]/30 to-transparent">
   </div>
-  
-  <!--  Book Events with Ease -->
-  <div class="shadow-lg border border-gray-200 rounded-xl w-full flex flex-col md:flex-row-reverse mb-8 overflow-hidden">
-    <div class="w-full md:w-1/2 p-6">
-      <img src="../../../../assets/landing3.png" alt="People at an event" class="w-full h-full object-cover">
-    </div>
-    <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
-      <h3 class="text-2xl font-semibold mb-4">Book Events with Ease</h3>
-      <p class="text-gray-700">
-        Explore Medina like never before with access to a wide range of local events. From cultural tours and 
-        creative workshops to inspiring tech gatherings — there's always something happening nearby. Browse, 
-        book, and be part of the experiences that make your visit unforgettable.
-      </p>
-    </div>
-  </div>
-  
-  <!--  Chat and Connect with Other Visitors -->
-  <div class="shadow-lg border border-gray-200 rounded-xl w-full flex flex-col md:flex-row overflow-hidden">
-    <div class="w-full md:w-1/2 p-6">
-      <img src="../../../../assets/landing4.png" alt="Person using laptop" class="w-full h-full object-cover">
-    </div>
-    <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
-      <h3 class="text-2xl font-semibold mb-4">Chat and Connect with Other Visitors</h3>
-      <p class="text-gray-700">
-        Start a conversation, ask for local tips, or simply share your experience with others. With real-time chat, you 
-        can connect with fellow visitors, build new friendships, and even plan meetups — all while 
-        exploring Medina together.
-      </p>
+
+  <div class="container mx-auto px-6 max-w-7xl text-center">
+    <div class="relative w-40 h-0.5 bg-[#c7a36f] mx-auto mb-8 opacity-60"></div>
+
+    <h2 class="text-3xl md:text-5xl font-bold mb-8 text-[#483c31]">Discover the Heart of <span
+        class="text-[#77613c]">Madinah</span></h2>
+
+    <p class="text-lg md:text-xl text-[#483c31] max-w-3xl mx-auto leading-relaxed mb-4 font-medium">
+      <span class="italic">What makes Madinah truly extraordinary?</span> It's the seamless blend of treasured
+      traditions and vibrant contemporary life.
+    </p>
+
+    <p class="text-lg md:text-xl text-[#483c31] max-w-3xl mx-auto leading-relaxed font-medium">
+      Through Madinah Hub, you'll journey beyond ordinary tourist experiences into the authentic soul of the city.
+      Connect with locals, participate in age-old traditions, and create memories that resonate with the city's timeless
+      rhythm.
+    </p>
+
+    <div class="w-full max-w-xs mx-auto mt-12 flex items-center justify-center">
+      <div class="w-1/3 h-px bg-[#c7a36f] opacity-50"></div>
+      <div class="w-3 h-3 mx-2 rounded-full border border-[#c7a36f] opacity-60"></div>
+      <div class="w-1/3 h-px bg-[#c7a36f] opacity-50"></div>
     </div>
   </div>
 </div>
+
+<!-- dividers -->
+<div class="bg-white py-24">
+  <div class="w-full h-4 flex justify-center items-center mb-16">
+    <div class="w-1/2 h-px bg-[#c7a36f] opacity-30 relative">
+      <div class="absolute -top-1.5 left-1/2 -translate-x-1/2 w-32 h-3 bg-[#c7a36f] opacity-20 rounded-full"></div>
+    </div>
+  </div>
+
+<div class="container mx-auto px-6 max-w-7xl">
+      <h2 class="text-3xl md:text-5xl font-bold mb-6 text-center text-[#483c31]">The <span class="text-[#77613c]">Madinah
+        Hub</span> Experience</h2>
+    <p class="text-center text-lg md:text-xl text-[#483c31] mb-20 max-w-2xl mx-auto font-medium">Crafting meaningful
+      journeys
+      through the cultural tapestry of Madinah</p>
+
+    <!-- Feature cards -->
+    <div class="shadow-xl border border-[#e0d5c1] rounded-lg w-full flex flex-col md:flex-row mb-16 overflow-hidden">
+      <div class="w-full md:w-1/2 p-2 md:p-4">
+        <img src="../../../../assets/landing2.png" alt="Cultural community gathering"
+          class="w-full h-full object-cover rounded-md">
+      </div>
+      <div id="communities" class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-[#f8f4ec]">
+        <h3 class="text-2xl md:text-3xl font-semibold mb-4 text-[#483c31]">Discover Local Communities</h3>
+        <p class="text-lg text-[#483c31] leading-relaxed font-medium">
+          Immerse yourself in Madinah's vibrant communities where tradition and modernity blend seamlessly. From
+          cultural heritage groups to modern interest clubs, find your place among those who share your passions and
+          interests.
+        </p>
+      </div>
+    </div>
+
+    <!-- feature card -->
+    <div id="events"
+      class="shadow-xl border border-[#e0d5c1] rounded-lg w-full flex flex-col md:flex-row-reverse mb-16 overflow-hidden">
+      <div class="w-full md:w-1/2 p-2 md:p-4">
+        <img src="../../../../assets/landing3.png" alt="Madinah events" class="w-full h-full object-cover rounded-md">
+      </div>
+      <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-[#f8f4ec]">
+        <h3 class="text-2xl md:text-3xl font-semibold mb-4 text-[#483c31]">Attend Meaningful Events</h3>
+        <p class="text-lg text-[#483c31] leading-relaxed font-medium">
+          Experience the richness of Madinah through carefully curated events that celebrate the city's cultural
+          heritage, artistic expressions, and scholarly traditions. Connect with others while exploring the unique
+          character of this historic city.
+        </p>
+      </div>
+    </div>
+
+    <!-- feature card -->
+    <div class="shadow-xl border border-[#e0d5c1] rounded-lg w-full flex flex-col md:flex-row mb-16 overflow-hidden">
+      <div class="w-full md:w-1/2 p-2 md:p-4">
+        <img src="../../../../assets/landing5.png" alt="Real-time connections"
+          class="w-full h-full object-cover rounded-md">
+      </div>
+      <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-[#f8f4ec]">
+        <h3 class="text-2xl md:text-3xl font-semibold mb-4 text-[#483c31]">Real-Time Connections</h3>
+        <p class="text-lg text-[#483c31] leading-relaxed font-medium">
+          Build meaningful relationships with locals and fellow visitors through our real-time messaging features. Share
+          experiences, plan meetups, and create lasting connections that enrich your time in Madinah.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <app-footer></app-footer>

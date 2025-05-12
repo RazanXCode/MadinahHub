@@ -31,11 +31,10 @@ import { AuthService } from '../../../services/auth.service';
             </a>
             <!-- Logout Button -->
             <ng-container *ngIf="(authService.currentUser$ | async) !== null">
-              <a 
-                href="#" 
-                (click)="logout($event)" 
-                class="px-3 py-2 rounded-lg text-base text-white transition"
-                style="background-color: #E69B6B; hover: background-color:rgb(233, 195, 174);"              >
+              <a
+                href="#"
+                (click)="logout($event)"
+                class="px-3 py-2 rounded-lg text-base transition border border-[#e69e6e] text-[#e69e6e] hover:bg-[#e69e6e] hover:text-white">
                 Logout
               </a>
             </ng-container>            
