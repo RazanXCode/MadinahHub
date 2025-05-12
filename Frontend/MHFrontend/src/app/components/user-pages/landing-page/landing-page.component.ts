@@ -16,17 +16,17 @@ import { FooterComponent } from '../../footer/footer.component';
 export class LandingPageComponent {
   slides = [
     {
-      image: '../../../../assets/landing1.png',
+      image: '.../../../../assets/images/slider1.jpg',
       alt: 'Madinah community gathering',
       caption: 'Connect with vibrant communities in Madinah'
     },
     {
-      image: '../../../../assets/landing2.png',
+      image: '../../../../assets/images/slider2.png',
       alt: 'Historic Madinah',
       caption: 'Explore the rich heritage of Madinah'
     },
     {
-      image: '../../../../assets/landing3.png',
+      image: '../../../../assets/images/slider3.jpg',
       alt: 'Madinah events',
       caption: 'Participate in cultural events that bring the city to life'
     }

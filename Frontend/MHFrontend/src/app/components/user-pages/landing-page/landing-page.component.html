@@ -19,10 +19,6 @@
                      'text-[#8b714a] border-b-2 border-[#8b714a] font-medium' : 
                      'text-[#5a4e42] hover:text-[#8b714a] transition-colors font-medium'"
         class="cursor-pointer pb-1">Events</a>
-
-      <a routerLink="/login"
-        class="px-5 py-2 border-2 border-[#8b714a] text-[#8b714a] rounded-md hover:bg-[#8b714a] hover:text-white transition-all">Log
-        In</a>
     </div>
 
     <button class="md:hidden text-[#5a4e42]" (click)="toggleMobileMenu()">
@@ -34,26 +30,21 @@
 
   <!-- Mobile menu - hidden by default -->
   <div class="md:hidden" [class.hidden]="!mobileMenuOpen">
+    
     <div class="px-2 pt-2 pb-3 space-y-1 bg-[#f8f5f0] border-t border-[#e0d5c1]">
-      <a (click)="scrollToSection('communities'); toggleMobileMenu()" [class]="activeSection === 'communities' ? 
-                 'text-[#8b714a] block px-3 py-2 font-medium' : 
-                 'text-[#5a4e42] hover:text-[#8b714a] block px-3 py-2 font-medium'"
-        class="cursor-pointer rounded-md">Communities</a>
-
-      <a (click)="scrollToSection('events'); toggleMobileMenu()" [class]="activeSection === 'events' ? 
-                 'text-[#8b714a] block px-3 py-2 font-medium' : 
-                 'text-[#5a4e42] hover:text-[#8b714a] block px-3 py-2 font-medium'"
-        class="cursor-pointer rounded-md">Events</a>
-
-      <a (click)="scrollToSection('about'); toggleMobileMenu()" [class]="activeSection === 'about' ? 
-                 'text-[#8b714a] block px-3 py-2 font-medium' : 
-                 'text-[#5a4e42] hover:text-[#8b714a] block px-3 py-2 font-medium'"
-        class="cursor-pointer rounded-md">About Us</a>
-
-      <a routerLink="/login"
-        class="block text-center px-5 py-2 border-2 border-[#8b714a] text-[#8b714a] rounded-md hover:bg-[#8b714a] hover:text-white transition-all">
-        Log In
-      </a>
+            <a (click)="scrollToSection('about'); toggleMobileMenu()" [class]="activeSection === 'about' ? 
+                             'text-[#8b714a] block px-3 py-2 font-medium' : 
+                             'text-[#5a4e42] hover:text-[#8b714a] block px-3 py-2 font-medium'"
+              class="cursor-pointer rounded-md">About Us</a>
+            <a (click)="scrollToSection('communities'); toggleMobileMenu()" [class]="activeSection === 'communities' ? 
+                             'text-[#8b714a] block px-3 py-2 font-medium' : 
+                             'text-[#5a4e42] hover:text-[#8b714a] block px-3 py-2 font-medium'"
+              class="cursor-pointer rounded-md">Communities</a>
+            
+            <a (click)="scrollToSection('events'); toggleMobileMenu()" [class]="activeSection === 'events' ? 
+                             'text-[#8b714a] block px-3 py-2 font-medium' : 
+                             'text-[#5a4e42] hover:text-[#8b714a] block px-3 py-2 font-medium'"
+              class="cursor-pointer rounded-md">Events</a>
     </div>
   </div>
 </nav>
@@ -75,8 +66,8 @@
 
       <!-- Content section in the slider -->
       <div class="absolute inset-0 flex items-center">
-        <div class="container mx-auto px-6">
-          <div class="max-w-2xl text-white">
+<div class="container mx-auto px-6 max-w-7xl">
+            <div class="max-w-2xl text-white">
             <!-- Decorative element above heading -->
             <div class="w-16 h-1 bg-[#e0c688] mb-8"></div>
             <h1 class="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
@@ -107,11 +98,6 @@
                 Begin Your Journey
               </button>
 
-              <button
-                class="w-full sm:w-auto border-2 border-white hover:bg-white/20 text-white font-medium py-4 px-10 rounded-md transition-all duration-300"
-                (click)="onExploreCommunities()">
-                Discover Communities
-              </button>
             </div>
           </div>
         </div>
@@ -147,7 +133,7 @@
   <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-[#c7a36f]/30 to-transparent">
   </div>
 
-  <div class="container mx-auto px-6 text-center">
+  <div class="container mx-auto px-6 max-w-7xl text-center">
     <div class="relative w-40 h-0.5 bg-[#c7a36f] mx-auto mb-8 opacity-60"></div>
 
     <h2 class="text-3xl md:text-5xl font-bold mb-8 text-[#483c31]">Discover the Heart of <span
@@ -180,8 +166,8 @@
     </div>
   </div>
 
-  <div class="container mx-auto px-6">
-    <h2 class="text-3xl md:text-5xl font-bold mb-6 text-center text-[#483c31]">The <span class="text-[#77613c]">Madinah
+<div class="container mx-auto px-6 max-w-7xl">
+      <h2 class="text-3xl md:text-5xl font-bold mb-6 text-center text-[#483c31]">The <span class="text-[#77613c]">Madinah
         Hub</span> Experience</h2>
     <p class="text-center text-lg md:text-xl text-[#483c31] mb-20 max-w-2xl mx-auto font-medium">Crafting meaningful
       journeys
@@ -194,9 +180,6 @@
           class="w-full h-full object-cover rounded-md">
       </div>
       <div id="communities" class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-[#f8f4ec]">
-        <div class="inline-block mb-3 bg-[#e6dcc7] px-4 py-1.5 rounded-full border border-[#e0d5c1]">
-          <span class="text-[#77613c] font-semibold">Community</span>
-        </div>
         <h3 class="text-2xl md:text-3xl font-semibold mb-4 text-[#483c31]">Discover Local Communities</h3>
         <p class="text-lg text-[#483c31] leading-relaxed font-medium">
           Immerse yourself in Madinah's vibrant communities where tradition and modernity blend seamlessly. From
@@ -213,9 +196,6 @@
         <img src="../../../../assets/landing3.png" alt="Madinah events" class="w-full h-full object-cover rounded-md">
       </div>
       <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-[#f8f4ec]">
-        <div class="inline-block mb-3 bg-[#e6dcc7] px-4 py-1.5 rounded-full border border-[#e0d5c1]">
-          <span class="text-[#77613c] font-semibold">Events</span>
-        </div>
         <h3 class="text-2xl md:text-3xl font-semibold mb-4 text-[#483c31]">Attend Meaningful Events</h3>
         <p class="text-lg text-[#483c31] leading-relaxed font-medium">
           Experience the richness of Madinah through carefully curated events that celebrate the city's cultural
@@ -232,9 +212,6 @@
           class="w-full h-full object-cover rounded-md">
       </div>
       <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-[#f8f4ec]">
-        <div class="inline-block mb-3 bg-[#e6dcc7] px-4 py-1.5 rounded-full border border-[#e0d5c1]">
-          <span class="text-[#77613c] font-semibold">Connect</span>
-        </div>
         <h3 class="text-2xl md:text-3xl font-semibold mb-4 text-[#483c31]">Real-Time Connections</h3>
         <p class="text-lg text-[#483c31] leading-relaxed font-medium">
           Build meaningful relationships with locals and fellow visitors through our real-time messaging features. Share
@@ -245,36 +222,5 @@
   </div>
 </div>
 
-<div class="bg-[#483c31] text-white py-20 relative">
-  <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-[#a48a69] to-transparent"></div>
-
-  <div class="container mx-auto px-6 text-center">
-    <div class="relative w-32 h-8 mx-auto mb-10">
-      <div class="absolute inset-0 bg-[#a48a69] opacity-30 rounded-full"></div>
-      <div class="absolute left-10 right-10 top-3 h-px bg-[#a48a69] opacity-50"></div>
-    </div>
-
-    <h2 class="text-3xl md:text-5xl font-bold mb-8 drop-shadow-sm">Begin Your Madinah Journey Today</h2>
-    <p class="text-xl mb-10 max-w-2xl mx-auto font-medium">Join our community of explorers discovering the timeless
-      beauty and traditions of Madinah.</p>
-
-    <button
-      class="bg-[#a48a69] text-white hover:bg-[#c99c46] font-medium py-4 px-12 rounded-md border border-[#e0d5c1] transition-all duration-300 shadow-md hover:shadow-lg"
-      (click)="onGetStarted()">
-      Join Our Community
-    </button>
-
-    <div class="w-full max-w-md mx-auto mt-16 flex items-center justify-center">
-      <div class="w-1/3 h-px bg-[#a48a69] opacity-40"></div>
-      <div class="w-4 h-4 mx-2 rounded-full border border-[#a48a69] opacity-50 flex items-center justify-center">
-        <div class="w-2 h-2 rounded-full bg-[#a48a69] opacity-60"></div>
-      </div>
-      <div class="w-1/3 h-px bg-[#a48a69] opacity-40"></div>
-    </div>
-  </div>
-
-  <div class="absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-[#a48a69] to-transparent">
-  </div>
-</div>
 
 <app-footer></app-footer>
