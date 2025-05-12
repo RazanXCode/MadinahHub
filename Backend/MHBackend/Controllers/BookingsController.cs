@@ -21,8 +21,9 @@ namespace MHBackend.Controllers
         private IEmailService _emailService;
         private readonly ISmsService _smsService;
         private readonly INotificationService _notificationService;
+        private readonly Bugsnag.IClient _bugsnag;
 
-        public BookingsController(MyAppDbContext db, IQRCodeService qRCodeService, IUserRepository userRepository, IEmailService emailService, ISmsService smsService, INotificationService notificationService)
+        public BookingsController(MyAppDbContext db, IQRCodeService qRCodeService, IUserRepository userRepository, IEmailService emailService, ISmsService smsService, INotificationService notificationService, Bugsnag.IClient bugsnag)
         {
             _db = db;
             _qRCodeService = qRCodeService;
@@ -30,6 +31,7 @@ namespace MHBackend.Controllers
             _emailService = emailService;
             _smsService = smsService;
             _notificationService = notificationService;
+            _bugsnag = bugsnag;
         }
 
         //POST: Booking/BookEvent/{PublicEventId}
@@ -44,7 +46,12 @@ namespace MHBackend.Controllers
                 .FirstOrDefault(e => e.PublicEventId == PublicEventId);
 
             if (eventToBook == null)
+            {
+                _bugsnag.Notify(new Exception($"Event not found with id: {PublicEventId}"));
                 return NotFound("Event not found");
+            }
+
+
 
             if (eventToBook.Status == EventStatus.Finished) // user can only book active events
                 return BadRequest("Event is not available for booking");
@@ -91,7 +98,6 @@ namespace MHBackend.Controllers
                 EventId = eventToBook.EventId,
                 Status = TicketStatus.Valid,
                 Booking = newBooking,
-                // QRCode =  _qRCodeService.GenerateQRCodeAsync($"{newBooking.PublicBookingId}{eventToBook.Title}{eventToBook.Location}"),
                 QRCode = qrBase64,
                 CreatedAt = DateTime.UtcNow
             };

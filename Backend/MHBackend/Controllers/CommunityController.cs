@@ -16,14 +16,16 @@ namespace MHBackend.Controllers
     {
         private readonly MyAppDbContext _db;
         private readonly IUserRepository _userRepository;
+        private readonly Bugsnag.IClient _bugsnag;
 
 
-        public CommunityController(MyAppDbContext db,   IUserRepository userRepository)
+
+        public CommunityController(MyAppDbContext db,   IUserRepository userRepository, Bugsnag.IClient bugsnag)
 
         {
             _db = db;
             _userRepository = userRepository;
-
+            _bugsnag = bugsnag;
         }
 
         // POST: communities/createCommunity
@@ -165,6 +167,7 @@ namespace MHBackend.Controllers
                 .FirstOrDefaultAsync(c => c.PublicCommunityId == publicCommunityId);
             if (community == null)
             {
+                _bugsnag.Notify(new Exception($"Community not found with: {publicCommunityId}"));
                 return NotFound("Community not found");
             }
 

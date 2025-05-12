@@ -12,10 +12,13 @@ namespace MHBackend.Controllers
     {
 
         private readonly MyAppDbContext _context;
+        private readonly Bugsnag.IClient _bugsnag;
 
-        public UserController(MyAppDbContext context)
+
+        public UserController(MyAppDbContext context, Bugsnag.IClient bugsnag)
         {
             _context = context;
+            _bugsnag = bugsnag;
         }
 
         // Get api/user: Return all users with details
@@ -136,6 +139,7 @@ namespace MHBackend.Controllers
 
             if (user == null)
             {
+                _bugsnag.Notify(new Exception($"User not found with PublicUserId: {publicUserId}"));
                 return NotFound("User not found.");
             }
 
@@ -155,6 +159,7 @@ namespace MHBackend.Controllers
                     PublicBookingId = t.Booking.PublicBookingId // Added this line 
                 })
                 .ToListAsync();
+
 
             return Ok(tickets);
         }
